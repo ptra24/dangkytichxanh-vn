@@ -3,6 +3,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
+    "./resources/**/*.{blade.php,js,vue}",
   ],
   darkMode: 'class',
   theme: {
