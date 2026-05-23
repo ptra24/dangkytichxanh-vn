@@ -7,21 +7,26 @@ import {
   Send, 
   CheckCircle2 
 } from '@lucide/vue';
-
-// Local services list to avoid importing external files
-const services = [
-  { id: 'facebook-fanpage', name: 'Tích Xanh Fanpage', price: '1.500.000đ' },
-  { id: 'facebook-personal', name: 'Tích Xanh Cá Nhân', price: '1.500.000đ' },
-  { id: 'instagram', name: 'Tích Xanh Instagram', price: '1.500.000đ' },
-  { id: 'tiktok', name: 'Tích Xanh TikTok', price: '5.000.000đ' },
-  { id: 'whatsapp', name: 'Tích Xanh WhatsApp', price: '3.000.000đ' }
-];
+import Header from './components/Header.vue';
+import HeroSection from './components/HeroSection.vue';
+import StatsBar from './components/StatsBar.vue';
+import WhyUs from './components/WhyUs.vue';
+import Footer from './components/Footer.vue';
+import { services } from './data/services';
 
 const currentServiceIndex = ref(0);
 const isModalOpen = ref(false);
 
 const selectService = (index) => {
   currentServiceIndex.value = index;
+};
+
+const handleToggleTheme = (isDark) => {
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
 };
 
 const openModal = () => {
@@ -82,7 +87,7 @@ const pricingCards = [
       '15 phút hoàn thành',
       'Bảo hành trọn đời'
     ],
-    metaFee: 'Phi Meta Verified: ~100.000đ/tháng',
+    metaFee: 'Phí Meta Verified: ~100.000đ/tháng',
     btnText: 'Đăng ký Fanpage',
     isPopular: false,
     serviceIndex: 0
@@ -98,7 +103,7 @@ const pricingCards = [
       '15 phút hoàn thành',
       'Hỗ trợ 24/7'
     ],
-    metaFee: 'Phi Meta Verified: ~100.000đ/tháng',
+    metaFee: 'Phí Meta Verified: ~100.000đ/tháng',
     btnText: 'Đăng ký Instagram',
     isPopular: false,
     serviceIndex: 2
@@ -107,15 +112,15 @@ const pricingCards = [
     title: 'Combo Fanpage + IG',
     subtitle: '2 nền tảng, 1 lần thanh toán',
     price: '2.500.000đ',
-    unit: '/ tiết',
-    subPriceLine: 'kiệm 500k',
+    unit: '/ tiết kiệm',
+    subPriceLine: '500.000đ',
     features: [
       'Đăng ký cả Fanpage + Instagram',
       'Tiết kiệm 500.000đ',
       'Khuyên dùng cho shop',
       'Bảo hành trọn đời'
     ],
-    metaFee: 'Phi Meta Verified: ~150.000đ/tháng',
+    metaFee: 'Phí Meta Verified: ~150.000đ/tháng',
     btnText: 'Đăng ký Combo',
     isPopular: true,
     serviceIndex: 0
@@ -124,14 +129,33 @@ const pricingCards = [
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#060b13] text-slate-100 flex flex-col justify-center items-center p-4 selection:bg-blue-600/30 selection:text-blue-200">
-    <main class="w-full max-w-7xl">
+  <div class="min-h-screen bg-[#060b13] text-slate-100 flex flex-col selection:bg-blue-600/30 selection:text-blue-200">
+    <!-- Header component -->
+    <Header 
+      :currentServiceIndex="currentServiceIndex" 
+      @select-service="selectService" 
+      @toggle-theme="handleToggleTheme" 
+    />
+
+    <!-- Hero component -->
+    <HeroSection 
+      :service="services[currentServiceIndex]" 
+      @open-register="openModal" 
+    />
+
+    <!-- Stats Bar component -->
+    <StatsBar />
+
+    <!-- Why Us component -->
+    <WhyUs />
+
+    <main class="w-full">
       <!-- Bảng giá (Pricing) Section -->
-      <section id="bang-gia" class="py-20 relative overflow-hidden">
+      <section id="bang-gia" class="py-20 bg-[#060b13] relative overflow-hidden">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="text-center max-w-3xl mx-auto mb-12 space-y-2">
             <h2 class="font-sans text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              Bảng giá Tích xanh
+              Bảng giá dịch vụ Tích Xanh
             </h2>
             <p class="text-slate-400 text-sm sm:text-base font-medium">
               Làm xong mới thanh toán, cam kết 100% thành công
@@ -199,6 +223,9 @@ const pricingCards = [
       </section>
     </main>
 
+    <!-- Footer component -->
+    <Footer />
+
     <!-- Inline Registry Form Modal -->
     <div 
       v-if="isModalOpen" 
@@ -228,7 +255,7 @@ const pricingCards = [
         </button>
 
         <!-- Form Content -->
-        <div class="p-6 sm:p-8">
+        <div class="p-6 sm:p-8 text-left">
           
           <div v-if="!isSubmitted">
             <h3 class="text-2xl font-black tracking-tight text-white mb-2">
