@@ -24,12 +24,14 @@ class ContactController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:50',
+            'link' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'service' => 'nullable|string|max:255',
             'message' => 'nullable|string|max:5000',
         ], [
             'name.required' => 'Vui lòng nhập họ và tên.',
             'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'link.required' => 'Vui lòng nhập link tài khoản / Fanpage.',
             'email.email' => 'Địa chỉ email không đúng định dạng.',
         ]);
 
@@ -45,6 +47,7 @@ class ContactController extends Controller
         $contact = Contact::create([
             'name' => $request->name,
             'phone' => $request->phone,
+            'link' => $request->link,
             'email' => $request->email,
             'service' => $request->service ?? 'Tư vấn tích xanh',
             'message' => $request->message,
