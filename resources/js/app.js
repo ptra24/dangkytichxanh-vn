@@ -1,5 +1,7 @@
-import { createApp } from 'vue';
-import App from '../../src/App.vue';
-import '../../src/style.css';
+import { createApp } from 'vue'
+import App from './App.vue'
 
-createApp(App).mount('#app');
+import '../css/app.css'
+import '../css/benefit-section.css'
+
+createApp(App).mount('#app')
