@@ -18,6 +18,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
             </svg>
             Hotline: 0968.825.068
+            (Mr.Quang)
           </a>
         </div>
       </div>
@@ -65,15 +66,15 @@
           <ul class="space-y-3 text-sm text-gray-400">
             <li class="flex items-start gap-2">
               <span class="text-white font-semibold">Hotline:</span>
-              <a href="tel:0968825068" class="text-blue-400 hover:underline">0968.825.068</a>
+              <a href="tel:0968825068" class="text-blue-400 hover:underline">0968.825.068 (Mr.Quang)</a>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-white font-semibold">Email:</span>
-              <a href="mailto:support@dangkytichxanh.vn" class="hover:text-white transition-colors">support@dangkytichxanh.vn</a>
+              <a href="mailto:azmedia.com.vn@gmail.com" class="hover:text-white transition-colors">azmedia.com.vn@gmail.com</a>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-white font-semibold flex-shrink-0">Địa chỉ:</span>
-              <span>Khu Đô Thị Mới, Phường Nam, Đông Hà, Quảng Trị</span>
+              <span>84 Nguyễn Hữu Dật, Hoà Cường Bắc, Hải Châu, Đà Nẵng</span>
             </li>
           </ul>
         </div>
