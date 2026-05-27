@@ -18,7 +18,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['select-service', 'toggle-theme']);
+const emit = defineEmits(['select-service', 'toggle-theme', 'open-register']);
 
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
@@ -183,10 +183,13 @@ onUnmounted(() => {
       <!-- Right Header Actions (Desktop) -->
       <div class="hidden md:flex items-center gap-4">
         <!-- Quick Register Info -->
-        <a href="#dang-ky" class="flex items-center gap-1.5 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors">
+        <button 
+          @click="emit('open-register')" 
+          class="flex items-center gap-1.5 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+        >
           <Zap class="h-4 w-4 fill-blue-400/20" />
           Đăng ký nhanh
-        </a>
+        </button>
 
         <!-- Theme Toggle -->
         <button 
@@ -346,14 +349,13 @@ onUnmounted(() => {
       </a>
 
       <!-- Quick Register mobile link -->
-      <a 
-        href="#dang-ky" 
-        @click="isMobileMenuOpen = false" 
-        class="flex items-center gap-1.5 px-3 py-2 text-base font-semibold text-blue-400"
+      <button 
+        @click="emit('open-register'); isMobileMenuOpen = false" 
+        class="flex w-full items-center gap-1.5 px-3 py-2 text-base font-semibold text-blue-400"
       >
         <Zap class="h-4 w-4 fill-blue-400/20" />
         Đăng ký nhanh
-      </a>
+      </button>
     </div>
   </header>
 </template>

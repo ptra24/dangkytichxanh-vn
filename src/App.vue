@@ -35,6 +35,9 @@ const openModal = () => {
   name.value = '';
   phone.value = '';
   link.value = '';
+
+  formServiceIndex.value = '';
+
   errors.value = {};
 };
 
@@ -47,7 +50,23 @@ const name = ref('');
 const phone = ref('');
 const link = ref('');
 const isSubmitted = ref(false);
-const errors = ref({});
+const formServiceIndex = ref("");
+
+// Biến quản lý trạng thái Loading hiển thị ở nút bấm
+const isLoading = ref(false);
+
+// Xử lý gửi Form (Chỉ mô phỏng phía Frontend)
+const handleSubmit = () => {
+  // 1. Bật trạng thái loading để vô hiệu hóa nút bấm và hiện icon xoay xoay
+  isLoading.value = true;
+
+  // 2. Giả lập độ trễ của mạng (1.5 giây)
+  setTimeout(() => {
+    // 3. Tắt loading và chuyển sang màn hình thành công
+    isLoading.value = false;
+    isSubmitted.value = true;
+  }, 1500); 
+};
 
 const validateForm = () => {
   const formErrors = {};
@@ -62,17 +81,17 @@ const validateForm = () => {
   if (!link.value.trim()) {
     formErrors.link = 'Vui lòng nhập link tài khoản / Fanpage';
   }
+  
+  // THÊM ĐOẠN NÀY: Kiểm tra nếu ô dịch vụ bị bỏ trống
+  if (formServiceIndex.value === "") {
+    formErrors.service = 'Vui lòng chọn dịch vụ bạn quan tâm';
+  }
+
   errors.value = formErrors;
   return Object.keys(formErrors).length === 0;
 };
 
-const handleSubmit = () => {
-  if (validateForm()) {
-    setTimeout(() => {
-      isSubmitted.value = true;
-    }, 400);
-  }
-};
+
 
 // Pricing cards data (matching target design)
 const pricingCards = [
@@ -135,6 +154,7 @@ const pricingCards = [
       :currentServiceIndex="currentServiceIndex" 
       @select-service="selectService" 
       @toggle-theme="handleToggleTheme" 
+      @open-register="openModal"
     />
 
     <!-- Hero component -->
@@ -224,7 +244,7 @@ const pricingCards = [
     </main>
 
     <!-- Footer component -->
-    <Footer />
+    <Footer @open-register="openModal"/>
 
     <!-- Inline Registry Form Modal -->
     <div 
@@ -267,25 +287,7 @@ const pricingCards = [
 
             <form @submit.prevent="handleSubmit" class="space-y-4">
               <!-- Service Selector -->
-              <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Loại Dịch Vụ
-                </label>
-                <select 
-                  v-model="currentServiceIndex" 
-                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
-                >
-                  <option 
-                    v-for="(service, idx) in services" 
-                    :key="service.id" 
-                    :value="idx"
-                  >
-                    {{ service.name }} ({{ service.price }})
-                  </option>
-                </select>
-              </div>
 
-              <!-- Name Input -->
               <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Họ Và Tên
@@ -293,35 +295,47 @@ const pricingCards = [
                 <input 
                   type="text" 
                   v-model="name"
-                  placeholder="Ví dụ: Nguyễn Văn A"
-                  class="w-full rounded-xl border px-4 py-3 text-sm text-white bg-slate-900/60 transition-colors focus:outline-none focus:ring-1 border-white/10 focus:border-blue-500 focus:ring-blue-500"
-                  :class="{ 'border-red-500/50 focus:border-red-500 focus:ring-red-500': errors.name }"
+                  placeholder="Nguyễn Văn A"
+                  required
+                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
-                <span v-if="errors.name" class="flex items-center gap-1 text-xs text-red-400 mt-1.5 font-medium">
-                  <AlertCircle class="h-3.5 w-3.5" />
-                  {{ errors.name }}
-                </span>
               </div>
 
-              <!-- Phone Input -->
               <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Số Điện Thoại Zalo
+                  Số Điện Thoại
                 </label>
                 <input 
                   type="tel" 
                   v-model="phone"
-                  placeholder="Ví dụ: 0921169999"
-                  class="w-full rounded-xl border px-4 py-3 text-sm text-white bg-slate-900/60 transition-colors focus:outline-none focus:ring-1 border-white/10 focus:border-blue-500 focus:ring-blue-500"
-                  :class="{ 'border-red-500/50 focus:border-red-500 focus:ring-red-500': errors.phone }"
+                  placeholder="0921169999"
+                  required
+                  pattern="[0-9]{9,11}"
+                  title="Vui lòng nhập số điện thoại hợp lệ từ 9 đến 11 số"
+                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
-                <span v-if="errors.phone" class="flex items-center gap-1 text-xs text-red-400 mt-1.5 font-medium">
-                  <AlertCircle class="h-3.5 w-3.5" />
-                  {{ errors.phone }}
-                </span>
               </div>
 
-              <!-- Profile/Page Link -->
+              <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Dịch vụ quan tâm
+                </label>
+                <select 
+                  v-model="formServiceIndex" 
+                  required
+                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="" disabled>-- Chọn dịch vụ --</option>
+                  <option 
+                    v-for="(service, idx) in services" 
+                    :key="service.id" 
+                    :value="idx"
+                  >
+                    {{ service.name }}
+                  </option>
+                </select>
+              </div>
+
               <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Link Trang Cá Nhân / Fanpage
@@ -330,13 +344,9 @@ const pricingCards = [
                   type="text" 
                   v-model="link"
                   placeholder="Ví dụ: facebook.com/dangkytichxanh"
-                  class="w-full rounded-xl border px-4 py-3 text-sm text-white bg-slate-900/60 transition-colors focus:outline-none focus:ring-1 border-white/10 focus:border-blue-500 focus:ring-blue-500"
-                  :class="{ 'border-red-500/50 focus:border-red-500 focus:ring-red-500': errors.link }"
+                  required
+                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
-                <span v-if="errors.link" class="flex items-center gap-1 text-xs text-red-400 mt-1.5 font-medium">
-                  <AlertCircle class="h-3.5 w-3.5" />
-                  {{ errors.link }}
-                </span>
               </div>
 
               <!-- Quick Info Badge -->
@@ -354,10 +364,21 @@ const pricingCards = [
               <!-- Submit Button -->
               <button 
                 type="submit" 
-                class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 hover:shadow-blue-500/30 transition-all duration-300 transform active:scale-98"
+                :disabled="isLoading"
+                class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-all duration-300 transform active:scale-98 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <Send class="h-4 w-4" />
-                Gửi Yêu Cầu Đăng Ký
+                <template v-if="!isLoading">
+                  <Send class="h-4 w-4" />
+                  Gửi Yêu Cầu Đăng Ký
+                </template>
+                
+                <template v-else>
+                  <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Đang xử lý...
+                </template>
               </button>
             </form>
           </div>

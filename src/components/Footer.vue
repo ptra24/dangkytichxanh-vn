@@ -1,3 +1,7 @@
+<script setup>
+const emit = defineEmits(['open-register']);
+</script>
+
 <template>
   <div>
     <section class="relative py-16 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-blue-900 dark:to-slate-950 text-white">
@@ -10,9 +14,14 @@
           Đừng bỏ lỡ cơ hội khẳng định uy tín, tăng tỷ lệ chuyển đổi và bảo vệ tài khoản toàn diện trên mạng xã hội.
         </p>
         <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-          <a href="#contact" class="w-full sm:w-auto px-8 py-4 bg-white text-blue-600 font-bold rounded-xl shadow-lg hover:bg-blue-50 transition transform hover:-translate-y-0.5 text-center">
+          
+          <button 
+            @click="emit('open-register')" 
+            class="w-full sm:w-auto px-8 py-4 bg-white text-blue-600 font-bold rounded-xl shadow-lg hover:bg-blue-50 transition transform hover:-translate-y-0.5 text-center"
+          >
             Đăng Ký Tư Vấn Ngay
-          </a>
+          </button>
+          
           <a href="tel:0968825068" class="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-white/50 text-white font-bold rounded-xl hover:bg-white/10 transition text-center flex items-center justify-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
