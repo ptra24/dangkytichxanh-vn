@@ -55,17 +55,41 @@ const formServiceIndex = ref("");
 // Biến quản lý trạng thái Loading hiển thị ở nút bấm
 const isLoading = ref(false);
 
-// Xử lý gửi Form (Chỉ mô phỏng phía Frontend)
-const handleSubmit = () => {
-  // 1. Bật trạng thái loading để vô hiệu hóa nút bấm và hiện icon xoay xoay
+// Xử lý gửi Form (Gửi yêu cầu thực tế lên Backend API Laravel)
+const handleSubmit = async () => {
   isLoading.value = true;
 
-  // 2. Giả lập độ trễ của mạng (1.5 giây)
-  setTimeout(() => {
-    // 3. Tắt loading và chuyển sang màn hình thành công
+  try {
+    const selectedService = services[formServiceIndex.value] || services[currentServiceIndex.value];
+    const payload = {
+      name: name.value,
+      phone: phone.value,
+      link: link.value,
+      service: selectedService ? selectedService.name : 'Tư vấn tích xanh'
+    };
+
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      isSubmitted.value = true;
+    } else {
+      alert(result.message || 'Có lỗi xảy ra khi gửi đăng ký.');
+    }
+  } catch (error) {
+    console.error('Lỗi kết nối API:', error);
+    alert('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng hoặc server.');
+  } finally {
     isLoading.value = false;
-    isSubmitted.value = true;
-  }, 1500); 
+  }
 };
 
 const validateForm = () => {
