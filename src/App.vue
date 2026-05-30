@@ -11,6 +11,8 @@ import Header from './components/Header.vue';
 import HeroSection from './components/HeroSection.vue';
 import StatsBar from './components/StatsBar.vue';
 import WhyUs from './components/WhyUs.vue';
+import ProcessSteps from './components/ProcessSteps.vue';
+import Testimonials from './components/Testimonials.vue';
 import Footer from './components/Footer.vue';
 import { services } from './data/services';
 import { articles } from './data/articles';
@@ -378,6 +380,13 @@ const faqs = [
           </div>
         </div>
       </section>
+
+      <!-- Quy trình 4 bước Section -->
+      <ProcessSteps />
+
+      <!-- Testimonials Section -->
+      <Testimonials />
+
       <!-- FAQ Accordion Section -->
       <section id="faq" class="py-20 bg-[#0d1829] relative overflow-hidden border-t border-white/5">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative">
