@@ -12,6 +12,8 @@ import HeroSection from './components/HeroSection.vue';
 import StatsBar from './components/StatsBar.vue';
 import WhyUs from './components/WhyUs.vue';
 import Footer from './components/Footer.vue';
+import BlogPreview from './components/BlogPreview.vue';
+import HotlinePopup from './components/HotlinePopup.vue'
 import { services } from './data/services';
 
 const currentServiceIndex = ref(0);
@@ -173,6 +175,9 @@ const pricingCards = [
 
 <template>
   <div class="min-h-screen bg-[#060b13] text-slate-100 flex flex-col selection:bg-blue-600/30 selection:text-blue-200">
+    
+    <!-- Hotline Popup component -->
+    <HotlinePopup />
     <!-- Header component -->
     <Header 
       :currentServiceIndex="currentServiceIndex" 
@@ -192,6 +197,9 @@ const pricingCards = [
 
     <!-- Why Us component -->
     <WhyUs />
+
+    <!-- Blog Preview component -->
+    <BlogPreview />
 
     <main class="w-full">
       <!-- Bảng giá (Pricing) Section -->
