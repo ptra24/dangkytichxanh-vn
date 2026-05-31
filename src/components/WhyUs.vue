@@ -92,10 +92,14 @@
 /* ── Section wrapper ──────────────────────────── */
 .why-us-section {
   position: relative;
-  background-color: #0b0f1e;
+  background-color: #f8fafc;
   padding: 80px 24px;
   overflow: hidden;
   font-family: 'Inter', 'Segoe UI', sans-serif;
+  transition: background-color 0.3s ease;
+}
+:global(.dark) .why-us-section {
+  background-color: #0b0f1e;
 }
 
 /* Dot-grid background on the section */
@@ -103,9 +107,12 @@
   pointer-events: none;
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
   background-size: 28px 28px;
   opacity: 0.5;
+}
+:global(.dark) .why-us-bg-dots {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
 }
 
 /* ── Inner container ──────────────────────────── */
@@ -128,18 +135,26 @@
 .why-us-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   line-height: 1.25;
   letter-spacing: -0.02em;
   margin: 0 0 14px 0;
+  transition: color 0.3s ease;
+}
+:global(.dark) .why-us-title {
+  color: #ffffff;
 }
 
 .why-us-subtitle {
   font-size: 0.9rem;
-  color: #8b9ab5;
+  color: #475569;
   line-height: 1.6;
   margin: 0;
   font-weight: 400;
+  transition: color 0.3s ease;
+}
+:global(.dark) .why-us-subtitle {
+  color: #8b9ab5;
 }
 
 /* ── Cards row ────────────────────────────────── */
@@ -152,18 +167,26 @@
 /* ── Single card ─────────────────────────────── */
 .why-card {
   position: relative;
-  background: #131929;
-  border: 1px solid #1e2d47;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 28px 22px 28px;
   text-align: center;
-  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease, background-color 0.3s ease;
   overflow: hidden;
+}
+:global(.dark) .why-card {
+  background: #131929;
+  border: 1px solid #1e2d47;
 }
 
 .why-card:hover {
-  border-color: #2d4a7a;
+  border-color: #94a3b8;
   transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(30, 64, 175, 0.08);
+}
+:global(.dark) .why-card:hover {
+  border-color: #2d4a7a;
   box-shadow: 0 12px 32px rgba(30, 64, 175, 0.18);
 }
 
@@ -173,7 +196,7 @@
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
   background-size: 18px 18px;
   /* Ẩn hoàn toàn: clip từ dưới lên (bottom inset = 100%) */
   clip-path: inset(0 0 100% 0 round 16px);
@@ -183,6 +206,9 @@
   transition: clip-path 0.5s ease;
   pointer-events: none;
   z-index: 0;
+}
+:global(.dark) .why-card-dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
 }
 
 .why-card:hover .why-card-dot-grid {
@@ -209,6 +235,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 14px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+:global(.dark) .why-card-icon-box {
   background-color: #192236;
   border: 1px solid #1e2d47;
 }
@@ -229,21 +260,29 @@
 .why-card-title {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #e8edf5;
+  color: #0f172a;
   margin: 0 0 10px;
   letter-spacing: -0.01em;
   position: relative;
   z-index: 1;
+  transition: color 0.3s ease;
+}
+:global(.dark) .why-card-title {
+  color: #e8edf5;
 }
 
 .why-card-desc {
   font-size: 0.8rem;
-  color: #6b7fa3;
+  color: #475569;
   line-height: 1.55;
   margin: 0;
   font-weight: 400;
   position: relative;
   z-index: 1;
+  transition: color 0.3s ease;
+}
+:global(.dark) .why-card-desc {
+  color: #6b7fa3;
 }
 
 /* ── Responsive ──────────────────────────────── */

@@ -30,7 +30,7 @@ const checkBgColor = computed(() => {
 <template>
   <section class="relative overflow-hidden py-16 lg:py-24">
     <!-- Premium background glowing gradients -->
-    <div class="absolute inset-0 -z-10 bg-[#060b13]">
+    <div class="absolute inset-0 -z-10 bg-white dark:bg-[#060b13] transition-colors duration-300">
       <div 
         class="absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full blur-[120px] opacity-25 mix-blend-screen transition-colors duration-500"
         :class="{
@@ -40,7 +40,7 @@ const checkBgColor = computed(() => {
           'bg-emerald-600': service.id === 'whatsapp'
         }"
       ></div>
-      <div class="absolute right-10 bottom-10 h-[350px] w-[350px] rounded-full bg-slate-900 blur-[80px] opacity-50"></div>
+      <div class="absolute right-10 bottom-10 h-[350px] w-[350px] rounded-full bg-slate-100 dark:bg-slate-900 blur-[80px] opacity-50"></div>
     </div>
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -50,24 +50,24 @@ const checkBgColor = computed(() => {
         <div class="lg:col-span-7 space-y-6 text-left">
           
           <!-- Badge -->
-          <div class="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/5 px-4 py-1.5 transition-all duration-300">
-            <span class="text-xs font-bold uppercase tracking-wider text-blue-400">
+          <div class="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-50 dark:bg-blue-500/5 px-4 py-1.5 transition-all duration-300">
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
               {{ service.badgeLabel }}
             </span>
           </div>
 
           <!-- Main Dynamic Heading -->
-          <h1 class="font-sans text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl leading-[1.15]">
+          <h1 class="font-sans text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-6xl leading-[1.15]">
             <span class="block">{{ service.title }}</span>
           </h1>
 
           <!-- Description -->
-          <p class="text-base text-slate-300 sm:text-lg max-w-2xl leading-relaxed">
+          <p class="text-base text-slate-600 dark:text-slate-300 sm:text-lg max-w-2xl leading-relaxed">
             {{ service.subtitle }}
           </p>
 
           <!-- Divider -->
-          <div class="h-px w-full bg-gradient-to-r from-white/10 to-transparent"></div>
+          <div class="h-px w-full bg-gradient-to-r from-slate-200 dark:from-white/10 to-transparent"></div>
 
           <!-- Checklist Grid -->
           <div class="grid grid-cols-1 gap-x-6 gap-y-3.5 sm:grid-cols-2">
@@ -92,14 +92,14 @@ const checkBgColor = computed(() => {
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <span class="text-sm font-medium text-slate-300 group-hover:text-white transition-colors duration-200">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors duration-200">
                 {{ feature }}
               </span>
             </div>
           </div>
 
           <!-- Divider -->
-          <div class="h-px w-full bg-gradient-to-r from-white/10 to-transparent"></div>
+          <div class="h-px w-full bg-gradient-to-r from-slate-200 dark:from-white/10 to-transparent"></div>
 
           <!-- Action Buttons -->
           <div class="flex flex-wrap gap-4 pt-2">
@@ -113,7 +113,7 @@ const checkBgColor = computed(() => {
 
             <a 
               href="tel:0921169999" 
-              class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 px-7 py-4 text-base font-bold text-white transition-all duration-300 transform active:scale-98"
+              class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 px-7 py-4 text-base font-bold text-slate-700 dark:text-white shadow-sm dark:shadow-none transition-all duration-300 transform active:scale-98"
             >
               <Phone class="h-5 w-5 text-slate-400 fill-slate-400/10" />
               092.116.9999
@@ -125,7 +125,7 @@ const checkBgColor = computed(() => {
         <!-- Right Mockup Preview Card -->
         <div class="lg:col-span-5 flex justify-center lg:justify-end">
           <div 
-            class="relative w-full max-w-[380px] rounded-2xl p-6 border transition-all duration-500 ease-out bg-[#0f172a]/60 backdrop-blur-xl"
+            class="relative w-full max-w-[380px] rounded-2xl p-6 border border-slate-200 dark:border-transparent transition-all duration-500 ease-out bg-white dark:bg-[#0f172a]/60 backdrop-blur-xl shadow-xl dark:shadow-none"
             :class="service.mockup.glowClass"
           >
             <!-- Glowing overlay effect behind the card -->
@@ -149,7 +149,7 @@ const checkBgColor = computed(() => {
                 </div>
                 
                 <!-- Verification Check Badge at the bottom right corner of avatar -->
-                <div class="absolute bottom-0 right-0 rounded-full border-2 border-[#090f1d] bg-white p-0.5">
+                <div class="absolute bottom-0 right-0 rounded-full border-2 border-white dark:border-[#090f1d] bg-white p-0.5">
                   <div class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white">
                     <!-- Standard Verification Icon SVG -->
                     <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
@@ -161,7 +161,7 @@ const checkBgColor = computed(() => {
 
               <!-- Username & Badge -->
               <div class="flex items-center gap-1.5">
-                <h3 class="font-sans text-lg font-bold text-white tracking-tight">
+                <h3 class="font-sans text-lg font-bold text-slate-900 dark:text-white tracking-tight">
                   {{ service.mockup.username }}
                 </h3>
                 <!-- Custom small verified badge -->
@@ -173,14 +173,14 @@ const checkBgColor = computed(() => {
               </div>
 
               <!-- Subtitle / Meta Verified state -->
-              <p class="text-xs text-slate-400 mt-1">
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 {{ service.mockup.verifiedType }}
               </p>
 
             </div>
 
             <!-- Divider -->
-            <div class="h-px w-full bg-white/5"></div>
+            <div class="h-px w-full bg-slate-200 dark:bg-white/5"></div>
 
             <!-- Platform Stats Grid -->
             <div class="grid grid-cols-3 gap-2 py-5 text-center">
@@ -188,12 +188,12 @@ const checkBgColor = computed(() => {
                 v-for="(stat, idx) in service.mockup.stats" 
                 :key="idx"
                 class="flex flex-col items-center justify-center px-1"
-                :class="{ 'border-r border-white/5': idx < 2 }"
+                :class="{ 'border-r border-slate-200 dark:border-white/5': idx < 2 }"
               >
-                <span class="font-sans text-lg font-black tracking-tight text-white block">
+                <span class="font-sans text-lg font-black tracking-tight text-blue-600 dark:text-white block">
                   {{ stat.value }}
                 </span>
-                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-1 block">
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider mt-1 block">
                   {{ stat.label }}
                 </span>
               </div>
@@ -201,7 +201,7 @@ const checkBgColor = computed(() => {
 
             <!-- Decorative mini line -->
             <div class="flex justify-center">
-              <div class="h-1 w-12 rounded-full bg-white/10"></div>
+              <div class="h-1 w-12 rounded-full bg-slate-200 dark:bg-white/10"></div>
             </div>
             
           </div>

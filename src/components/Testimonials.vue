@@ -64,9 +64,14 @@ const reviews = [
 <style scoped>
 /* ── Section ─────────────────────────────────── */
 .testimonials-section {
-  background-color: #060b13;
+  background-color: #f8fafc;
   padding: 72px 24px 80px;
   font-family: 'Inter', 'Segoe UI', sans-serif;
+  border-top: 1px solid #f1f5f9;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+:global(.dark) .testimonials-section {
+  background-color: #060b13;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -79,10 +84,14 @@ const reviews = [
 .testimonials-title {
   font-size: 1.875rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.2;
+  transition: color 0.3s ease;
+}
+:global(.dark) .testimonials-title {
+  color: #ffffff;
 }
 
 /* ── Grid ────────────────────────────────────── */
@@ -96,19 +105,26 @@ const reviews = [
 
 /* ── Card ────────────────────────────────────── */
 .review-card {
-  background-color: #131f35;
-  border: 1px solid #1e2d47;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 14px;
   padding: 26px 24px 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  transition: border-color 0.25s ease, transform 0.25s ease;
+  transition: border-color 0.25s ease, transform 0.25s ease, background-color 0.3s ease;
+}
+:global(.dark) .review-card {
+  background-color: #131f35;
+  border: 1px solid #1e2d47;
 }
 
 .review-card:hover {
-  border-color: #2d4a7a;
+  border-color: #94a3b8;
   transform: translateY(-3px);
+}
+:global(.dark) .review-card:hover {
+  border-color: #2d4a7a;
 }
 
 /* ── Stars ───────────────────────────────────── */
@@ -126,11 +142,15 @@ const reviews = [
 /* ── Quote ───────────────────────────────────── */
 .review-quote {
   font-size: 0.875rem;
-  color: #cbd5e1;
+  color: #334155;
   line-height: 1.65;
   margin: 0;
   font-weight: 400;
   flex: 1;
+  transition: color 0.3s ease;
+}
+:global(.dark) .review-quote {
+  color: #cbd5e1;
 }
 
 /* ── Author ──────────────────────────────────── */
@@ -164,15 +184,23 @@ const reviews = [
 .author-name {
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: #0f172a;
   line-height: 1;
+  transition: color 0.3s ease;
+}
+:global(.dark) .author-name {
+  color: #e2e8f0;
 }
 
 .author-role {
   font-size: 0.75rem;
-  color: #64748b;
+  color: #475569;
   font-weight: 400;
   line-height: 1;
+  transition: color 0.3s ease;
+}
+:global(.dark) .author-role {
+  color: #64748b;
 }
 
 /* ── Responsive ──────────────────────────────── */

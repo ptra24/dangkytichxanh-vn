@@ -32,14 +32,14 @@ const emit = defineEmits(['open-register']);
       </div>
     </section>
 
-    <footer class="bg-gray-900 dark:bg-black text-gray-300 pt-16 pb-8 border-t border-gray-800">
+    <footer class="bg-slate-50 dark:bg-[#060b13] text-slate-600 dark:text-gray-300 pt-16 pb-8 border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 mb-12">
         
         <div class="space-y-4">
           <div class="flex items-center gap-2">
-            <span class="text-2xl font-black tracking-wider text-white">DANGKYTICHXANH<span class="text-blue-500">.VN</span></span>
+            <span class="text-2xl font-black tracking-wider text-slate-900 dark:text-white">DANGKYTICHXANH<span class="text-blue-600 dark:text-blue-500">.VN</span></span>
           </div>
-          <p class="text-sm text-gray-400 leading-relaxed">
+          <p class="text-sm text-slate-600 dark:text-gray-400 leading-relaxed">
             Đơn vị cung cấp giải pháp tối ưu, hỗ trợ lên tích xanh chính chủ an toàn, nhanh chóng và bảo mật cao cho Cá nhân & Doanh nghiệp.
           </p>
           <div class="pt-2">
@@ -50,45 +50,45 @@ const emit = defineEmits(['open-register']);
         </div>
 
         <div>
-          <h3 class="text-white font-bold text-lg mb-4 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-blue-500 pb-2">Dịch Vụ Tích Xanh</h3>
+          <h3 class="text-slate-900 dark:text-white font-bold text-lg mb-4 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-500 pb-2">Dịch Vụ Tích Xanh</h3>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="hover:text-blue-400 transition-colors">Tích xanh Facebook Fanpage</a></li>
-            <li><a href="#" class="hover:text-blue-400 transition-colors">Tích xanh Facebook Cá nhân</a></li>
-            <li><a href="#" class="hover:text-blue-400 transition-colors">Tích xanh Instagram</a></li>
-            <li><a href="#" class="hover:text-blue-400 transition-colors">Tích xanh TikTok</a></li>
+            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Tích xanh Facebook Fanpage</a></li>
+            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Tích xanh Facebook Cá nhân</a></li>
+            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Tích xanh Instagram</a></li>
+            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Tích xanh TikTok</a></li>
           </ul>
         </div>
 
         <div>
-          <h3 class="text-white font-bold text-lg mb-4 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-blue-500 pb-2">Chính Sách & Quy Định</h3>
+          <h3 class="text-slate-900 dark:text-white font-bold text-lg mb-4 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-500 pb-2">Chính Sách & Quy Định</h3>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="hover:text-blue-400 transition-colors">Chính sách bảo mật thông tin</a></li>
-            <li><a href="#" class="hover:text-blue-400 transition-colors">Điều khoản dịch vụ</a></li>
-            <li><a href="#" class="hover:text-blue-400 transition-colors">Quy trình hoàn tiền</a></li>
-            <li><a href="#" class="hover:text-blue-400 transition-colors">Câu hỏi thường gặp (FAQ)</a></li>
+            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Chính sách bảo mật thông tin</a></li>
+            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Điều khoản dịch vụ</a></li>
+            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Quy trình hoàn tiền</a></li>
+            <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Câu hỏi thường gặp (FAQ)</a></li>
           </ul>
         </div>
 
         <div>
-          <h3 class="text-white font-bold text-lg mb-4 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-blue-500 pb-2">Thông Tin Liên Hệ</h3>
-          <ul class="space-y-3 text-sm text-gray-400">
+          <h3 class="text-slate-900 dark:text-white font-bold text-lg mb-4 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-500 pb-2">Thông Tin Liên Hệ</h3>
+          <ul class="space-y-3 text-sm text-slate-600 dark:text-gray-400">
             <li class="flex items-start gap-2">
-              <span class="text-white font-semibold">Hotline:</span>
-              <a href="tel:0968825068" class="text-blue-400 hover:underline">0968.825.068</a>
+              <span class="text-slate-900 dark:text-white font-semibold">Hotline:</span>
+              <a href="tel:0968825068" class="text-blue-600 dark:text-blue-400 hover:underline">0968.825.068</a>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-white font-semibold">Email:</span>
-              <a href="mailto:support@dangkytichxanh.vn" class="hover:text-white transition-colors">support@dangkytichxanh.vn</a>
+              <span class="text-slate-900 dark:text-white font-semibold">Email:</span>
+              <a href="mailto:support@dangkytichxanh.vn" class="hover:text-slate-900 dark:hover:text-white transition-colors">support@dangkytichxanh.vn</a>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-white font-semibold flex-shrink-0">Địa chỉ:</span>
+              <span class="text-slate-900 dark:text-white font-semibold flex-shrink-0">Địa chỉ:</span>
               <span>Khu Đô Thị Mới, Phường Nam, Đông Hà, Quảng Trị</span>
             </li>
           </ul>
         </div>
       </div>
 
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-gray-800 text-center text-xs text-gray-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-slate-200 dark:border-gray-800 text-center text-xs text-slate-500 dark:text-gray-500 flex flex-col sm:flex-row justify-between items-center gap-4">
         <p>© 2026 Dangkytichxanh.vn. All rights reserved. Covered & Optimized by Team.</p>
         <p>Thương hiệu và logo thuộc bản quyền của các nền tảng MXH tương ứng.</p>
       </div>

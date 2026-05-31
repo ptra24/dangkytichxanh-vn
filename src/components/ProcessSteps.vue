@@ -57,9 +57,14 @@ const steps = [
 <style scoped>
 /* ── Section ─────────────────────────────────── */
 .process-section {
-  background-color: #0d1829;
+  background-color: #ffffff;
   padding: 72px 24px 80px;
   font-family: 'Inter', 'Segoe UI', sans-serif;
+  border-top: 1px solid #f1f5f9;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+:global(.dark) .process-section {
+  background-color: #0d1829;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -72,10 +77,14 @@ const steps = [
 .process-title {
   font-size: 1.875rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   letter-spacing: -0.02em;
   margin: 0 0 10px;
   line-height: 1.2;
+  transition: color 0.3s ease;
+}
+:global(.dark) .process-title {
+  color: #ffffff;
 }
 
 .process-subtitle {
@@ -129,8 +138,11 @@ const steps = [
   width: 2px;
   flex: 1;
   min-height: 40px;
-  background: linear-gradient(to bottom, rgba(37, 99, 235, 0.6) 0%, rgba(37, 99, 235, 0.15) 100%);
+  background: linear-gradient(to bottom, rgba(37, 99, 235, 0.4) 0%, rgba(37, 99, 235, 0.05) 100%);
   margin: 4px 0;
+}
+:global(.dark) .step-line {
+  background: linear-gradient(to bottom, rgba(37, 99, 235, 0.6) 0%, rgba(37, 99, 235, 0.15) 100%);
 }
 
 /* ── Right column: text ──────────────────────── */
@@ -146,17 +158,25 @@ const steps = [
 .step-title {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: #0f172a;
   margin: 0 0 5px;
   letter-spacing: -0.01em;
+  transition: color 0.3s ease;
+}
+:global(.dark) .step-title {
+  color: #e2e8f0;
 }
 
 .step-desc {
   font-size: 0.8125rem;
-  color: #64748b;
+  color: #475569;
   margin: 0;
   line-height: 1.5;
   font-weight: 400;
+  transition: color 0.3s ease;
+}
+:global(.dark) .step-desc {
+  color: #64748b;
 }
 
 /* ── Responsive ──────────────────────────────── */
