@@ -92,10 +92,14 @@
 /* ── Section wrapper ──────────────────────────── */
 .why-us-section {
   position: relative;
-  background-color: #0b0f1e;
+  background-color: var(--site-bg-soft);
   padding: 80px 24px;
   overflow: hidden;
   font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+:global(.dark) .why-us-section {
+  background-color: #0b0f1e;
 }
 
 /* Dot-grid background on the section */
@@ -128,7 +132,7 @@
 .why-us-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--site-text);
   line-height: 1.25;
   letter-spacing: -0.02em;
   margin: 0 0 14px 0;
@@ -136,7 +140,7 @@
 
 .why-us-subtitle {
   font-size: 0.9rem;
-  color: #8b9ab5;
+  color: var(--site-muted);
   line-height: 1.6;
   margin: 0;
   font-weight: 400;
@@ -152,13 +156,18 @@
 /* ── Single card ─────────────────────────────── */
 .why-card {
   position: relative;
-  background: #131929;
-  border: 1px solid #1e2d47;
+  background: var(--site-card);
+  border: 1px solid var(--site-border);
   border-radius: 16px;
   padding: 28px 22px 28px;
   text-align: center;
   transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
   overflow: hidden;
+}
+
+:global(.dark) .why-card {
+  background: #131929;
+  border-color: #1e2d47;
 }
 
 .why-card:hover {
@@ -209,8 +218,13 @@
   align-items: center;
   justify-content: center;
   border-radius: 14px;
+  background-color: var(--site-card-soft);
+  border: 1px solid var(--site-border);
+}
+
+:global(.dark) .why-card-icon-box {
   background-color: #192236;
-  border: 1px solid #1e2d47;
+  border-color: #1e2d47;
 }
 
 .why-card-icon {
@@ -229,7 +243,7 @@
 .why-card-title {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #e8edf5;
+  color: var(--site-text);
   margin: 0 0 10px;
   letter-spacing: -0.01em;
   position: relative;
@@ -238,7 +252,7 @@
 
 .why-card-desc {
   font-size: 0.8rem;
-  color: #6b7fa3;
+  color: var(--site-muted);
   line-height: 1.55;
   margin: 0;
   font-weight: 400;

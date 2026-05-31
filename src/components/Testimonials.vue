@@ -64,10 +64,15 @@ const reviews = [
 <style scoped>
 /* ── Section ─────────────────────────────────── */
 .testimonials-section {
-  background-color: #060b13;
+  background-color: var(--site-bg-soft);
   padding: 72px 24px 80px;
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--site-border);
+}
+
+:global(.dark) .testimonials-section {
+  background-color: #060b13;
+  border-top-color: rgba(255, 255, 255, 0.05);
 }
 
 /* ── Heading ─────────────────────────────────── */
@@ -79,7 +84,7 @@ const reviews = [
 .testimonials-title {
   font-size: 1.875rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--site-text);
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.2;
@@ -96,14 +101,19 @@ const reviews = [
 
 /* ── Card ────────────────────────────────────── */
 .review-card {
-  background-color: #131f35;
-  border: 1px solid #1e2d47;
+  background-color: var(--site-card);
+  border: 1px solid var(--site-border);
   border-radius: 14px;
   padding: 26px 24px 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+:global(.dark) .review-card {
+  background-color: #131f35;
+  border-color: #1e2d47;
 }
 
 .review-card:hover {
@@ -126,7 +136,7 @@ const reviews = [
 /* ── Quote ───────────────────────────────────── */
 .review-quote {
   font-size: 0.875rem;
-  color: #cbd5e1;
+  color: var(--site-muted);
   line-height: 1.65;
   margin: 0;
   font-weight: 400;
@@ -164,13 +174,13 @@ const reviews = [
 .author-name {
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--site-text);
   line-height: 1;
 }
 
 .author-role {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--site-muted);
   font-weight: 400;
   line-height: 1;
 }

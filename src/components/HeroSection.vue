@@ -124,8 +124,7 @@ const checkBgColor = computed(() => {
 
         <!-- Right Mockup Preview Card -->
         <div class="lg:col-span-5 flex justify-center lg:justify-end">
-          <div 
-            class="relative w-full max-w-[380px] rounded-2xl p-6 border transition-all duration-500 ease-out bg-[#0f172a]/60 backdrop-blur-xl"
+          <div class="always-dark relative w-full max-w-[380px] rounded-2xl p-6 border transition-all duration-500 ease-out backdrop-blur-xl" style="background-color: rgba(15,23,42,0.6);"
             :class="service.mockup.glowClass"
           >
             <!-- Glowing overlay effect behind the card -->

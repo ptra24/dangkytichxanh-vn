@@ -24,7 +24,7 @@ const stats = [
 </script>
 
 <template>
-  <div class="border-t border-b border-white/5 bg-[#090f1d]/50 backdrop-blur-sm py-8">
+  <div class="always-dark border-t border-b border-white/5 backdrop-blur-sm py-8" style="background-color: rgba(9,15,29,0.5); border-color: rgba(255,255,255,0.05);">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-2 gap-y-8 md:grid-cols-4 md:gap-y-0 text-center">
         <div 

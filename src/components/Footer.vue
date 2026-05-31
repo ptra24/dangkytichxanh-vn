@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <section class="relative py-16 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-blue-900 dark:to-slate-950 text-white">
+  <div class="always-dark">
+    <section class="relative py-16 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
       <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
@@ -23,7 +23,7 @@
       </div>
     </section>
 
-    <footer class="bg-gray-900 dark:bg-black text-gray-300 pt-16 pb-8 border-t border-gray-800">
+    <footer class="bg-gray-900 text-gray-300 pt-16 pb-8 border-t border-gray-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 mb-12">
         
         <div class="space-y-4">
