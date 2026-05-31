@@ -1,89 +1,83 @@
 <template>
-  <section class="py-24 bg-slate-950 relative overflow-hidden font-sans min-h-screen flex items-center">
-    <!-- Hiệu ứng radial-gradient nền siêu ảo diệu -->
-    <div class="pointer-events-none absolute inset-0" style="background-image: radial-gradient(600px 300px at 15% 20%, rgba(59, 130, 246, 0.25), transparent), radial-gradient(500px 300px at 90% 80%, rgba(14, 165, 233, 0.2), transparent);"></div>
+  <section class="why-us-section">
+    <!-- Subtle dot-grid background overlay -->
+    <div class="why-us-bg-dots"></div>
 
-    <div class="relative mx-auto max-w-6xl px-4 md:px-6 z-10 w-full">
-      <!-- Tiêu đề -->
-      <div class="mb-14 mx-auto max-w-2xl text-center">
-        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-white mb-3">Tại sao chọn chúng tôi?</h2>
-        <p class="text-lg text-slate-300 mt-3">Được 2.368 khách hàng tin tưởng</p>
+    <div class="why-us-inner">
+      <!-- Heading -->
+      <div class="why-us-heading">
+        <h2 class="why-us-title">Tích Xanh Đem Lại Gì Cho Fanpage &amp; Business Của Bạn?</h2>
+        <p class="why-us-subtitle">Tin hiệu Uy Tín cao nhất trên Meta, tăng tiếp cận tự nhiên và doanh số ngay lập tức</p>
       </div>
 
-      <!-- Lưới 6 thẻ -->
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        
-        <!-- Card 1 -->
-        <!-- Đã thêm dark:border-white/20 để viền sáng hơn khi ở chế độ Dark Mode -->
-        <div class="group relative overflow-hidden rounded-2xl border border-white/10 dark:border-white/20 bg-white/5 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/10">
-          <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style="background-image: linear-gradient(rgba(96, 165, 250, 0.08) 1px, transparent 1px); background-size: 100% 8px; mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);"></div>
-          
-          <div class="relative mx-auto mb-5 h-16 w-16 flex items-center justify-center rounded-full border border-white/10 dark:border-white/20 bg-[#0F172A] overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all duration-300">
-            <div class="absolute top-1/2 -translate-y-1/2 left-0 w-12 h-12 bg-sky-500/50 rounded-full blur-[10px] transition-transform duration-500 -translate-x-6 group-hover:translate-x-10"></div>
-            <svg class="relative z-10 w-7 h-7 text-sky-400 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      <!-- 4 cards row -->
+      <div class="why-us-cards">
+
+        <!-- Card 1: Xác minh chính chủ -->
+        <div class="why-card">
+          <div class="why-card-dot-grid"></div>
+          <div class="why-card-icon-wrap">
+            <div class="why-card-icon-box">
+              <!-- Checkmark shield icon -->
+              <svg class="why-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"/>
+                <polyline points="9 12 11 14 15 10"/>
+              </svg>
+            </div>
           </div>
-          <h3 class="relative mb-2 text-base font-bold text-white">Nhanh nhất thị trường</h3>
-          <p class="relative text-sm leading-relaxed text-slate-300">15 phút, không phải 1 - 7 ngày như tự làm</p>
+          <h3 class="why-card-title">Xác minh chính chủ</h3>
+          <p class="why-card-desc">Khách hàng của bạn tin tưởng, không nghi ngờ giả mạo</p>
         </div>
 
-        <!-- Card 2 -->
-        <div class="group relative overflow-hidden rounded-2xl border border-white/10 dark:border-white/20 bg-white/5 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/10">
-          <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style="background-image: linear-gradient(rgba(96, 165, 250, 0.08) 1px, transparent 1px); background-size: 100% 8px; mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);"></div>
-          
-          <div class="relative mx-auto mb-5 h-16 w-16 flex items-center justify-center rounded-full border border-white/10 dark:border-white/20 bg-[#0F172A] overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all duration-300">
-            <div class="absolute top-1/2 -translate-y-1/2 left-0 w-12 h-12 bg-sky-500/50 rounded-full blur-[10px] transition-transform duration-500 -translate-x-6 group-hover:translate-x-10"></div>
-            <svg class="relative z-10 w-7 h-7 text-sky-400 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <!-- Card 2: Ưu tiên hiển thị -->
+        <div class="why-card">
+          <div class="why-card-dot-grid"></div>
+          <div class="why-card-icon-wrap">
+            <div class="why-card-icon-box">
+              <!-- Trending up icon -->
+              <svg class="why-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                <polyline points="17 6 23 6 23 12"/>
+              </svg>
+            </div>
           </div>
-          <h3 class="relative mb-2 text-base font-bold text-white">Tỉ lệ 100% thành công</h3>
-          <p class="relative text-sm leading-relaxed text-slate-300">Làm xong tích xanh mới phải thanh toán,<br>không mất tiền oan</p>
+          <h3 class="why-card-title">Ưu tiên hiển thị</h3>
+          <p class="why-card-desc">Lượt tiếp cận tự nhiên tăng 20-40%, hiển thị top 1 khi khách tìm kiếm</p>
         </div>
 
-        <!-- Card 3 -->
-        <div class="group relative overflow-hidden rounded-2xl border border-white/10 dark:border-white/20 bg-white/5 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/10">
-          <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style="background-image: linear-gradient(rgba(96, 165, 250, 0.08) 1px, transparent 1px); background-size: 100% 8px; mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);"></div>
-          
-          <div class="relative mx-auto mb-5 h-16 w-16 flex items-center justify-center rounded-full border border-white/10 dark:border-white/20 bg-[#0F172A] overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all duration-300">
-            <div class="absolute top-1/2 -translate-y-1/2 left-0 w-12 h-12 bg-sky-500/50 rounded-full blur-[10px] transition-transform duration-500 -translate-x-6 group-hover:translate-x-10"></div>
-            <svg class="relative z-10 w-7 h-7 text-sky-400 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24"/></svg>
+        <!-- Card 3: Tăng doanh thu -->
+        <div class="why-card">
+          <div class="why-card-dot-grid"></div>
+          <div class="why-card-icon-wrap">
+            <div class="why-card-icon-box">
+              <!-- Dollar circle icon -->
+              <svg class="why-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+                <line x1="9.5" y1="10.5" x2="14.5" y2="10.5"/>
+                <path d="M9.5 10.5a2.5 2.5 0 0 1 5 0"/>
+                <path d="M9.5 13.5a2.5 2.5 0 0 0 5 0"/>
+              </svg>
+            </div>
           </div>
-          <h3 class="relative mb-2 text-base font-bold text-white">Hỗ trợ trọn đời</h3>
-          <p class="relative text-sm leading-relaxed text-slate-300">Gặp sự cố gì chúng tôi xử lý miễn phí</p>
+          <h3 class="why-card-title">Tăng doanh thu</h3>
+          <p class="why-card-desc">Tỉ lệ chốt đơn trên page tích xanh tăng trung bình 28%</p>
         </div>
 
-        <!-- Card 4 -->
-        <div class="group relative overflow-hidden rounded-2xl border border-white/10 dark:border-white/20 bg-white/5 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/10">
-          <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style="background-image: linear-gradient(rgba(96, 165, 250, 0.08) 1px, transparent 1px); background-size: 100% 8px; mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);"></div>
-          
-          <div class="relative mx-auto mb-5 h-16 w-16 flex items-center justify-center rounded-full border border-white/10 dark:border-white/20 bg-[#0F172A] overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all duration-300">
-            <div class="absolute top-1/2 -translate-y-1/2 left-0 w-12 h-12 bg-sky-500/50 rounded-full blur-[10px] transition-transform duration-500 -translate-x-6 group-hover:translate-x-10"></div>
-            <svg class="relative z-10 w-7 h-7 text-sky-400 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <!-- Card 4: Bảo vệ thương hiệu -->
+        <div class="why-card">
+          <div class="why-card-dot-grid"></div>
+          <div class="why-card-icon-wrap">
+            <div class="why-card-icon-box">
+              <!-- Shield check icon -->
+              <svg class="why-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"/>
+                <path d="M9 12l2 2 4-4"/>
+              </svg>
+            </div>
           </div>
-          <h3 class="relative mb-2 text-base font-bold text-white">An toàn 100%</h3>
-          <p class="relative text-sm leading-relaxed text-slate-300">Chỉ dùng phương pháp chính thức của Meta</p>
-        </div>
-
-        <!-- Card 5 -->
-        <div class="group relative overflow-hidden rounded-2xl border border-white/10 dark:border-white/20 bg-white/5 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/10">
-          <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style="background-image: linear-gradient(rgba(96, 165, 250, 0.08) 1px, transparent 1px); background-size: 100% 8px; mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);"></div>
-          
-          <div class="relative mx-auto mb-5 h-16 w-16 flex items-center justify-center rounded-full border border-white/10 dark:border-white/20 bg-[#0F172A] overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all duration-300">
-            <div class="absolute top-1/2 -translate-y-1/2 left-0 w-12 h-12 bg-sky-500/50 rounded-full blur-[10px] transition-transform duration-500 -translate-x-6 group-hover:translate-x-10"></div>
-            <svg class="relative z-10 w-7 h-7 text-sky-400 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
-          </div>
-          <h3 class="relative mb-2 text-base font-bold text-white">Tư vấn 24/7</h3>
-          <p class="relative text-sm leading-relaxed text-slate-300">Luôn có nhân viên trực hotline và Zalo</p>
-        </div>
-
-        <!-- Card 6 -->
-        <div class="group relative overflow-hidden rounded-2xl border border-white/10 dark:border-white/20 bg-white/5 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/10">
-          <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style="background-image: linear-gradient(rgba(96, 165, 250, 0.08) 1px, transparent 1px); background-size: 100% 8px; mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);"></div>
-          
-          <div class="relative mx-auto mb-5 h-16 w-16 flex items-center justify-center rounded-full border border-white/10 dark:border-white/20 bg-[#0F172A] overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all duration-300">
-            <div class="absolute top-1/2 -translate-y-1/2 left-0 w-12 h-12 bg-sky-500/50 rounded-full blur-[10px] transition-transform duration-500 -translate-x-6 group-hover:translate-x-10"></div>
-            <svg class="relative z-10 w-7 h-7 text-sky-400 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-          </div>
-          <h3 class="relative mb-2 text-base font-bold text-white">Uy tín #1 Việt Nam</h3>
-          <p class="relative text-sm leading-relaxed text-slate-300">Được review 5 sao bởi hàng nghìn khách hàng</p>
+          <h3 class="why-card-title">Bảo vệ thương hiệu</h3>
+          <p class="why-card-desc">Facebook tự động gỡ các trang mạo danh bạn</p>
         </div>
 
       </div>
@@ -93,3 +87,181 @@
 
 <script setup>
 </script>
+
+<style scoped>
+/* ── Section wrapper ──────────────────────────── */
+.why-us-section {
+  position: relative;
+  background-color: #0b0f1e;
+  padding: 80px 24px;
+  overflow: hidden;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* Dot-grid background on the section */
+.why-us-bg-dots {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.5;
+}
+
+/* ── Inner container ──────────────────────────── */
+.why-us-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Heading block ───────────────────────────── */
+.why-us-heading {
+  text-align: center;
+  margin-bottom: 56px;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.why-us-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px 0;
+}
+
+.why-us-subtitle {
+  font-size: 0.9rem;
+  color: #8b9ab5;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ── Cards row ────────────────────────────────── */
+.why-us-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* ── Single card ─────────────────────────────── */
+.why-card {
+  position: relative;
+  background: #131929;
+  border: 1px solid #1e2d47;
+  border-radius: 16px;
+  padding: 28px 22px 28px;
+  text-align: center;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+}
+
+.why-card:hover {
+  border-color: #2d4a7a;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(30, 64, 175, 0.18);
+}
+
+
+/* Dot-grid — sweep từ dưới lên khi hover */
+.why-card-dot-grid {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+  background-size: 18px 18px;
+  /* Ẩn hoàn toàn: clip từ dưới lên (bottom inset = 100%) */
+  clip-path: inset(0 0 100% 0 round 16px);
+  /* Mờ dần phần trên để trông tự nhiên hơn */
+  -webkit-mask-image: linear-gradient(to top, black 50%, transparent 100%);
+  mask-image: linear-gradient(to top, black 50%, transparent 100%);
+  transition: clip-path 0.5s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.why-card:hover .why-card-dot-grid {
+  /* Mở ra hoàn toàn: sweep từ dưới lên trên */
+  clip-path: inset(0 0 0% 0 round 16px);
+}
+
+
+
+/* ── Icon wrapper ────────────────────── */
+.why-card-icon-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 22px;
+  z-index: 1;
+}
+
+/* Centered icon box (plain square) */
+.why-card-icon-box {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background-color: #192236;
+  border: 1px solid #1e2d47;
+}
+
+.why-card-icon {
+  width: 30px;
+  height: 30px;
+  color: #4d87f6;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.why-card:hover .why-card-icon {
+  transform: rotate(-15deg);
+}
+
+/* ── Card text ───────────────────────────────── */
+.why-card-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #e8edf5;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
+}
+
+.why-card-desc {
+  font-size: 0.8rem;
+  color: #6b7fa3;
+  line-height: 1.55;
+  margin: 0;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 900px) {
+  .why-us-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .why-us-title {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .why-us-cards {
+    grid-template-columns: 1fr;
+  }
+  .why-us-section {
+    padding: 56px 16px;
+  }
+}
+</style>
