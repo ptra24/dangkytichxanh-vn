@@ -1,5 +1,5 @@
 <template>
-  <section class="process-section">
+  <section id="quy-trinh" class="process-section">
     <!-- Heading -->
     <div class="process-heading">
       <h2 class="process-title">Quy trình 4 bước</h2>
@@ -8,11 +8,7 @@
 
     <!-- Steps list -->
     <div class="process-steps">
-      <div
-        v-for="(step, index) in steps"
-        :key="index"
-        class="process-step"
-      >
+      <div v-for="(step, index) in steps" :key="index" class="process-step">
         <!-- Left: circle + connector -->
         <div class="step-indicator">
           <div class="step-circle">{{ step.number }}</div>
@@ -164,6 +160,7 @@ const steps = [
   .process-title {
     font-size: 1.5rem;
   }
+
   .process-section {
     padding: 56px 20px 64px;
   }
