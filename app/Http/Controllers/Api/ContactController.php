@@ -59,7 +59,7 @@ class ContactController extends Controller
         $mailError = null;
 
         try {
-            $adminEmail = config('mail.admin_receiver', 'admin@dangkytichxanh.vn');
+            $adminEmail = config('mail.admin_receiver', 'azmedia.com.vn@gmail.com');
             Mail::to($adminEmail)->send(new NewRegistrationMail($contact));
             $mailSent = true;
         } catch (\Throwable $e) {

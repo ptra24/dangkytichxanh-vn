@@ -1,5 +1,4 @@
 <script setup>
-import { computed } from 'vue';
 import { Phone } from '@lucide/vue';
 
 const props = defineProps({
@@ -10,21 +9,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['open-register']);
-
-// Determine checkmark color based on service
-const checkIconColor = computed(() => {
-  if (props.service.id === 'whatsapp') return 'text-emerald-400';
-  if (props.service.id === 'tiktok') return 'text-cyan-400';
-  if (props.service.id === 'instagram') return 'text-pink-500';
-  return 'text-blue-500';
-});
-
-const checkBgColor = computed(() => {
-  if (props.service.id === 'whatsapp') return 'bg-emerald-500/15';
-  if (props.service.id === 'tiktok') return 'bg-cyan-500/15';
-  if (props.service.id === 'instagram') return 'bg-pink-500/15';
-  return 'bg-blue-500/15';
-});
 </script>
 
 <template>
@@ -76,10 +60,7 @@ const checkBgColor = computed(() => {
               :key="idx" 
               class="flex items-start gap-3 group"
             >
-              <div 
-                class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white transition-all duration-300"
-              >
-                <!-- Checked Circle Icon -->
+              <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white transition-all duration-300">
                 <svg 
                   class="h-4 w-4 text-white" 
                   fill="none" 
@@ -103,17 +84,17 @@ const checkBgColor = computed(() => {
           <div class="flex flex-wrap gap-4 pt-2">
             <button 
               @click="emit('open-register')" 
-              class="relative inline-flex items-center justify-center rounded-xl bg-blue-600 px-9 py-4 text-lg font-extrabold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-500 hover:shadow-blue-500/40 transition-all duration-300 transform active:scale-98 group overflow-hidden"
+              class="relative inline-flex items-center justify-center rounded-xl bg-blue-600 px-9 py-4 text-lg font-extrabold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-500 hover:shadow-blue-500/40 transition-all duration-300 transform active:scale-95 group overflow-hidden"
             >
               <span class="relative z-10">Đăng Ký Ngay</span>
-              <div class="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-gradient-to-r from-blue-500 to-indigo-600 transition-transform duration-300 -z-10"></div>
+              <div class="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-gradient-to-r from-blue-500 to-indigo-600 transition-transform duration-300"></div>
             </button>
 
             <a 
               href="tel:0968825068" 
-              class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white px-8 py-4 text-lg font-bold text-slate-900 shadow-sm hover:border-blue-200 hover:bg-blue-50 transition-all duration-300 transform active:scale-98 dark:border-white/10 dark:bg-[#111b2f] dark:text-white dark:hover:bg-[#16233b] dark:hover:border-white/20"
+              class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white px-8 py-4 text-lg font-bold text-slate-900 shadow-sm hover:border-blue-200 hover:bg-blue-50 transition-all duration-300 transform active:scale-95 dark:border-white/10 dark:bg-[#111b2f] dark:text-white dark:hover:bg-[#16233b] dark:hover:border-white/20"
             >
-              <Phone class="h-5 w-5 text-blue-600 fill-blue-600/10 dark:text-slate-400 dark:fill-slate-400/10" />
+              <Phone class="h-5 w-5 text-blue-600 dark:text-slate-400" />
               0968.825.068
             </a>
           </div>
@@ -124,7 +105,7 @@ const checkBgColor = computed(() => {
         <div class="lg:col-span-5 flex justify-center lg:justify-end">
           <div 
             class="relative w-full max-w-[480px] rounded-2xl border bg-white p-9 shadow-xl shadow-slate-900/10 transition-all duration-500 ease-out dark:border-white/10 dark:bg-[#111b2f] dark:shadow-none"
-            :class="service.mockup.glowClass"
+            :class="service.mockup?.glowClass ?? ''"
           >
             <!-- Glowing overlay effect behind the card -->
             <div class="absolute inset-0 -z-10 rounded-2xl opacity-10 blur-xl bg-gradient-to-tr from-blue-600 to-indigo-500"></div>
@@ -146,10 +127,9 @@ const checkBgColor = computed(() => {
                   {{ service.mockup.avatarLetters }}
                 </div>
                 
-                <!-- Verification Check Badge at the bottom right corner of avatar -->
+                <!-- Verification Check Badge -->
                 <div class="absolute bottom-0 right-0 rounded-full border-2 border-white bg-white p-0.5 dark:border-[#090f1d]">
                   <div class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white">
-                    <!-- Standard Verification Icon SVG -->
                     <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -162,8 +142,8 @@ const checkBgColor = computed(() => {
                 <h3 class="font-sans text-xl font-extrabold text-slate-950 tracking-tight dark:text-white">
                   {{ service.mockup.username }}
                 </h3>
-                <!-- Custom small verified badge -->
-                <div class="inline-flex h-4.5 w-4.5 items-center justify-center rounded-full bg-blue-600">
+                <!-- Verified badge — fixed size h-5 w-5 (h-4.5 không hợp lệ) -->
+                <div class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600">
                   <svg class="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                   </svg>

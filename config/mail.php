@@ -115,6 +115,6 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
-    'admin_receiver' => env('ADMIN_MAIL_RECEIVER', 'admin@dangkytichxanh.vn'),
+    'admin_receiver' => env('ADMIN_MAIL_RECEIVER', 'azmedia.com.vn@gmail.com'),
 
 ];

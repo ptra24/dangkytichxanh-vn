@@ -1,865 +1,595 @@
-<script setup>
-import { ref, nextTick, onMounted, onUnmounted } from 'vue';
-import { 
-  Check, 
-  X, 
-  AlertCircle, 
-  Send, 
-  CheckCircle2 
+﻿<script setup>
+import { computed, onMounted, ref } from 'vue';
+import {
+  Award,
+  BadgeCheck,
+  BarChart3,
+  Check,
+  ChevronDown,
+  Clock,
+  LockKeyhole,
+  Mail,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Moon,
+  Phone,
+  ShieldCheck,
+  Star,
+  Sun,
+  TrendingUp,
+  Trophy,
+  WalletCards
 } from '@lucide/vue';
-import Header from './components/Header.vue';
-import HeroSection from './components/HeroSection.vue';
-import StatsBar from './components/StatsBar.vue';
-import WhyUs from './components/WhyUs.vue';
-import ProcessSteps from './components/ProcessSteps.vue';
-import Testimonials from './components/Testimonials.vue';
-import BlogPreview from './components/BlogPreview.vue';
-import ArticleView from './components/ArticleView.vue';
-import Footer from './components/Footer.vue';
-import { services } from './data/services';
-import { articles } from './data/articles';
+import { articles as articlePosts } from './data/articles';
 
-// ──────────────────────────────────────────────
-// Routing / Page state
-// ──────────────────────────────────────────────
-// currentPage: 'home' | 'article'
-const currentPage = ref('home');
+const isDark = ref(false);
+const activeFaq = ref(0);
+const leadName = ref('');
+const leadPhone = ref('');
+const leadLink = ref('');
 const selectedArticle = ref(null);
+const selectedHeroService = ref(null);
 
-const goHome = () => {
-  currentPage.value = 'home';
-  selectedArticle.value = null;
-  if (window.location.pathname !== '/') {
-    window.history.pushState({}, '', '/');
-  }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+const applyTheme = (dark) => {
+  isDark.value = dark;
+  document.documentElement.classList.toggle('dark', dark);
+  localStorage.theme = dark ? 'dark' : 'light';
 };
 
 const openArticle = (article) => {
   selectedArticle.value = article;
-  currentPage.value = 'article';
   window.history.pushState({}, '', `/tin-tuc/${article.id}`);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// ──────────────────────────────────────────────
-// Service selection
-// ──────────────────────────────────────────────
-const currentServiceIndex = ref(0);
-
-const selectService = (index) => {
-  currentServiceIndex.value = index;
+const closeArticle = () => {
+  selectedArticle.value = null;
+  window.history.pushState({}, '', '/#tin-tuc');
+  setTimeout(() => document.getElementById('tin-tuc')?.scrollIntoView({ behavior: 'smooth' }), 0);
 };
 
-const navigateHome = () => {
-  currentPage.value = 'home';
+const defaultHero = {
+  title: 'Tích Xanh Fanpage Instagram - Không Cần Báo Chí',
+  desc: 'Đăng Ký Tích Xanh Fanpage, Tích Xanh Instagram hoàn thành sau 15 phút. Lên tích ngay.',
+  badge: 'Dịch Vụ Uy Tín #1 Việt Nam',
+  features: [
+    'Áp dụng chính sách mới nhất Meta Verified',
+    'Tên tài khoản có tích xanh, không mất khi đổi tên',
+    'Thanh toán khi có tích xanh, không mất tiền oan',
+    '100% thành công, 2.368 khách tin tưởng'
+  ]
+};
+
+const servicePages = [
+  {
+    id: 'tich-xanh-fanpage',
+    name: 'Tích xanh Fanpage',
+    title: 'Dịch vụ đăng ký Tích Xanh Fanpage',
+    desc: 'Hỗ trợ kiểm tra và đăng ký tích xanh cho Fanpage bán hàng, thương hiệu, cộng đồng. Làm xong mới thanh toán, tư vấn rõ điều kiện trước khi triển khai.',
+    features: ['Không cần báo chí trong nhiều trường hợp', 'Tăng độ tin cậy khi khách hàng tìm kiếm', 'Hạn chế giả mạo thương hiệu', 'Phù hợp shop online và doanh nghiệp'],
+    price: '1.500.000đ',
+    meta: 'Phí Meta Verified được tư vấn theo từng hồ sơ'
+  },
+  {
+    id: 'tich-xanh-instagram',
+    name: 'Tích xanh Instagram',
+    title: 'Dịch vụ đăng ký Tích Xanh Instagram',
+    desc: 'Dành cho cá nhân, creator, shop online và business cần tăng uy tín tài khoản Instagram khi bán hàng hoặc xây dựng thương hiệu.',
+    features: ['Kiểm tra điều kiện trước khi làm', 'Tối ưu hồ sơ Instagram', 'Hỗ trợ shop và creator', 'Theo sát tới khi có kết quả'],
+    price: '1.500.000đ',
+    meta: 'Tư vấn phí nền tảng nếu có'
+  },
+  {
+    id: 'tich-xanh-tiktok',
+    name: 'Tích xanh TikTok',
+    title: 'Dịch vụ đăng ký Tích Xanh TikTok',
+    desc: 'Tư vấn và hỗ trợ hồ sơ xác minh TikTok cho creator, thương hiệu, shop và người bán hàng cần tăng độ tin cậy.',
+    features: ['Rà soát hồ sơ TikTok', 'Tư vấn điều kiện xác minh', 'Hỗ trợ định vị thương hiệu', 'Cập nhật theo chính sách nền tảng'],
+    price: 'Tư vấn theo hồ sơ',
+    meta: 'Báo rõ chi phí trước khi triển khai'
+  },
+  {
+    id: 'tich-xanh-facebook-ca-nhan',
+    name: 'Tích xanh Facebook cá nhân',
+    title: 'Dịch vụ đăng ký Tích Xanh Facebook cá nhân',
+    desc: 'Hỗ trợ cá nhân, KOL, chủ shop và người xây dựng thương hiệu cá nhân đăng ký xác minh tài khoản Facebook.',
+    features: ['Tối ưu tên và hồ sơ cá nhân', 'Tư vấn giấy tờ cần chuẩn bị', 'Không yêu cầu mật khẩu', 'Hỗ trợ sau khi lên tích xanh'],
+    price: '1.500.000đ',
+    meta: 'Chi phí nền tảng được tư vấn riêng'
+  },
+  {
+    id: 'tich-xanh-whatsapp',
+    name: 'Tích xanh WhatsApp',
+    title: 'Dịch vụ đăng ký Tích Xanh WhatsApp',
+    desc: 'Dành cho doanh nghiệp dùng WhatsApp Business cần xác minh chính chủ, tăng độ tin cậy khi chăm sóc khách hàng.',
+    features: ['Kiểm tra tài khoản doanh nghiệp', 'Tư vấn hồ sơ xác minh', 'Phù hợp đội sale/chăm sóc khách hàng', 'Hỗ trợ cấu hình thông tin doanh nghiệp'],
+    price: 'Tư vấn theo hồ sơ',
+    meta: 'Báo phí sau khi kiểm tra tài khoản'
+  }
+];
+
+const openServicePage = (service) => {
   selectedArticle.value = null;
+  selectedHeroService.value = service;
+  window.history.pushState({}, '', `/dich-vu/${service.id}`);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const closeServicePage = () => {
+  selectedHeroService.value = null;
   window.history.pushState({}, '', '/');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-const navigateService = (index) => {
-  currentServiceIndex.value = index;
-  currentPage.value = 'home';
-  selectedArticle.value = null;
-  window.history.pushState({}, '', `/dich-vu/${services[index].id}`);
-  nextTick(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
-};
-
-const navigateSection = (sectionId) => {
-  currentPage.value = 'home';
-  selectedArticle.value = null;
-  const path = sectionId === 'tin-tuc' ? '/tin-tuc' : `/#${sectionId}`;
-  window.history.pushState({}, '', path);
-  nextTick(() => {
-    const el = document.getElementById(sectionId);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-};
-
-const resolveRoute = () => {
-  const path = window.location.pathname;
-
-  if (path.startsWith('/tin-tuc/') && path !== '/tin-tuc/') {
-    const articleId = decodeURIComponent(path.split('/').pop());
-    const found = articles.find((item) => item.id === articleId);
-    if (found) {
-      selectedArticle.value = found;
-      currentPage.value = 'article';
-      return;
-    }
-  }
-
-  if (path.startsWith('/dich-vu/') && path !== '/dich-vu/') {
-    const serviceId = decodeURIComponent(path.split('/').pop());
-    const serviceIndex = services.findIndex((item) => item.id === serviceId);
-    if (serviceIndex >= 0) currentServiceIndex.value = serviceIndex;
-  }
-
-  currentPage.value = 'home';
-  selectedArticle.value = null;
-
-  if (path === '/tin-tuc') {
-    nextTick(() => document.getElementById('tin-tuc')?.scrollIntoView({ behavior: 'smooth' }));
-  }
-};
+const currentHero = computed(() => selectedHeroService.value ? { ...defaultHero, ...selectedHeroService.value } : defaultHero);
 
 onMounted(() => {
-  resolveRoute();
-  window.addEventListener('popstate', resolveRoute);
+  const savedTheme = localStorage.theme;
+  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+  applyTheme(savedTheme ? savedTheme === 'dark' : prefersDark);
+  const serviceId = window.location.pathname.startsWith('/dich-vu/')
+    ? window.location.pathname.split('/').pop()
+    : null;
+  if (serviceId) {
+    selectedHeroService.value = servicePages.find((service) => service.id === serviceId) || null;
+  }
+  const articleId = window.location.pathname.startsWith('/tin-tuc/')
+    ? window.location.pathname.split('/').pop()
+    : null;
+  if (articleId) {
+    selectedArticle.value = articlePosts.find((article) => article.id === articleId) || null;
+  }
 });
 
-onUnmounted(() => {
-  window.removeEventListener('popstate', resolveRoute);
-});
+const stats = [
+  ['2.368', 'Trang đã cấp tích xanh'],
+  ["15'", 'Thời gian trung bình'],
+  ['100%', 'Tỉ lệ thành công'],
+  ['1.5tr', 'Trọn gói']
+];
 
-// ──────────────────────────────────────────────
-// Dark / Light mode
-// ──────────────────────────────────────────────
-const isDark = ref(true);
+const benefits = [
+  [ShieldCheck, 'Xác minh chính chủ', 'Khách hàng còn lại sự tin tưởng, không nghi ngờ giả mạo'],
+  [TrendingUp, 'Ưu tiên hiển thị', 'Lượt tiếp cận tự nhiên tăng 20-40%, hiển thị top khi tìm kiếm'],
+  [BarChart3, 'Tăng doanh thu', 'Tỉ lệ chốt đơn trên page tích xanh tăng trung bình 28%'],
+  [BadgeCheck, 'Bảo vệ thương hiệu', 'Facebook tự động gỡ các trang mạo danh bạn']
+];
 
-// Apply initial theme
-if (typeof document !== 'undefined') {
-  document.documentElement.classList.add('dark');
-}
-
-const handleToggleTheme = (dark) => {
-  isDark.value = dark;
-  if (dark) {
-    document.documentElement.classList.add('dark');
-    localStorage.theme = 'dark';
-  } else {
-    document.documentElement.classList.remove('dark');
-    localStorage.theme = 'light';
-  }
-};
-
-// ──────────────────────────────────────────────
-// Registration Modal
-// ──────────────────────────────────────────────
-const isModalOpen = ref(false);
-const isSubmitted = ref(false);
-const isLoading = ref(false);
-
-// Form fields
-const name = ref('');
-const phone = ref('');
-const link = ref('');
-const formServiceIndex = ref('');
-const errors = ref({});
-
-const openModal = () => {
-  isModalOpen.value = true;
-  isSubmitted.value = false;
-  name.value = '';
-  phone.value = '';
-  link.value = '';
-  formServiceIndex.value = '';
-  errors.value = {};
-};
-
-const closeModal = () => {
-  isModalOpen.value = false;
-};
-
-const validateForm = () => {
-  const formErrors = {};
-  if (!name.value.trim()) formErrors.name = 'Vui lòng nhập họ và tên';
-  if (!phone.value.trim()) {
-    formErrors.phone = 'Vui lòng nhập số điện thoại';
-  } else if (!/^\d{9,11}$/.test(phone.value.replace(/\s+/g, ''))) {
-    formErrors.phone = 'Số điện thoại không hợp lệ (9 - 11 chữ số)';
-  }
-  if (!link.value.trim()) formErrors.link = 'Vui lòng nhập link tài khoản / Fanpage';
-  if (formServiceIndex.value === '') formErrors.service = 'Vui lòng chọn dịch vụ bạn quan tâm';
-  errors.value = formErrors;
-  return Object.keys(formErrors).length === 0;
-};
-
-const handleSubmit = async () => {
-  if (!validateForm()) return;
-  isLoading.value = true;
-  try {
-    const selectedService = services[formServiceIndex.value] || services[currentServiceIndex.value];
-    const payload = {
-      name: name.value,
-      phone: phone.value,
-      link: link.value,
-      service: selectedService ? selectedService.name : 'Tư vấn tích xanh'
-    };
-    const response = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json();
-    if (response.ok && result.success) {
-      isSubmitted.value = true;
-    } else {
-      alert(result.message || 'Có lỗi xảy ra khi gửi đăng ký.');
-    }
-  } catch (error) {
-    console.error('Lỗi kết nối API:', error);
-    alert('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng hoặc server.');
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// ──────────────────────────────────────────────
-// Pricing cards
-// ──────────────────────────────────────────────
-const pricingCards = [
+const priceCards = [
   {
-    title: 'Tích Xanh Fanpage',
-    subtitle: 'Cho Fanpage Facebook',
+    name: 'Tích Xanh Fanpage',
+    desc: 'Cho Fanpage Facebook',
     price: '1.500.000đ',
-    unit: '/ trọn gói',
-    features: [
-      'Tên Fanpage nào cũng lên',
-      'Không cần báo chí',
-      '15 phút hoàn thành',
-      'Bảo hành trọn đời'
-    ],
-    metaFee: 'Phí Meta Verified: ~100.000đ/tháng',
-    btnText: 'Đăng ký Fanpage',
-    isPopular: false,
-    serviceIndex: 0
+    features: ['Tên Fanpage nào cũng lên được', 'Không cần báo chí', '15 phút hoàn thành', 'Bảo hành trọn đời'],
+    button: 'Đăng ký Fanpage'
   },
   {
-    title: 'Tích Xanh Instagram',
-    subtitle: 'Cho Instagram cá nhân & business',
+name: 'Tích Xanh Instagram',
+    desc: 'Cho Instagram cá nhân & business',
     price: '1.500.000đ',
-    unit: '/ trọn gói',
-    features: [
-      'Cá nhân & business đều được',
-      'Tăng trust cho shop online',
-      '15 phút hoàn thành',
-      'Hỗ trợ 24/7'
-    ],
-    metaFee: 'Phí Meta Verified: ~100.000đ/tháng',
-    btnText: 'Đăng ký Instagram',
-    isPopular: false,
-    serviceIndex: 2
+    features: ['Cá nhân & doanh nghiệp đều được', 'Tăng độ tin cậy cho shop online', '15 phút hoàn thành', 'Hỗ trợ 24/7'],
+    button: 'Đăng ký Instagram'
   },
   {
-    title: 'Combo Fanpage + IG',
-    subtitle: '2 nền tảng, 1 lần thanh toán',
+    name: 'Combo Fanpage + IG',
+    desc: '2 nền tảng, 1 lần thanh toán',
     price: '2.500.000đ',
-    unit: '/ tiết kiệm',
-    subPriceLine: '500.000đ',
-    features: [
-      'Đăng ký cả Fanpage + Instagram',
-      'Tiết kiệm 500.000đ',
-      'Khuyên dùng cho shop',
-      'Bảo hành trọn đời'
-    ],
-    metaFee: 'Phí Meta Verified: ~150.000đ/tháng',
-    btnText: 'Đăng ký Combo',
-    isPopular: true,
-    serviceIndex: 0
+    popular: true,
+    features: ['Đăng ký cả Fanpage + Instagram', 'Tiết kiệm hơn đăng ký riêng', 'Khuyến dùng cho shop lớn', 'Bảo hành trọn đời'],
+    button: 'Đăng ký Combo'
   }
 ];
 
-const trustReasons = [
-  {
-    title: 'Nhanh nhất thị trường',
-    desc: '15 phút, không phải 1-7 ngày như tự làm'
-  },
-  {
-    title: 'Tỉ lệ 100% thành công',
-    desc: 'Làm xong tích xanh mới phải thanh toán, không mất tiền oan'
-  },
-  {
-    title: 'Hỗ trợ trọn đời',
-    desc: 'Gặp sự cố gì chúng tôi xử lý miễn phí'
-  },
-  {
-    title: 'An toàn 100%',
-    desc: 'Chỉ dùng phương pháp chính thức của Meta'
-  },
-  {
-    title: 'Tư vấn 24/7',
-    desc: 'Luôn có nhân viên trực hotline và Zalo'
-  },
-  {
-    title: 'Uy tín AZ Media',
-    desc: 'Được khách hàng cá nhân, shop và doanh nghiệp tin tưởng'
-  }
+const process = [
+  ['1', 'Liên hệ tư vấn', 'Gọi hoặc nhắn Zalo để được tư vấn miễn phí trong 5 phút'],
+  ['2', 'Cung cấp thông tin', 'Gửi link Fanpage + ảnh CMND/CCCD qua Zalo'],
+  ['3', 'Chúng tôi xử lý', 'Đội ngũ kỹ thuật hoàn tất trong 15-60 phút'],
+  ['4', 'Nhận tích xanh & thanh toán', 'Xem tích xanh live trên Fanpage, thanh toán khi hài lòng']
 ];
 
-const helpfulLinks = [
-  'Tích xanh Facebook là gì?',
-  'Hướng dẫn đăng ký từ A-Z',
-  'So sánh tích xanh vs tích xám',
-  'Giá tích xanh 2026',
-  'Đăng ký có an toàn không?',
-  'Lợi ích cho Fanpage kinh doanh'
+const reasons = [
+  [Award, 'Nhanh nhất thị trường', '15 phút, không phải 1-7 ngày như tự làm'],
+  [BadgeCheck, 'Tỉ lệ 100% thành công', 'Làm xong mới thanh toán, không mất tiền oan'],
+  [WalletCards, 'Hỗ trợ trọn đời', 'Gặp sự cố gì chúng tôi xử lý miễn phí'],
+  [LockKeyhole, 'An toàn 100%', 'Chỉ dùng phương pháp chính thức của Meta'],
+  [Phone, 'Tư vấn 24/7', 'Luôn có nhân viên trực hotline và Zalo'],
+  [Trophy, 'Uy tín AZ Media', 'Được nhiều cá nhân và doanh nghiệp tin tưởng']
 ];
 
-const serviceQuickLinks = [
-  { label: 'Tích xanh Fanpage', color: 'from-fuchsia-600 to-purple-700', serviceIndex: 0 },
-  { label: 'Tích xanh Facebook cá nhân', color: 'from-blue-600 to-blue-700', serviceIndex: 1 },
-  { label: 'Tích xanh TikTok', color: 'from-slate-800 to-slate-950', serviceIndex: 3 },
-  { label: 'Tích xanh Instagram', color: 'from-pink-600 to-rose-700', serviceIndex: 2 }
+const reviews = [
+  ['Nguyễn Văn Minh', 'Chủ shop thời trang', 'NV', 'Sau khi có tích xanh, inbox hỏi mua tăng gần gấp đôi. Khách không còn hỏi "có phải shop thật không?" nữa.'],
+  ['Trần Thị Lan', 'Chủ spa làm đẹp', 'TT', 'Thủ tục cực nhanh, đúng 20 phút là có tích xanh. Quan trọng là không phải trả tiền trước.'],
+  ['Phạm Hồng Quân', 'KOL kinh doanh', 'PH', 'Nhờ có tích xanh mà nhãn hàng chịu booking giá cao hơn trước. ROI quá hời.']
+];
+
+const faqs = [
+  ['Đăng ký tích xanh mất bao lâu?', 'Chỉ 15-60 phút sau khi nhận đủ thông tin. Trường hợp đặc biệt có thể lên tới 24h, chúng tôi sẽ báo trước.'],
+  ['Fanpage mới tạo có đăng ký được không?', 'Có thể kiểm tra trước. Chúng tôi sẽ tư vấn điều kiện cụ thể để tránh mất thời gian.'],
+  ['Chi phí đăng ký cụ thể là bao nhiêu?', 'Gói phổ biến từ 1.500.000đ, làm xong mới thanh toán.'],
+  ['Phải trả phí trong giai đoạn hay gói tháng?', 'Phí dịch vụ được báo rõ trước khi làm. Nếu có phí nền tảng từ Meta, chuyên viên sẽ tư vấn riêng.'],
+  ['Tích xanh có bị mất không?', 'Chúng tôi hỗ trợ đúng quy trình và tư vấn cách giữ tài khoản an toàn sau khi lên tích xanh.'],
+  ['Có an toàn không? Tài khoản có bị khóa không?', 'Quy trình không yêu cầu mật khẩu và ưu tiên phương pháp chính thức, minh bạch.'],
+  ['Tích xanh khác tích xám như thế nào?', 'Tích xanh thể hiện xác minh chính chủ, phù hợp thương hiệu, cá nhân, shop và doanh nghiệp.'],
+  ['Nếu không thành công thì sao?', 'Không thành công thì không thu phí dịch vụ.']
+];
+const articles = articlePosts.slice(0, 6);
+
+const quickServices = [
+  ['Tích xanh Fanpage', 'from-violet-600 to-purple-700'],
+  ['Tích xanh Facebook cá nhân', 'from-blue-600 to-blue-700'],
+  ['Tích xanh TikTok', 'from-slate-800 to-slate-950'],
+  ['Tích xanh Instagram', 'from-pink-600 to-rose-700']
 ];
 </script>
 
 <template>
-  <!--
-    Root wrapper:
-    - dark class is toggled on <html> by handleToggleTheme
-    - bg/text defaults cover both modes via Tailwind dark: variants
-  -->
-  <div
-    class="app-shell min-h-screen flex flex-col selection:bg-blue-600/30 selection:text-blue-200
-           bg-white text-slate-800
-           dark:bg-[#060b13] dark:text-slate-100"
-  >
+  <div class="site-page min-h-screen bg-[#f7fbff] text-slate-950 transition-colors duration-300 dark:bg-[#07101f] dark:text-white">
+    <header class="site-header mx-auto flex max-w-[760px] items-center justify-between px-5 py-5">
+      <a href="/" class="site-logo flex items-center gap-2 text-[13px] font-black text-slate-900 dark:text-white">
+        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white">
+          <Check class="h-3.5 w-3.5 stroke-[4]" />
+        </span>
+        <span>Đăng Ký Tích Xanh<small>.vn</small></span>
+      </a>
+      <nav class="site-nav">
+        <a href="#">Trang chủ</a>
+        <div class="site-service-menu">
+          <button type="button">Dịch vụ <ChevronDown class="site-service-chevron" /></button>
+          <div class="site-service-dropdown">
+            <a v-for="service in servicePages" :key="service.id" :href="`/dich-vu/${service.id}`" @click.prevent="openServicePage(service)">{{ service.name }}</a>
+          </div>
+        </div>
+        <a href="#loi-ich">Lợi ích</a>
+        <a href="#bang-gia">Bảng giá</a>
+        <a href="#quy-trinh">Quy trình</a>
+        <a href="#tin-tuc">Tin tức</a>
+        <a href="#contact">Liên hệ</a>
+      </nav>
+      <div class="site-actions flex items-center gap-3">
+        <a class="site-fast-register" href="#contact">🚀 Đăng ký nhanh</a>
+        <button class="site-theme-button text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-white" @click="applyTheme(!isDark)" aria-label="Đổi giao diện">
+          <Sun v-if="isDark" class="h-4 w-4" />
+          <Moon v-else class="h-4 w-4" />
+        </button>
+        <a class="site-header-phone" href="tel:0968825068">0968.825.068</a>
+        <Menu class="site-menu-icon h-4 w-4 text-slate-500 dark:text-slate-400" />
+      </div>
+    </header>
 
-    <!-- ─── HEADER (always visible) ──────────────────── -->
-    <Header
-      :currentServiceIndex="currentServiceIndex"
-      @select-service="selectService"
-      @navigate-service="navigateService"
-      @navigate-home="navigateHome"
-      @navigate-section="navigateSection"
-      @toggle-theme="handleToggleTheme"
-      @open-register="openModal"
-    />
+    <main v-if="selectedArticle" class="article-modern">
+      <div class="article-modern-shell">
+        <div class="article-modern-wrap">
+          <nav class="article-breadcrumb" aria-label="Đường dẫn bài viết">
+            <button type="button" @click="closeArticle">Trang chủ</button>
+            <span>/</span>
+            <button type="button" @click="closeArticle">Tin tức</button>
+            <span>/</span>
+            <span>{{ selectedArticle.title }}</span>
+          </nav>
 
-    <!-- ═══════════════════════════════════════════════ -->
-    <!--  PAGE: HOME                                     -->
-    <!-- ═══════════════════════════════════════════════ -->
-    <template v-if="currentPage === 'home'">
+          <div class="article-modern-grid">
+            <article class="article-modern-main">
+              <h1>{{ selectedArticle.title }}</h1>
 
-      <!-- Hero -->
-      <HeroSection
-        :service="services[currentServiceIndex]"
-        @open-register="openModal"
-      />
-
-      <!-- Stats Bar -->
-      <StatsBar />
-
-      <!-- Why Us -->
-      <WhyUs />
-
-      <!-- ── Pricing Section ─────────────────────────── -->
-      <main class="w-full">
-        <section
-          id="bang-gia"
-          class="py-20 relative overflow-hidden
-                 bg-white dark:bg-[#060b13]"
-        >
-          <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-12 space-y-2">
-              <h2
-                class="font-sans text-3xl font-extrabold tracking-tight sm:text-4xl
-                       text-slate-900 dark:text-white"
-              >
-                Bảng giá dịch vụ Tích Xanh
-              </h2>
-              <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium">
-                Làm xong mới thanh toán, cam kết 100% thành công
-              </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div
-                v-for="card in pricingCards"
-                :key="card.title"
-                class="rounded-2xl p-6 flex flex-col justify-between
-                       hover:border-white/15 transition-all duration-300
-                       transform hover:-translate-y-1 relative
-                       border
-                       bg-slate-50 border-slate-200
-                       dark:bg-slate-950/40 dark:border-white/5
-                       dark:hover:bg-slate-900/60"
-                :class="card.isPopular
-                  ? 'border-blue-500 shadow-[0_0_25px_rgba(37,99,235,0.15)] ring-1 ring-blue-500/30 dark:border-blue-500'
-                  : ''"
-              >
-                <!-- Popular badge -->
-                <span
-                  v-if="card.isPopular"
-                  class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#10b981] text-[9px] font-black text-white uppercase tracking-wider shadow-md"
-                >
-                  Phổ biến nhất
-                </span>
-
-                <div>
-                  <h3
-                    class="text-lg font-bold tracking-tight
-                           text-slate-900 dark:text-white"
-                  >{{ card.title }}</h3>
-                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6 font-medium">{{ card.subtitle }}</p>
-
-                  <div class="flex items-baseline flex-wrap gap-1 mb-6">
-                    <span class="text-3xl font-black text-blue-500 tracking-tight">{{ card.price }}</span>
-                    <div class="flex flex-col ml-1">
-                      <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold">{{ card.unit }}</span>
-                      <span v-if="card.subPriceLine" class="text-[10px] text-slate-400 font-bold leading-none mt-0.5">{{ card.subPriceLine }}</span>
-                    </div>
-                  </div>
-
-                  <div class="h-px w-full bg-slate-200 dark:bg-white/5 mb-6"></div>
-
-                  <ul class="space-y-3 mb-8 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                    <li v-for="feat in card.features" :key="feat" class="flex items-center gap-2">
-                      <svg class="h-4 w-4 text-emerald-400 stroke-[3] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>{{ feat }}</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
-                  <div
-                    class="rounded-lg py-2 px-3 text-center text-[10px] mb-5 font-semibold
-                           bg-slate-100 border border-slate-200 text-slate-500
-                           dark:bg-slate-800/40 dark:border-white/5 dark:text-slate-400"
-                  >
-                    {{ card.metaFee }}
-                  </div>
-
-                  <button
-                    @click="selectService(card.serviceIndex); openModal();"
-                    class="w-full py-3 rounded-xl text-xs font-extrabold transition-all duration-300 transform active:scale-98"
-                    :class="card.isPopular
-                      ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/10'
-                      : 'border border-blue-500/50 hover:bg-blue-500/10 text-blue-600 dark:text-white'"
-                  >
-                    {{ card.btnText }}
-                  </button>
-                </div>
+              <div class="article-tldr">
+                <strong>💡 TL;DR - TÓM TẮT NHANH</strong>
+                <p>{{ selectedArticle.description }}</p>
               </div>
+
+              <div class="article-modern-meta">
+                <span>{{ selectedArticle.author || 'Đăng Ký Tích Xanh Team' }}</span>
+                <span>·</span>
+                <span>{{ selectedArticle.category }}</span>
+                <span>·</span>
+                <span>{{ selectedArticle.date }}</span>
+                <span>·</span>
+                <span>{{ selectedArticle.readTime }}</span>
+                <button type="button">Lưu bài</button>
+              </div>
+
+              <div class="article-hero-img">
+                <img :src="selectedArticle.banner" :alt="selectedArticle.title" />
+              </div>
+
+              <div class="article-modern-content" v-html="selectedArticle.content"></div>
+            </article>
+
+            <aside class="article-modern-sidebar">
+              <h3>☷ Mục lục</h3>
+              <a v-for="item in articles.filter(a => a.id !== selectedArticle.id).slice(0, 6)" :key="item.id" href="#" @click.prevent="openArticle(item)">
+                {{ item.title }}
+              </a>
+              <a href="#contact" @click="selectedArticle = null">Dịch vụ hỗ trợ đăng ký tích xanh</a>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <main v-else>
+      <section class="mx-auto grid max-w-[760px] gap-8 px-5 pb-14 pt-7 md:grid-cols-[1.05fr_0.95fr] md:items-center md:pt-14">
+        <div>
+          <div class="mb-5 inline-flex rounded-full bg-blue-50 px-3 py-1.5 text-[11px] font-bold text-blue-600 dark:bg-blue-500/10 dark:text-blue-300">
+            {{ currentHero.badge }}
+          </div>
+          <h1 class="max-w-[360px] text-[39px] font-black leading-[0.95] tracking-tight text-slate-950 dark:text-white md:text-[43px]">
+            {{ currentHero.title }}
+          </h1>
+          <p class="mt-4 max-w-[390px] text-[13px] font-medium leading-6 text-slate-600 dark:text-slate-300">
+            {{ currentHero.desc }}
+          </p>
+
+          <div class="mt-4 grid max-w-[390px] grid-cols-2 gap-2">
+<div v-for="item in currentHero.features" :key="item" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-semibold leading-4 text-slate-700 shadow-sm dark:border-white/10 dark:bg-[#0e1b31] dark:text-slate-200">
+              <Check class="mb-1 h-3.5 w-3.5 text-emerald-500" />
+              {{ item }}
             </div>
           </div>
-        </section>
-      </main>
 
-      <!-- Process Steps -->
-      <ProcessSteps />
-
-      <section class="py-20 bg-[#102946] text-white dark:bg-[#0b1628]">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="mb-12 text-center">
-            <h2 class="text-4xl font-black tracking-tight sm:text-5xl">Tại sao chọn chúng tôi?</h2>
-            <p class="mt-4 text-xl font-semibold text-slate-300">Được 2.368 khách hàng tin tưởng</p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a href="#contact" class="rounded-lg bg-blue-600 px-5 py-3 text-[12px] font-black text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500">Đăng Ký Ngay</a>
+            <a href="tel:0968825068" class="rounded-lg border border-slate-200 bg-white px-5 py-3 text-[12px] font-black text-slate-800 shadow-sm hover:border-blue-300 dark:border-white/10 dark:bg-[#0e1b31] dark:text-white">0968.825.068</a>
           </div>
+        </div>
 
-          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div
-              v-for="item in trustReasons"
-              :key="item.title"
-              class="rounded-2xl border border-white/10 bg-white/[0.06] p-8 text-center shadow-xl shadow-black/10 transition hover:-translate-y-1 hover:border-blue-400/50"
-            >
-              <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-300">
-                <Check class="h-9 w-9 stroke-[3]" />
-              </div>
-              <h3 class="text-2xl font-black">{{ item.title }}</h3>
-              <p class="mt-4 text-lg font-medium leading-relaxed text-slate-300">{{ item.desc }}</p>
+        <div class="mx-auto w-full max-w-[330px] rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xl shadow-slate-900/8 dark:border-white/10 dark:bg-[#14223b] dark:shadow-none">
+          <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 text-2xl font-black text-white">DK</div>
+          <div class="mt-4 flex items-center justify-center gap-1 text-sm font-black text-slate-950 dark:text-white">
+            Đăng Ký Tích Xanh
+            <BadgeCheck class="h-4 w-4 fill-blue-600 text-white" />
+          </div>
+          <p class="mt-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">Meta Verified · Trang chính chủ</p>
+          <div class="mt-5 grid grid-cols-3 border-t border-slate-100 pt-4 text-center dark:border-white/10">
+            <div v-for="stat in [['2.368', 'Trang đã cấp'], ['99%', 'Tỷ lệ thành công'], ['15’', 'Thời gian']]" :key="stat[1]">
+              <p class="text-sm font-black text-blue-600 dark:text-blue-400">{{ stat[0] }}</p>
+              <p class="mt-1 text-[9px] font-semibold text-slate-500 dark:text-slate-400">{{ stat[1] }}</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Testimonials -->
-      <Testimonials />
-
-      <!-- Blog / Articles Section -->
-      <section
-        id="tin-tuc"
-        class="py-20 bg-slate-50 dark:bg-[#060b13] border-t border-slate-200 dark:border-white/5"
-      >
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="text-center mb-12 space-y-2">
-            <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900 dark:text-white">
-              Tin tức & Kiến thức
-            </h2>
-            <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium">
-              Cập nhật mới nhất về tích xanh và mạng xã hội
-            </p>
+      <section class="bg-[#092247] py-7 text-white">
+        <div class="mx-auto grid max-w-[760px] grid-cols-4 px-5 text-center">
+          <div v-for="item in stats" :key="item[1]">
+            <p class="text-xl font-black">{{ item[0] }}</p>
+            <p class="mt-1 text-[10px] font-semibold text-blue-100/80">{{ item[1] }}</p>
           </div>
+        </div>
+      </section>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <article
-              v-for="article in articles"
-              :key="article.id"
-              class="group rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 cursor-pointer
-                     bg-white border-slate-200 hover:border-blue-300 hover:shadow-lg
-                     dark:bg-[#0a1020] dark:border-white/5 dark:hover:border-blue-500/30 dark:hover:shadow-blue-500/5"
-              @click="openArticle(article)"
-            >
-              <!-- Thumbnail -->
-              <div class="aspect-[16/9] overflow-hidden bg-slate-100 dark:bg-slate-900">
-                <img
-                  :src="article.banner"
-                  :alt="article.title"
-                  class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                />
+      <section class="bg-white py-16 dark:bg-[#07101f]">
+        <div class="mx-auto max-w-[760px] px-5">
+          <div class="mx-auto max-w-[560px] text-center">
+            <h2 class="text-2xl font-black leading-tight text-slate-950 dark:text-white">Tích Xanh Đem Lại Gì Cho Fanpage & Business Của Bạn?</h2>
+<p class="mt-3 text-[12px] font-medium text-slate-500 dark:text-slate-400">Tín hiệu Uy Tín cao nhất trên Meta, tăng tiếp cận tự nhiên và doanh số ngay lập tức</p>
+          </div>
+          <div class="mt-10 grid gap-4 sm:grid-cols-2">
+            <div v-for="[Icon, title, desc] in benefits" :key="title" class="rounded-xl border border-slate-200 bg-white p-7 text-center shadow-sm dark:border-white/10 dark:bg-[#122039]">
+              <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300">
+                <component :is="Icon" class="h-5 w-5" />
               </div>
+              <h3 class="mt-5 text-sm font-black text-slate-950 dark:text-white">{{ title }}</h3>
+              <p class="mt-2 text-[11px] font-medium leading-5 text-slate-500 dark:text-slate-400">{{ desc }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <!-- Content -->
-              <div class="p-5 space-y-3">
-                <span
-                  class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full
-                         bg-blue-50 text-blue-600 border border-blue-100
-                         dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20"
-                >
-                  {{ article.category }}
-                </span>
-
-                <h3 class="text-sm font-bold leading-snug line-clamp-2 text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  {{ article.title }}
-                </h3>
-
-                <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                  {{ article.description }}
-                </p>
-
-                <div class="flex items-center justify-between pt-1">
-                  <span class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{{ article.date }}</span>
-                  <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 group-hover:underline">
-                    Đọc thêm →
-                  </span>
-                </div>
-              </div>
+      <section id="bang-gia" class="bg-[#f3f8ff] py-16 dark:bg-[#0b1528]">
+        <div class="mx-auto max-w-[760px] px-5">
+          <div class="mb-9 text-center">
+            <h2 class="text-2xl font-black text-slate-950 dark:text-white">Bảng giá dịch vụ</h2>
+            <p class="mt-2 text-[12px] font-medium text-slate-500 dark:text-slate-400">Làm xong mới thanh toán, cam kết 100% thành công</p>
+          </div>
+          <div class="grid gap-4 md:grid-cols-3">
+            <article v-for="card in priceCards" :key="card.name" class="relative rounded-xl border bg-white p-5 shadow-sm dark:bg-[#111d34]" :class="card.popular ? 'border-blue-500 ring-2 ring-blue-500/20 dark:border-blue-400' : 'border-slate-200 dark:border-white/10'">
+              <span v-if="card.popular" class="absolute -top-3 right-4 rounded-full bg-emerald-400 px-3 py-1 text-[10px] font-black text-white">Phổ biến nhất</span>
+              <h3 class="text-sm font-black text-slate-950 dark:text-white">{{ card.name }}</h3>
+              <p class="mt-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400">{{ card.desc }}</p>
+              <p class="mt-5 text-2xl font-black text-blue-600 dark:text-blue-400">{{ card.price }}</p>
+              <p class="text-[10px] font-bold text-slate-400">trọn gói</p>
+              <ul class="mt-5 space-y-2">
+                <li v-for="feature in card.features" :key="feature" class="flex gap-2 text-[10px] font-semibold leading-4 text-slate-600 dark:text-slate-300">
+                  <Check class="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                  {{ feature }}
+                </li>
+              </ul>
+              <div class="mt-5 rounded-lg bg-slate-50 px-3 py-2 text-[9px] font-semibold text-slate-500 dark:bg-[#0a1325] dark:text-slate-400">Phí Meta Verified: tư vấn khi kiểm tra hồ sơ</div>
+<a href="#contact" class="mt-5 block rounded-lg border border-blue-600 px-4 py-2.5 text-center text-[11px] font-black text-blue-600 hover:bg-blue-600 hover:text-white dark:text-blue-300">{{ card.button }}</a>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="py-20 bg-slate-100 dark:bg-[#0f1d35] border-t border-slate-200 dark:border-white/5">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="mb-12 text-center">
-            <h2 class="text-4xl font-black tracking-tight text-slate-950 dark:text-white sm:text-5xl">Bài viết hữu ích</h2>
-            <p class="mt-4 text-xl font-semibold text-slate-500 dark:text-slate-400">Kiến thức cần biết trước khi đăng ký tích xanh</p>
+      <section id="quy-trinh" class="bg-white py-16 dark:bg-[#07101f]">
+        <div class="mx-auto max-w-[560px] px-5">
+          <div class="text-center">
+            <h2 class="text-2xl font-black text-slate-950 dark:text-white">Quy trình 4 bước</h2>
+            <p class="mt-2 text-[12px] font-medium text-slate-500 dark:text-slate-400">Đơn giản, minh bạch, hoàn thành trong 15 phút</p>
           </div>
-
-          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <button
-              v-for="link in helpfulLinks"
-              :key="link"
-              @click="navigateSection('tin-tuc')"
-              class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-6 py-5 text-left text-lg font-extrabold text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:text-blue-600 dark:border-white/10 dark:bg-[#16243d] dark:text-white dark:hover:border-blue-400"
-            >
-              <span>{{ link }}</span>
-              <span class="text-2xl">↗</span>
-            </button>
-          </div>
-
-          <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            <button
-              v-for="item in serviceQuickLinks"
-              :key="item.label"
-              @click="navigateService(item.serviceIndex)"
-              class="flex min-h-28 items-center justify-between rounded-2xl bg-gradient-to-br px-7 py-6 text-left text-xl font-black text-white shadow-lg transition hover:-translate-y-1"
-              :class="item.color"
-            >
-              <span>{{ item.label }}</span>
-              <span class="text-3xl">→</span>
-            </button>
+          <div class="mt-10 space-y-6">
+            <div v-for="step in process" :key="step[0]" class="flex gap-5">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white shadow-lg shadow-blue-600/25">{{ step[0] }}</div>
+              <div class="pt-1">
+                <h3 class="text-sm font-black text-slate-950 dark:text-white">{{ step[1] }}</h3>
+                <p class="mt-1 text-[12px] font-medium leading-5 text-slate-500 dark:text-slate-400">{{ step[2] }}</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="py-20 bg-white dark:bg-[#060b13] border-t border-slate-200 dark:border-white/5">
-        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div class="text-center mb-10">
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white sm:text-4xl">
-              Đăng Ký Tích Xanh Có An Toàn Không?
-            </h2>
-            <p class="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
-              Giải đáp nhanh các câu hỏi thường gặp
-            </p>
+      <section id="loi-ich" class="why-choice-section bg-[#0c1930] py-16 text-white dark:bg-[#0c1930]">
+        <div class="mx-auto max-w-[760px] px-5">
+          <div class="why-choice-heading mb-9 text-center">
+            <h2 class="text-2xl font-black">Tại sao chọn chúng tôi?</h2>
+            <p class="mt-2 text-[12px] font-medium text-slate-300">Được 2.368 khách hàng tin tưởng</p>
           </div>
+          <div class="why-choice-grid grid gap-4 sm:grid-cols-2">
+            <div v-for="[Icon, title, desc] in reasons" :key="title" class="why-choice-card rounded-xl bg-white/7 p-6 text-center">
+              <div class="why-choice-icon mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300">
+                <component :is="Icon" class="h-5 w-5" />
+              </div>
+              <h3 class="mt-4 text-sm font-black">{{ title }}</h3>
+              <p class="mt-2 text-[11px] font-medium leading-5 text-slate-300">{{ desc }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      <section class="bg-white py-16 dark:bg-[#07101f]">
+        <div class="mx-auto max-w-[760px] px-5">
+          <h2 class="mb-8 text-center text-2xl font-black text-slate-950 dark:text-white">Khách hàng nói gì?</h2>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div v-for="review in reviews" :key="review[0]" class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111d34]">
+              <div class="mb-3 flex text-amber-400">
+<Star v-for="n in 5" :key="n" class="h-3.5 w-3.5 fill-current" />
+              </div>
+              <p class="min-h-20 text-[11px] font-medium italic leading-5 text-slate-600 dark:text-slate-300">"{{ review[3] }}"</p>
+              <div class="mt-5 flex items-center gap-3">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-[10px] font-black text-white">{{ review[2] }}</div>
+                <div>
+                  <p class="text-[11px] font-black text-slate-950 dark:text-white">{{ review[0] }}</p>
+                  <p class="text-[10px] font-medium text-slate-500 dark:text-slate-400">{{ review[1] }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-[#f8fbff] py-16 dark:bg-[#0b1528]">
+        <div class="mx-auto max-w-[640px] px-5">
+          <h2 class="mb-8 text-center text-2xl font-black leading-tight text-slate-950 dark:text-white">Đăng Ký Tích Xanh Có An Toàn Không? <br />- Giải Đáp 8 Câu Hỏi Top</h2>
           <div class="space-y-3">
-            <details open class="group rounded-2xl border border-blue-200 bg-white p-5 shadow-sm dark:border-blue-500/30 dark:bg-[#0f172a]/70">
-              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-extrabold text-slate-950 dark:text-white">
-                <span>Đăng ký tích xanh mất bao lâu?</span>
-                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white group-open:rotate-45">+</span>
-              </summary>
-              <p class="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                Chỉ 15-60 phút sau khi nhận đủ thông tin. Trường hợp đặc biệt có thể lên tới 24h, chúng tôi sẽ báo trước.
-              </p>
-            </details>
-
-            <details
-              v-for="item in [
-                ['Fanpage mới tạo có đăng ký được không?', 'Có thể kiểm tra trước. Chúng tôi sẽ tư vấn điều kiện cụ thể để tránh mất thời gian.'],
-                ['Chi phí đăng ký cụ thể là bao nhiêu?', 'Gói phổ biến từ 1.500.000đ, làm xong mới thanh toán.'],
-                ['Tích xanh có bị mất không?', 'Chúng tôi hỗ trợ đúng quy trình Meta và bảo hành theo từng gói dịch vụ.'],
-                ['Nếu không thành công thì sao?', 'Không thành công thì không thu phí dịch vụ.']
-              ]"
-              :key="item[0]"
-              class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0f172a]/60"
-            >
-              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-extrabold text-slate-950 dark:text-white">
-                <span>{{ item[0] }}</span>
-                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 group-open:rotate-45 dark:bg-blue-500/10 dark:text-blue-300">+</span>
-              </summary>
-              <p class="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{{ item[1] }}</p>
-            </details>
+            <div v-for="(faq, index) in faqs" :key="faq[0]" class="rounded-lg border border-slate-200 bg-white dark:border-white/10 dark:bg-[#111d34]">
+              <button class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-[12px] font-black text-slate-900 dark:text-white" @click="activeFaq = activeFaq === index ? -1 : index">
+                {{ faq[0] }}
+                <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300">
+                  <ChevronDown class="h-3.5 w-3.5 transition" :class="{ 'rotate-180': activeFaq === index }" />
+                </span>
+              </button>
+              <p v-if="activeFaq === index" class="px-4 pb-4 text-[11px] font-medium leading-5 text-slate-500 dark:text-slate-400">{{ faq[1] }}</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="contact" class="py-20 bg-slate-50 dark:bg-[#060b13] border-t border-slate-200 dark:border-white/5">
-        <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-          <div>
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white sm:text-4xl">
-              Liên hệ
-            </h2>
-            <p class="mt-3 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Văn phòng giao dịch và thông tin hỗ trợ chính thức của AZ Media.
-            </p>
-
-            <div class="mt-8 space-y-4">
-              <div class="rounded-2xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#0f172a]/70">
-                <p class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Hotline</p>
-                <a href="tel:0968825068" class="mt-1 block text-xl font-extrabold text-slate-950 dark:text-white">0968.825.068 (Mr. Quang)</a>
-              </div>
-              <div class="rounded-2xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#0f172a]/70">
-                <p class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Địa chỉ</p>
-                <p class="mt-1 text-base font-bold text-slate-950 dark:text-white">84 Nguyễn Hữu Dật, Hòa Cường Bắc, Hải Châu, Đà Nẵng</p>
-              </div>
-              <div class="rounded-2xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#0f172a]/70">
-                <p class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Email / Facebook</p>
-                <p class="mt-1 text-base font-bold text-slate-950 dark:text-white">azmedia.com.vn@gmail.com - fb.com/congtyazmedia</p>
-              </div>
-            </div>
+      <section id="tin-tuc" class="bg-[#eef6ff] py-16 dark:bg-[#0d1b31]">
+        <div class="mx-auto max-w-[760px] px-5">
+          <div class="mb-8 text-center">
+            <h2 class="text-2xl font-black text-slate-950 dark:text-white">Bài viết hữu ích</h2>
+            <p class="mt-2 text-[12px] font-medium text-slate-500 dark:text-slate-400">Kiến thức cập nhật trước khi đăng ký tích xanh</p>
           </div>
-
-          <form
-            @submit.prevent="openModal"
-            class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5 dark:border-white/10 dark:bg-[#0f172a]/80 dark:shadow-none"
-          >
-            <div class="grid gap-4">
-              <input class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" placeholder="Họ và tên" />
-              <input class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" placeholder="Số điện thoại" />
-              <input class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" placeholder="Link Fanpage / Instagram / TikTok" />
-              <textarea class="min-h-28 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" placeholder="Bạn cần tư vấn dịch vụ nào?"></textarea>
-              <label class="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
-                <input type="checkbox" class="h-4 w-4 rounded border-slate-300" />
-                Tôi xác nhận không phải robot
-              </label>
-              <button class="rounded-xl bg-blue-600 px-4 py-3 text-sm font-extrabold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500">
-                Gửi yêu cầu tư vấn
-              </button>
-              <p class="text-center text-xs text-slate-500 dark:text-slate-400">Cam kết bảo mật thông tin, không spam</p>
-            </div>
-          </form>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <button v-for="item in articles" :key="item.id" type="button" class="flex items-center justify-between rounded-lg bg-white px-4 py-3 text-left text-[12px] font-bold text-slate-700 shadow-sm dark:bg-[#111d34] dark:text-slate-200" @click="openArticle(item)">
+              <span>{{ item.title }}</span>
+              <ChevronDown class="-rotate-90 h-3.5 w-3.5" />
+            </button>
+          </div>
+<div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <a v-for="item in quickServices" :key="item[0]" href="#contact" class="flex items-center justify-between rounded-lg bg-gradient-to-r px-4 py-3 text-[12px] font-black text-white" :class="item[1]">
+              {{ item[0] }}
+              <ChevronDown class="-rotate-90 h-4 w-4" />
+            </a>
+          </div>
         </div>
       </section>
 
-    </template>
+      <section class="bg-blue-600 py-14 text-center text-white">
+        <div class="mx-auto max-w-[760px] px-5">
+          <h2 class="text-2xl font-black">Sẵn sàng có tích xanh trong 15 phút?</h2>
+          <p class="mt-3 text-[12px] font-semibold text-blue-100">Hotline 0968.825.068 - tư vấn miễn phí, không ép mua, hỗ trợ cả đêm</p>
+          <div class="mt-6 flex justify-center gap-3">
+            <a href="#contact" class="rounded-lg bg-white px-5 py-3 text-[12px] font-black text-blue-600">Đăng ký ngay</a>
+            <a href="tel:0968825068" class="rounded-lg border border-white/70 px-5 py-3 text-[12px] font-black text-white">0968.825.068</a>
+          </div>
+        </div>
+      </section>
 
-    <!-- ═══════════════════════════════════════════════ -->
-    <!--  PAGE: ARTICLE VIEW                             -->
-    <!-- ═══════════════════════════════════════════════ -->
-    <template v-else-if="currentPage === 'article' && selectedArticle">
-      <ArticleView
-        :article="selectedArticle"
-        :allArticles="articles"
-        @back="goHome"
-        @select-article="openArticle"
-        @open-register="openModal"
-        @select-service="selectService"
-      />
-    </template>
-
-    <!-- ─── FOOTER (always visible) ──────────────────── -->
-    <Footer @open-register="openModal" />
-
-    <!-- ─── HOTLINE POPUP ─────────────────────────────── -->
-
-    <!-- ═══════════════════════════════════════════════ -->
-    <!--  REGISTRATION MODAL                             -->
-    <!-- ═══════════════════════════════════════════════ -->
-    <div
-      v-if="isModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
-      @click.self="closeModal"
-    >
-      <div
-        class="relative w-full max-w-lg overflow-hidden rounded-2xl border shadow-2xl transition-all duration-300
-               bg-white border-slate-200
-               dark:bg-[#0f172a] dark:border-white/10"
-      >
-        <!-- Top color bar -->
-        <div
-          class="h-1.5 w-full bg-blue-600 transition-colors duration-300"
-          :class="{
-            'bg-blue-600': currentServiceIndex === 0 || currentServiceIndex === 1,
-            'bg-pink-600': currentServiceIndex === 2,
-            'bg-cyan-500': currentServiceIndex === 3,
-            'bg-emerald-500': currentServiceIndex === 4,
-          }"
-        ></div>
-
-        <!-- Close Button -->
-        <button
-          @click="closeModal"
-          class="absolute top-4 right-4 rounded-lg p-1.5 transition-colors focus:outline-none
-                 text-slate-400 hover:text-slate-700 hover:bg-slate-100
-                 dark:hover:text-white dark:hover:bg-white/5"
-        >
-          <X class="h-5 w-5" />
-        </button>
-
-        <!-- Form Content -->
-        <div class="p-6 sm:p-8 text-left">
-
-          <!-- ── Form ───────────────────────────────── -->
-          <div v-if="!isSubmitted">
-            <h3 class="text-2xl font-black tracking-tight mb-2 text-slate-900 dark:text-white">
-              Đăng Ký Tích Xanh
-            </h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
-              Vui lòng điền thông tin bên dưới, chuyên viên sẽ liên hệ tư vấn trong 5 - 15 phút.
-            </p>
-
-            <form @submit.prevent="handleSubmit" class="space-y-4">
-
-              <!-- Họ tên -->
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500 dark:text-slate-400">
-                  Họ Và Tên
-                </label>
-                <input
-                  type="text"
-                  v-model="name"
-                  placeholder="Nguyễn Văn A"
-                  class="w-full rounded-xl px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                         border border-slate-300 bg-white text-slate-900 placeholder-slate-400
-                         dark:border-white/10 dark:bg-slate-900/60 dark:text-white dark:placeholder-slate-500"
-                />
-                <p v-if="errors.name" class="text-xs text-red-500 mt-1">{{ errors.name }}</p>
-              </div>
-
-              <!-- Số điện thoại -->
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500 dark:text-slate-400">
-                  Số Điện Thoại
-                </label>
-                <input
-                  type="tel"
-                  v-model="phone"
-                  placeholder="0968825068"
-                  class="w-full rounded-xl px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                         border border-slate-300 bg-white text-slate-900 placeholder-slate-400
-                         dark:border-white/10 dark:bg-slate-900/60 dark:text-white dark:placeholder-slate-500"
-                />
-                <p v-if="errors.phone" class="text-xs text-red-500 mt-1">{{ errors.phone }}</p>
-              </div>
-
-              <!-- Dịch vụ -->
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500 dark:text-slate-400">
-                  Dịch vụ quan tâm
-                </label>
-                <select
-                  v-model="formServiceIndex"
-                  class="w-full rounded-xl px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                         border border-slate-300 bg-white text-slate-900
-                         dark:border-white/10 dark:bg-slate-900/60 dark:text-white"
-                >
-                  <option value="" disabled>-- Chọn dịch vụ --</option>
-                  <option
-                    v-for="(service, idx) in services"
-                    :key="service.id"
-                    :value="idx"
-                  >
-                    {{ service.name }}
-                  </option>
-                </select>
-                <p v-if="errors.service" class="text-xs text-red-500 mt-1">{{ errors.service }}</p>
-              </div>
-
-              <!-- Link tài khoản -->
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-slate-500 dark:text-slate-400">
-                  Link Trang Cá Nhân / Fanpage
-                </label>
-                <input
-                  type="text"
-                  v-model="link"
-                  placeholder="Ví dụ: facebook.com/dangkytichxanh"
-                  class="w-full rounded-xl px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                         border border-slate-300 bg-white text-slate-900 placeholder-slate-400
-                         dark:border-white/10 dark:bg-slate-900/60 dark:text-white dark:placeholder-slate-500"
-                />
-                <p v-if="errors.link" class="text-xs text-red-500 mt-1">{{ errors.link }}</p>
-              </div>
-
-              <!-- Quick Info Badge -->
-              <div
-                class="rounded-xl p-4 border space-y-2
-                       bg-slate-50 border-slate-200
-                       dark:bg-slate-950/40 dark:border-white/5"
-              >
-                <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  <Check class="h-4 w-4 text-emerald-400 stroke-[3]" />
-                  <span>Trọn gói {{ services[currentServiceIndex].price }}, không phát sinh thêm phí.</span>
+      <section id="contact" class="bg-[#f8fbff] py-16 dark:bg-[#07101f]">
+        <div class="mx-auto max-w-[760px] px-5">
+          <div class="mb-8 text-center">
+            <h2 class="text-2xl font-black text-slate-950 dark:text-white">Liên hệ</h2>
+            <p class="mt-2 text-[12px] font-medium text-slate-500 dark:text-slate-400">Chúng tôi trả lời trong 15 phút</p>
+          </div>
+          <div class="grid gap-5 md:grid-cols-2">
+            <div class="space-y-3">
+              <div v-for="[Icon, label, value] in [[Phone, 'HOTLINE', '0968.825.068 (Mr. Quang)'], [MessageCircle, 'ZALO', '0968.825.068'], [Mail, 'EMAIL', 'azmedia.com.vn@gmail.com'], [MapPin, 'ĐỊA CHỈ', '84 Nguyễn Hữu Dật, Hòa Cường Bắc, Hải Châu, Đà Nẵng'], [Clock, 'LÀM VIỆC', '8:00 - 12:00, 13:30 - 17:30']]" :key="label" class="contact-info-card flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111d34]">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300">
+                  <component :is="Icon" class="h-4 w-4" />
                 </div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  <Check class="h-4 w-4 text-emerald-400 stroke-[3]" />
-                  <span>Làm xong mới thanh toán – An toàn 100%.</span>
+                <div>
+                  <p class="text-[10px] font-black text-slate-400">{{ label }}</p>
+                  <p class="text-[12px] font-black text-slate-900 dark:text-white">{{ value }}</p>
                 </div>
               </div>
-
-              <!-- Submit Button -->
-              <button
-                type="submit"
-                :disabled="isLoading"
-                class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-all duration-300 transform active:scale-98 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                <template v-if="!isLoading">
-                  <Send class="h-4 w-4" />
-                  Gửi Yêu Cầu Đăng Ký
-                </template>
-                <template v-else>
-                  <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Đang xử lý...
-                </template>
-              </button>
+            </div>
+            <form class="contact-form-card rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111d34]" @submit.prevent>
+              <h3 class="text-sm font-black text-slate-950 dark:text-white">Đăng ký tư vấn miễn phí</h3>
+<p class="mt-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">Điền 3 thông tin, chúng tôi gọi lại trong 15 phút</p>
+              <div class="mt-4 space-y-3">
+                <label class="contact-label">Họ tên *</label>
+                <input v-model="leadName" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[12px] text-slate-900 outline-none focus:border-blue-500 dark:border-white/10 dark:bg-[#07101f] dark:text-white" placeholder="Nguyễn Văn A" />
+                <label class="contact-label">Số điện thoại *</label>
+                <input v-model="leadPhone" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[12px] text-slate-900 outline-none focus:border-blue-500 dark:border-white/10 dark:bg-[#07101f] dark:text-white" placeholder="0912345678" />
+                <label class="contact-label">Lời nhắn *</label>
+                <textarea v-model="leadLink" class="min-h-20 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[12px] text-slate-900 outline-none focus:border-blue-500 dark:border-white/10 dark:bg-[#07101f] dark:text-white" placeholder="VD: Tôi muốn đăng ký tích xanh cho Fanpage ABC..."></textarea>
+                <label class="flex items-center gap-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  <input type="checkbox" class="rounded border-slate-300" />
+                  Tôi xác nhận không phải robot
+                </label>
+                <button class="w-full rounded-lg bg-blue-600 py-3 text-[12px] font-black text-white hover:bg-blue-500">Gửi yêu cầu tư vấn</button>
+                <p class="text-center text-[10px] font-medium text-slate-400">Cam kết bảo mật thông tin, không spam</p>
+              </div>
             </form>
           </div>
+        </div>
+      </section>
+    </main>
 
-          <!-- ── Success Screen ──────────────────────── -->
-          <div v-else class="text-center py-6 space-y-4">
-            <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 mb-2">
-              <CheckCircle2 class="h-10 w-10" />
-            </div>
-            <h3 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-              Đăng Ký Thành Công!
-            </h3>
-            <p class="text-slate-600 dark:text-slate-300 max-w-sm mx-auto leading-relaxed">
-              Cảm ơn <strong class="text-slate-900 dark:text-white">{{ name }}</strong>. Chúng tôi đã nhận được thông tin cho dịch vụ
-              <strong class="text-slate-900 dark:text-white">{{ services[currentServiceIndex].name }}</strong>.
-            </p>
-            <p class="text-xs text-slate-400 leading-normal">
-              Chuyên viên sẽ liên hệ trực tiếp cho bạn qua số
-              <strong class="text-slate-700 dark:text-slate-200">{{ phone }}</strong> trong vòng 15 phút tới.
-            </p>
-            <button
-              @click="closeModal"
-              class="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-colors mt-4 bg-slate-700 hover:bg-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700"
-            >
-              Đóng cửa sổ
-            </button>
+    <footer class="bg-[#07101f] py-10 text-slate-400 dark:bg-[#092247]">
+      <div class="mx-auto grid max-w-[760px] gap-8 px-5 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
+        <div>
+          <div class="flex items-center gap-2 text-[13px] font-black text-white">
+            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white"><Check class="h-3.5 w-3.5 stroke-[4]" /></span>
+            Đăng Ký Tích Xanh
           </div>
-
+          <p class="mt-4 text-[11px] font-medium leading-5">Đăng ký tích xanh Facebook, Instagram 15 phút. Không cần báo chí, làm xong thanh toán. Dịch vụ hỗ trợ bởi AZ Media.</p>
+        </div>
+        <div>
+          <h3 class="text-[12px] font-black text-white">Dịch vụ</h3>
+          <ul class="mt-3 space-y-2 text-[11px] font-medium">
+            <li>Tích xanh Fanpage</li>
+            <li>Tích xanh Instagram</li>
+            <li>Tích xanh TikTok</li>
+            <li>Tích xanh Cá nhân</li>
+          </ul>
+        </div>
+        <div>
+<h3 class="text-[12px] font-black text-white">Liên hệ</h3>
+          <ul class="mt-3 space-y-2 text-[11px] font-medium">
+            <li>Hotline: 0968.825.068</li>
+            <li>Email: azmedia.com.vn@gmail.com</li>
+            <li>84 Nguyễn Hữu Dật, Hòa Cường Bắc, Hải Châu, Đà Nẵng</li>
+          </ul>
         </div>
       </div>
-    </div>
+      <div class="mx-auto mt-8 flex max-w-[760px] flex-wrap justify-between gap-3 border-t border-white/10 px-5 pt-5 text-[10px] font-medium">
+        <p>© 2026 Đăng Ký Tích Xanh - Dịch vụ đăng ký tích xanh Facebook, Fanpage, Instagram, TikTok & WhatsApp.</p>
+        <p>Giới thiệu · Điều khoản · Bảo mật · DMCA</p>
+      </div>
+    </footer>
 
+    <a href="tel:0968825068" class="fixed right-5 top-[300px] z-40 flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-600/30">
+      <MessageCircle class="h-5 w-5" />
+    </a>
   </div>
 </template>
+
+
+
+
+
+

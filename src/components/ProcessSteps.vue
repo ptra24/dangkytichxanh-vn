@@ -53,10 +53,10 @@ const steps = [
 <style scoped>
 /* ── Section ─────────────────────────────────── */
 .process-section {
-  background-color: #0d1829;
+  background-color: var(--site-bg);
   padding: 72px 24px 80px;
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--site-border);
 }
 
 /* ── Heading ─────────────────────────────────── */
@@ -68,7 +68,7 @@ const steps = [
 .process-title {
   font-size: 1.875rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--site-text);
   letter-spacing: -0.02em;
   margin: 0 0 10px;
   line-height: 1.2;
@@ -76,7 +76,7 @@ const steps = [
 
 .process-subtitle {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--site-muted);
   margin: 0;
   font-weight: 400;
 }
@@ -142,14 +142,14 @@ const steps = [
 .step-title {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--site-text);
   margin: 0 0 5px;
   letter-spacing: -0.01em;
 }
 
 .step-desc {
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--site-muted);
   margin: 0;
   line-height: 1.5;
   font-weight: 400;

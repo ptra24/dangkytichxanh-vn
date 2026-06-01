@@ -1,30 +1,24 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { ChevronDown, Phone, Sun, Moon, Menu, X, Zap, Check } from '@lucide/vue';
+import { Check, ChevronDown, Menu, Moon, Phone, Sun, X, Zap } from '@lucide/vue';
 import { services } from '../data/services';
 
 defineProps({
   currentServiceIndex: {
     type: Number,
     required: true
+  },
+  isDark: {
+    type: Boolean,
+    default: false
   }
 });
 
 const emit = defineEmits(['select-service', 'navigate-service', 'navigate-home', 'navigate-section', 'toggle-theme', 'open-register']);
-
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
 const isMobileServicesOpen = ref(false);
-const isDarkMode = ref(true);
 const dropdownRef = ref(null);
-
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
-
-const closeDropdown = () => {
-  isDropdownOpen.value = false;
-};
 
 const handleSelectService = (index) => {
   emit('select-service', index);
@@ -44,161 +38,117 @@ const handleNavigateSection = (sectionId) => {
   isMobileMenuOpen.value = false;
 };
 
-const toggleTheme = () => {
-  isDarkMode.value = !isDarkMode.value;
-  emit('toggle-theme', isDarkMode.value);
-};
-
 const handleClickOutside = (event) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
-    closeDropdown();
+    isDropdownOpen.value = false;
   }
 };
 
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-});
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
-});
+onMounted(() => document.addEventListener('click', handleClickOutside));
+onUnmounted(() => document.removeEventListener('click', handleClickOutside));
 </script>
 
 <template>
-  <header class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 shadow-sm shadow-slate-900/5 dark:border-[#22304a] dark:bg-[#060b13] dark:shadow-none">
-    <div class="mx-auto grid max-w-[1420px] grid-cols-[auto_1fr_auto] items-center gap-8 px-4 py-4 sm:px-6 lg:px-8">
-      <a href="/" @click.prevent="handleNavigateHome" class="group flex items-center gap-2 whitespace-nowrap">
-        <span class="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-500/25">
+  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm shadow-slate-900/5 backdrop-blur-xl dark:border-white/10 dark:bg-[#060b13]/95 dark:shadow-none">
+    <div class="mx-auto grid max-w-[1420px] grid-cols-[auto_1fr_auto] items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
+      <a href="/" class="flex items-center gap-3 whitespace-nowrap" @click.prevent="handleNavigateHome">
+        <span class="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/25">
           <Check class="h-7 w-7 stroke-[3.5]" />
         </span>
-        <span class="font-sans text-[21px] font-extrabold tracking-tight text-slate-950 dark:text-white">
-          Đăng Ký Tích Xanh<span class="text-xs font-semibold text-slate-500 dark:text-slate-400">.vn</span>
+        <span class="text-xl font-black tracking-tight text-slate-950 dark:text-white">
+          Đăng Ký Tích Xanh<span class="text-xs font-bold text-slate-500 dark:text-slate-400">.vn</span>
         </span>
       </a>
 
-      <nav class="hidden items-center justify-center gap-7 whitespace-nowrap md:flex">
-        <a href="/" @click.prevent="handleNavigateHome" class="text-[17px] font-bold text-slate-800 transition-colors hover:text-blue-600 dark:text-slate-200 dark:hover:text-white">Trang chủ</a>
-
+      <nav class="hidden items-center justify-center gap-6 whitespace-nowrap lg:flex">
+        <a href="/" class="text-[15px] font-extrabold text-slate-800 hover:text-blue-600 dark:text-slate-200 dark:hover:text-white" @click.prevent="handleNavigateHome">Trang chủ</a>
         <div ref="dropdownRef" class="relative">
-          <button
-            @click="toggleDropdown"
-            class="flex items-center gap-1 text-[17px] font-bold text-slate-800 transition-colors hover:text-blue-600 focus:outline-none dark:text-slate-200 dark:hover:text-white"
-            :class="{ 'text-blue-600 dark:text-blue-400': isDropdownOpen }"
-          >
+          <button class="flex items-center gap-1 text-[15px] font-extrabold text-slate-800 hover:text-blue-600 dark:text-slate-200 dark:hover:text-white" @click="isDropdownOpen = !isDropdownOpen">
             Dịch vụ
-            <ChevronDown class="h-4 w-4 transition-transform duration-200" :class="{ 'rotate-180': isDropdownOpen }" />
+            <ChevronDown class="h-4 w-4 transition" :class="{ 'rotate-180': isDropdownOpen }" />
           </button>
-
           <Transition name="fade">
-            <div
-              v-if="isDropdownOpen"
-              class="absolute left-1/2 mt-3 w-72 -translate-x-1/2 rounded-xl border border-slate-200 bg-white/95 p-2 shadow-2xl shadow-slate-900/10 backdrop-blur-xl ring-1 ring-black/5 dark:border-white/10 dark:bg-slate-900/95"
-            >
+            <div v-if="isDropdownOpen" class="absolute left-1/2 mt-3 w-80 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-900/10 dark:border-white/10 dark:bg-[#111b2f]">
               <a
                 v-for="(service, index) in services"
                 :key="service.id"
                 :href="`/dich-vu/${service.id}`"
+                class="flex gap-3 rounded-xl px-3 py-3 text-left text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"
+                :class="{ 'bg-blue-50 font-bold text-blue-700 dark:bg-blue-500/10 dark:text-blue-300': currentServiceIndex === index }"
                 @click.prevent="handleSelectService(index)"
-                class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm text-slate-700 transition-all hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
-                :class="{ 'bg-blue-600/10 font-semibold text-blue-600 dark:text-blue-400': currentServiceIndex === index }"
               >
-                <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-blue-600 dark:bg-slate-800 dark:text-blue-400">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300">
                   <Check class="h-5 w-5 stroke-[3]" />
                 </span>
-                <span class="flex-1">
-                  <span class="block font-bold leading-none">{{ service.name }}</span>
-                  <span class="mt-1 block text-xs text-slate-500 dark:text-slate-400">Hỗ trợ nhanh trong 15'</span>
+                <span>
+                  <span class="block font-black">{{ service.name }}</span>
+                  <span class="mt-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Tư vấn nhanh trong 5-15 phút</span>
                 </span>
               </a>
             </div>
           </Transition>
         </div>
-
-        <a href="/#loi-ich" @click.prevent="handleNavigateSection('loi-ich')" class="text-[17px] font-bold text-slate-800 transition-colors hover:text-blue-600 dark:text-slate-200 dark:hover:text-white">Lợi ích</a>
-        <a href="/#bang-gia" @click.prevent="handleNavigateSection('bang-gia')" class="text-[17px] font-bold text-slate-800 transition-colors hover:text-blue-600 dark:text-slate-200 dark:hover:text-white">Bảng giá</a>
-        <a href="/#quy-trinh" @click.prevent="handleNavigateSection('quy-trinh')" class="text-[17px] font-bold text-slate-800 transition-colors hover:text-blue-600 dark:text-slate-200 dark:hover:text-white">Quy trình</a>
-        <a href="/tin-tuc" @click.prevent="handleNavigateSection('tin-tuc')" class="text-[17px] font-bold text-slate-800 transition-colors hover:text-blue-600 dark:text-slate-200 dark:hover:text-white">Tin tức</a>
+        <a href="/#loi-ich" class="text-[15px] font-extrabold text-slate-800 hover:text-blue-600 dark:text-slate-200 dark:hover:text-white" @click.prevent="handleNavigateSection('loi-ich')">Lợi ích</a>
+        <a href="/#bang-gia" class="text-[15px] font-extrabold text-slate-800 hover:text-blue-600 dark:text-slate-200 dark:hover:text-white" @click.prevent="handleNavigateSection('bang-gia')">Bảng giá</a>
+        <a href="/#quy-trinh" class="text-[15px] font-extrabold text-slate-800 hover:text-blue-600 dark:text-slate-200 dark:hover:text-white" @click.prevent="handleNavigateSection('quy-trinh')">Quy trình</a>
+        <a href="/tin-tuc" class="text-[15px] font-extrabold text-slate-800 hover:text-blue-600 dark:text-slate-200 dark:hover:text-white" @click.prevent="handleNavigateSection('tin-tuc')">Tin tức</a>
+        <a href="/#contact" class="text-[15px] font-extrabold text-slate-800 hover:text-blue-600 dark:text-slate-200 dark:hover:text-white" @click.prevent="handleNavigateSection('contact')">Liên hệ</a>
       </nav>
 
-      <div class="hidden items-center gap-4 whitespace-nowrap md:flex">
-        <button
-          @click="emit('open-register')"
-          class="flex items-center gap-1.5 text-[17px] font-extrabold text-blue-600 transition-colors hover:text-blue-500 dark:text-blue-400"
-        >
-          <Zap class="h-4 w-4 fill-blue-400/20" />
+      <div class="hidden items-center gap-3 lg:flex">
+        <button class="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-black text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10" @click="emit('open-register')">
+          <Zap class="h-4 w-4" />
           Đăng ký nhanh
         </button>
-
-        <button
-          @click="toggleTheme"
-          class="rounded-full border border-slate-200 p-3 text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950 dark:border-[#22304a] dark:text-slate-200 dark:hover:bg-[#111b2f] dark:hover:text-white"
-          title="Đổi giao diện"
-        >
-          <Sun v-if="isDarkMode" class="h-5 w-5" />
+        <button class="rounded-full border border-slate-200 p-3 text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/10" title="Đổi giao diện" @click="emit('toggle-theme', !isDark)">
+          <Sun v-if="isDark" class="h-5 w-5" />
           <Moon v-else class="h-5 w-5" />
         </button>
-
-        <a
-          href="tel:0968825068"
-          class="flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-[17px] font-extrabold text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:bg-blue-500 hover:shadow-blue-500/30 active:scale-95"
-        >
-          <Phone class="h-4 w-4 fill-white/10" />
+        <a href="tel:0968825068" class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500">
+          <Phone class="h-4 w-4" />
           0968.825.068
         </a>
       </div>
 
-      <div class="flex items-center gap-2 md:hidden">
-        <button
-          @click="toggleTheme"
-          class="rounded-full border border-slate-200 p-2 text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
-        >
-          <Sun v-if="isDarkMode" class="h-5 w-5" />
+      <div class="flex items-center justify-end gap-2 lg:hidden">
+        <button class="rounded-full border border-slate-200 p-2 text-slate-700 dark:border-white/10 dark:text-slate-200" @click="emit('toggle-theme', !isDark)">
+          <Sun v-if="isDark" class="h-5 w-5" />
           <Moon v-else class="h-5 w-5" />
         </button>
-
-        <a href="tel:0968825068" class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-500" title="Gọi ngay">
-          <Phone class="h-4 w-4 fill-white/10" />
+        <a href="tel:0968825068" class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
+          <Phone class="h-4 w-4" />
         </a>
-
-        <button
-          @click="isMobileMenuOpen = !isMobileMenuOpen"
-          class="rounded-lg p-2 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
-        >
+        <button class="rounded-lg p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/10" @click="isMobileMenuOpen = !isMobileMenuOpen">
           <Menu v-if="!isMobileMenuOpen" class="h-6 w-6" />
           <X v-else class="h-6 w-6" />
         </button>
       </div>
     </div>
 
-    <div v-if="isMobileMenuOpen" class="border-t border-slate-200 bg-white px-4 py-4 dark:border-white/5 dark:bg-[#090f1d] md:hidden">
-      <div class="space-y-2">
-        <a href="/" @click.prevent="handleNavigateHome" class="block rounded-lg px-3 py-2 text-base font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white">Trang chủ</a>
-
-        <button @click="isMobileServicesOpen = !isMobileServicesOpen" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-base font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white">
+    <div v-if="isMobileMenuOpen" class="border-t border-slate-200 bg-white px-4 py-4 dark:border-white/10 dark:bg-[#111b2f] lg:hidden">
+      <div class="space-y-1">
+        <a href="/" class="block rounded-lg px-3 py-2 font-bold text-slate-800 hover:bg-blue-50 dark:text-slate-200 dark:hover:bg-white/10" @click.prevent="handleNavigateHome">Trang chủ</a>
+        <button class="flex w-full items-center justify-between rounded-lg px-3 py-2 font-bold text-slate-800 hover:bg-blue-50 dark:text-slate-200 dark:hover:bg-white/10" @click="isMobileServicesOpen = !isMobileServicesOpen">
           <span>Dịch vụ</span>
-          <ChevronDown class="h-5 w-5 transition-transform duration-200" :class="{ 'rotate-180': isMobileServicesOpen }" />
+          <ChevronDown class="h-5 w-5 transition" :class="{ 'rotate-180': isMobileServicesOpen }" />
         </button>
-
-        <div v-if="isMobileServicesOpen" class="rounded-lg bg-slate-50 py-1 pl-4 pr-2 dark:bg-slate-950/40">
+        <div v-if="isMobileServicesOpen" class="rounded-lg bg-slate-50 p-2 dark:bg-[#060b13]">
           <a
             v-for="(service, index) in services"
             :key="service.id"
             :href="`/dich-vu/${service.id}`"
+            class="block rounded-lg px-3 py-2 text-sm font-bold text-slate-700 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white"
             @click.prevent="handleSelectService(index)"
-            class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:text-blue-700 dark:text-slate-400 dark:hover:text-white"
-            :class="{ 'bg-blue-600/5 text-blue-600 dark:text-blue-400': currentServiceIndex === index }"
           >
-            <Check class="h-4 w-4" />
             {{ service.name }}
           </a>
         </div>
-
-        <a href="/#loi-ich" @click.prevent="handleNavigateSection('loi-ich')" class="block rounded-lg px-3 py-2 text-base font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white">Lợi ích</a>
-        <a href="/#bang-gia" @click.prevent="handleNavigateSection('bang-gia')" class="block rounded-lg px-3 py-2 text-base font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white">Bảng giá</a>
-        <a href="/#quy-trinh" @click.prevent="handleNavigateSection('quy-trinh')" class="block rounded-lg px-3 py-2 text-base font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white">Quy trình</a>
-        <a href="/tin-tuc" @click.prevent="handleNavigateSection('tin-tuc')" class="block rounded-lg px-3 py-2 text-base font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-700 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white">Tin tức</a>
-        <button @click="emit('open-register'); isMobileMenuOpen = false" class="flex w-full items-center gap-1.5 px-3 py-2 text-base font-extrabold text-blue-600 dark:text-blue-400">
-          <Zap class="h-4 w-4 fill-blue-400/20" />
+        <a href="/#loi-ich" class="block rounded-lg px-3 py-2 font-bold text-slate-800 hover:bg-blue-50 dark:text-slate-200 dark:hover:bg-white/10" @click.prevent="handleNavigateSection('loi-ich')">Lợi ích</a>
+        <a href="/#bang-gia" class="block rounded-lg px-3 py-2 font-bold text-slate-800 hover:bg-blue-50 dark:text-slate-200 dark:hover:bg-white/10" @click.prevent="handleNavigateSection('bang-gia')">Bảng giá</a>
+        <a href="/#quy-trinh" class="block rounded-lg px-3 py-2 font-bold text-slate-800 hover:bg-blue-50 dark:text-slate-200 dark:hover:bg-white/10" @click.prevent="handleNavigateSection('quy-trinh')">Quy trình</a>
+        <a href="/tin-tuc" class="block rounded-lg px-3 py-2 font-bold text-slate-800 hover:bg-blue-50 dark:text-slate-200 dark:hover:bg-white/10" @click.prevent="handleNavigateSection('tin-tuc')">Tin tức</a>
+        <button class="flex w-full items-center gap-2 rounded-lg px-3 py-2 font-black text-blue-600 dark:text-blue-400" @click="emit('open-register'); isMobileMenuOpen = false">
+          <Zap class="h-4 w-4" />
           Đăng ký nhanh
         </button>
       </div>
