@@ -1,5 +1,5 @@
 <template>
-  <section class="why-us-section">
+  <section id="loi-ich" class="why-us-section">
     <!-- Subtle dot-grid background overlay -->
     <div class="why-us-bg-dots"></div>
 

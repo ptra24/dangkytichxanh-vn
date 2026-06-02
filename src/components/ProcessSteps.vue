@@ -1,5 +1,5 @@
 <template>
-  <section class="process-section">
+  <section id="quy-trinh" class="process-section">
     <!-- Heading -->
     <div class="process-heading">
       <h2 class="process-title">Quy trình 4 bước</h2>

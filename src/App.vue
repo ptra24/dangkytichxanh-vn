@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import { 
   Check, 
   X, 
@@ -39,13 +39,38 @@ const scrollToTop = () => {
   window.location.hash = 'top';
 };
 
-const handleHeaderClick = (event) => {
+const handleHeaderClick = async (event) => {
   const target = event.target.closest('a');
   if (target) {
     const text = target.textContent.trim();
-    if (text === 'Trang chủ' || text.includes('Đăng Ký Tích Xanh')) {
-      clearArticle();
+    const href = target.getAttribute('href');
+    
+    if (text === 'Tin tức') {
+      selectArticle(articles[0]);
       scrollToTop();
+      return;
+    }
+
+    if (selectedArticle.value) {
+      clearArticle();
+      if (href && href.startsWith('#') && href !== '#') {
+        event.preventDefault();
+        await nextTick();
+        const el = document.querySelector(href);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          window.location.hash = href;
+        }
+      } else {
+        selectService(0);
+        scrollToTop();
+      }
+    } else {
+      if (text === 'Trang chủ' || text.includes('Đăng Ký Tích Xanh')) {
+        clearArticle();
+        selectService(0);
+        scrollToTop();
+      }
     }
   }
 };
@@ -91,6 +116,19 @@ const contactNote = ref('');
 const contactRobot = ref(false);
 const contactSubmitted = ref(false);
 const contactLoading = ref(false);
+
+// Hàm lọc ký tự không phải số và giới hạn tối đa 11 chữ số cho số điện thoại (thao tác DOM trực tiếp để triệt tiêu bộ gõ tiếng Việt Telex/IME)
+const onPhoneInput = (event) => {
+  const filtered = event.target.value.replace(/\D/g, '').slice(0, 11);
+  phone.value = filtered;
+  event.target.value = filtered;
+};
+
+const onContactPhoneInput = (event) => {
+  const filtered = event.target.value.replace(/\D/g, '').slice(0, 11);
+  contactPhone.value = filtered;
+  event.target.value = filtered;
+};
 
 const handleContactSubmit = async () => {
   if (!contactName.value.trim() || !contactPhone.value.trim()) return;
@@ -450,7 +488,7 @@ const faqs = [
       </section>
 
       <!-- Bài viết hữu ích (Useful Articles) Section -->
-      <section id="bai-viet" class="py-20 bg-[#060b13] relative overflow-hidden border-t border-white/5">
+      <section id="tin-tuc" class="py-20 bg-[#060b13] relative overflow-hidden border-t border-white/5">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <!-- Heading -->
           <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
@@ -650,7 +688,10 @@ const faqs = [
                     <label class="block text-xs font-bold text-white uppercase tracking-wider mb-1.5">Số điện thoại <span class="text-blue-400">*</span></label>
                     <input
                       type="tel"
-                      v-model="contactPhone"
+                      :value="contactPhone"
+                      @keypress="!/[0-9]/.test($event.key) && $event.preventDefault()"
+                      @input="onContactPhoneInput"
+                      maxlength="11"
                       placeholder="0912345678"
                       required
                       class="w-full rounded-xl border border-white/5 bg-[#141f36] px-4 py-3 text-sm text-white placeholder-[#9aa8c7] transition-colors focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
@@ -797,7 +838,10 @@ const faqs = [
                 </label>
                 <input 
                   type="tel" 
-                  v-model="phone"
+                  :value="phone"
+                  @keypress="!/[0-9]/.test($event.key) && $event.preventDefault()"
+                  @input="onPhoneInput"
+                  maxlength="11"
                   placeholder="0921169999"
                   required
                   pattern="[0-9]{9,11}"
