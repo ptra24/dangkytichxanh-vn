@@ -10,3 +10,7 @@ Route::get('/swagger', function () {
     return view('swagger');
 });
 
+Route::get('{any}', function () {
+    return view('welcome');
+})->where('any', '^(?!api|swagger).*$');
+

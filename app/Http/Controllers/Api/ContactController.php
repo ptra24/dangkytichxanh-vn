@@ -86,4 +86,124 @@ class ContactController extends Controller
             'data' => $contact,
         ], 201);
     }
+
+    /**
+     * Display a listing of contacts for the admin.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(Request $request)
+    {
+        $user = $this->getAuthorizedUser($request);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $contacts = Contact::orderBy('created_at', 'desc')->get();
+        return response()->json([
+            'success' => true,
+            'data' => $contacts
+        ]);
+    }
+
+    /**
+     * Update the specified contact status.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
+    {
+        $user = $this->getAuthorizedUser($request);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|string|in:pending,contacting,completed,contacted'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $contact = Contact::findOrFail($id);
+        $contact->update([
+            'status' => $request->status
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật trạng thái thành công.',
+            'data' => $contact
+        ]);
+    }
+
+    /**
+     * Remove the specified contact from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Request $request, $id)
+    {
+        $user = $this->getAuthorizedUser($request);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+        if ($user['role'] !== 'admin') {
+            return response()->json(['success' => false, 'message' => 'Bạn không có quyền thực hiện hành động này.'], 403);
+        }
+
+        $contact = Contact::findOrFail($id);
+        $contact->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Xóa thông tin đăng ký thành công.'
+        ]);
+    }
+
+    /**
+     * Get recent contacts with anonymized names and phone numbers for public social proof.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getRecentContactsPublic()
+    {
+        $contacts = Contact::orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get(['name', 'phone', 'service', 'created_at']);
+
+        $anonymized = $contacts->map(function ($contact) {
+            // Anonymize Name
+            $nameParts = explode(' ', trim($contact->name));
+            $lastName = array_pop($nameParts);
+            $anonLastName = mb_substr($lastName, 0, 1, 'UTF-8') . '***';
+            $anonName = count($nameParts) > 0 
+                ? implode(' ', $nameParts) . ' ' . $anonLastName 
+                : $anonLastName;
+
+            // Anonymize Phone
+            $phone = trim($contact->phone);
+            $anonPhone = strlen($phone) >= 7 
+                ? substr($phone, 0, 4) . '***' . substr($phone, -3)
+                : substr($phone, 0, 3) . '***';
+
+            return [
+                'name' => $anonName,
+                'phone' => $anonPhone,
+                'service' => $contact->service,
+                'created_at' => $contact->created_at,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $anonymized
+        ]);
+    }
 }

@@ -1,11 +1,21 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { 
   Check, 
   X, 
   AlertCircle, 
   Send, 
-  CheckCircle2 
+  CheckCircle2,
+  MessageSquare,
+  Users,
+  Download,
+  LogOut,
+  Trash2,
+  Edit,
+  Phone,
+  Shield,
+  Plus,
+  ExternalLink
 } from '@lucide/vue';
 import Header from './components/Header.vue';
 import HeroSection from './components/HeroSection.vue';
@@ -15,64 +25,860 @@ import ProcessSteps from './components/ProcessSteps.vue';
 import Testimonials from './components/Testimonials.vue';
 import Footer from './components/Footer.vue';
 import { services } from './data/services';
-import { articles } from './data/articles';
+import { articles as staticArticles } from './data/articles';
 import ArticleView from './components/ArticleView.vue';
 
+const articles = ref([...staticArticles]);
 const currentServiceIndex = ref(0);
 const isModalOpen = ref(false);
 const selectedArticle = ref(null);
+const selectedPage = ref(null); // 'blog' | 'gioi-thieu' | 'legal-terms' | 'legal-privacy' | 'legal-dmca' | 'admin'
+
+// Modal chi tiết khách hàng đăng ký
+const isLeadDetailModalOpen = ref(false);
+const selectedLeadDetail = ref(null);
+const openLeadDetail = (lead) => {
+  selectedLeadDetail.value = lead;
+  isLeadDetailModalOpen.value = true;
+};
+const closeLeadDetail = () => {
+  isLeadDetailModalOpen.value = false;
+  selectedLeadDetail.value = null;
+};
+
+// ── SEO HELPERS ────────────────────────────────────────────────────────────
+const SITE = 'Đăng Ký Tích Xanh';
+const DEFAULT_DESC = 'Đăng ký tích xanh Facebook, Instagram 15 phút. Không cần báo chí, làm xong thanh toán. 100% thành công, 2.368 khách. Hotline 0968.825.068.';
+
+const setMeta = (name, content, attr = 'name') => {
+  let el = document.querySelector(`meta[${attr}="${name}"]`);
+  if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
+  el.setAttribute('content', content);
+};
+
+const setLink = (rel, href) => {
+  let el = document.querySelector(`link[rel="${rel}"]`);
+  if (!el) { el = document.createElement('link'); el.setAttribute('rel', rel); document.head.appendChild(el); }
+  el.setAttribute('href', href);
+};
+
+const updateMeta = (title, description) => {
+  const fullTitle = title ? `${title} | ${SITE}` : `Đăng Ký Tích Xanh Fanpage, Instagram 15 Phút | ${SITE}`;
+  const desc = description || DEFAULT_DESC;
+  document.title = fullTitle;
+  setMeta('description', desc);
+  setMeta('og:title', fullTitle, 'property');
+  setMeta('og:description', desc, 'property');
+  setMeta('og:url', window.location.href, 'property');
+  setMeta('og:type', 'website', 'property');
+  setLink('canonical', window.location.href);
+};
+// ───────────────────────────────────────────────────────────────────────────
 
 const selectService = (index) => {
   currentServiceIndex.value = index;
-  selectedArticle.value = null; // Reset article view to show the service landing page
+  selectedArticle.value = null;
+  selectedPage.value = null;
+  const service = services[index];
+  const urlMap = {
+    0: '/dang-ky-tich-xanh-fanpage',
+    1: '/dang-ky-tich-xanh-ca-nhan',
+    2: '/dang-ky-tich-xanh-instagram',
+    3: '/dang-ky-tich-xanh-tiktok'
+  };
+  const url = urlMap[index] || '/';
+  window.history.pushState({}, '', url);
+  
+  const metaMap = {
+    0: ['Đăng Ký Tích Xanh Fanpage 15 Phút | 1.5 Triệu', 'Đăng ký tích xanh Fanpage chỉ 15 phút, 1.5 triệu trọn gói. Tên Fanpage nào cũng được. Làm xong thanh toán. Hotline 0968.825.068.'],
+    1: ['Đăng Ký Tích Xanh Facebook Cá Nhân | 1.5 Triệu', 'Hỗ trợ cá nhân, KOL đăng ký tích xanh Facebook. Tư vấn miễn phí, không yêu cầu mật khẩu. Hotline 0968.825.068.'],
+    2: ['Đăng Ký Tích Xanh Instagram – 15 Phút, 1.5 Triệu', 'Tích xanh Instagram chỉ 15 phút, 1.5 triệu trọn gói. Không cần báo chí, 99% thành công. Gọi 0968.825.068 tư vấn miễn phí.'],
+    3: ['Đăng Ký Tích Xanh TikTok | Tư Vấn Miễn Phí', 'Tư vấn và hỗ trợ đăng ký tích xanh TikTok cho creator, thương hiệu, shop. Báo phí trước khi làm. Hotline 0968.825.068.']
+  };
+  const [t, d] = metaMap[index] || [];
+  updateMeta(t, d);
 };
 
 const selectArticle = (article) => {
   selectedArticle.value = article;
+  selectedPage.value = null;
+  window.history.pushState({}, '', `/tin-tuc/${article.id}`);
+  updateMeta(article.title, article.description);
 };
 
 const clearArticle = () => {
   selectedArticle.value = null;
+  window.history.pushState({}, '', '/');
+  updateMeta();
 };
 
-const scrollToTop = () => {
-  window.location.hash = 'top';
+const openPage = (page) => {
+  selectedArticle.value = null;
+  selectedPage.value = page;
+  const urlMap = { blog: '/blog', 'gioi-thieu': '/gioi-thieu', 'legal-terms': '/legal/terms', 'legal-privacy': '/legal/privacy', 'legal-dmca': '/legal/dmca', 'admin': '/admin' };
+  const metaMap = {
+    blog: ['Tin Tức & Kiến Thức Tích Xanh 2026', 'Kiến thức, hướng dẫn và tin tức mới nhất về Đăng ký tích xanh Facebook, Instagram, TikTok, WhatsApp.'],
+    'gioi-thieu': ['Giới Thiệu AZ Media', 'Đội ngũ Đăng Ký Tích Xanh với 5+ năm kinh nghiệm Meta Verified — đã hỗ trợ 2.368+ khách hàng. Cam kết làm xong mới thanh toán.'],
+    'legal-terms': ['Điều Khoản Dịch Vụ', DEFAULT_DESC],
+    'legal-privacy': ['Chính Sách Bảo Mật', DEFAULT_DESC],
+    'legal-dmca': ['DMCA', DEFAULT_DESC],
+    'admin': ['Admin Dashboard - Quản lý đăng ký', DEFAULT_DESC],
+  };
+  window.history.pushState({}, '', urlMap[page] || '/');
+  const [t, d] = metaMap[page] || [];
+  updateMeta(t, d);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-const handleHeaderClick = async (event) => {
-  const target = event.target.closest('a');
-  if (target) {
-    const text = target.textContent.trim();
-    const href = target.getAttribute('href');
-    
-    if (text === 'Tin tức') {
-      selectArticle(articles[0]);
-      scrollToTop();
-      return;
-    }
+const closePage = () => {
+  selectedPage.value = null;
+  window.history.pushState({}, '', '/');
+  updateMeta();
+};
 
-    if (selectedArticle.value) {
-      clearArticle();
-      if (href && href.startsWith('#') && href !== '#') {
-        event.preventDefault();
-        await nextTick();
-        const el = document.querySelector(href);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-          window.location.hash = href;
-        }
-      } else {
-        selectService(0);
-        scrollToTop();
-      }
-    } else {
-      if (text === 'Trang chủ' || text.includes('Đăng Ký Tích Xanh')) {
-        clearArticle();
-        selectService(0);
-        scrollToTop();
-      }
+const handleNavigateSection = async (sectionId) => {
+  selectedArticle.value = null;
+  selectedPage.value = null;
+  window.history.pushState({}, '', '/');
+  updateMeta();
+  await nextTick();
+  if (sectionId === 'top') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
     }
   }
+};
+
+// ── ADMIN PANEL LOGIC & EXTENSIONS ──────────────────────────────────────────
+// Khôi phục session: chỉ chấp nhận nếu role hợp lệ (admin | employee)
+const _savedRole = sessionStorage.getItem('admin_role') || '';
+const _validRoles = ['admin', 'employee'];
+const adminPasscode = ref(_validRoles.includes(_savedRole) ? (sessionStorage.getItem('admin_passcode') || '') : '');
+const adminRole = ref(_validRoles.includes(_savedRole) ? _savedRole : '');
+const adminName = ref(_validRoles.includes(_savedRole) ? (sessionStorage.getItem('admin_name') || '') : '');
+// Nếu session lưu không hợp lệ, xóa sạch
+if (!_validRoles.includes(_savedRole)) {
+  sessionStorage.removeItem('admin_passcode');
+  sessionStorage.removeItem('admin_role');
+  sessionStorage.removeItem('admin_name');
+}
+const activeAdminTab = ref('leads'); // 'leads' | 'employees' | 'chat'
+const adminError = ref('');
+const leads = ref([]);
+const leadsLoading = ref(false);
+// isAdminAuthenticated: gate chính - phải có CẢ passcode VÀ role hợp lệ
+const isAdminAuthenticated = computed(() => !!adminPasscode.value && _validRoles.includes(adminRole.value));
+const realtimeEnabled = ref(true);
+let pollingInterval = null;
+
+// Quản lý Nhân viên State
+const employeesList = ref([]);
+const employeesLoading = ref(false);
+const showEmployeeModal = ref(false);
+const employeeForm = ref({ id: null, name: '', passcode: '', status: 'active' });
+const employeeErrors = ref({});
+
+const verifyPasscode = async () => {
+  if (!adminPasscode.value) {
+    adminError.value = 'Vui lòng nhập mật mã';
+    return;
+  }
+  try {
+    const res = await fetch('/api/admin/verify-passcode', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ passcode: adminPasscode.value })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      sessionStorage.setItem('admin_passcode', adminPasscode.value);
+      sessionStorage.setItem('admin_role', data.role);
+      sessionStorage.setItem('admin_name', data.name);
+      adminRole.value = data.role;
+      adminName.value = data.name;
+      adminError.value = '';
+      activeAdminTab.value = 'leads';
+      fetchLeads();
+      startPolling();
+    } else {
+      adminError.value = data.message || 'Mật mã không hợp lệ';
+    }
+  } catch (err) {
+    adminError.value = 'Không thể kết nối đến máy chủ';
+  }
+};
+
+const fetchLeads = async () => {
+  if (!adminPasscode.value) return;
+  leadsLoading.value = true;
+  try {
+    const res = await fetch('/api/admin/contacts', {
+      headers: {
+        'X-Admin-Passcode': adminPasscode.value
+      }
+    });
+    if (res.status === 401) {
+      logoutAdmin();
+      adminError.value = 'Phiên làm việc hết hạn. Vui lòng nhập lại mật mã.';
+      return;
+    }
+    const data = await res.json();
+    if (data.success) {
+      leads.value = data.data;
+    }
+  } catch (err) {
+    console.error('Lỗi khi tải danh sách đăng ký:', err);
+  } finally {
+    leadsLoading.value = false;
+  }
+};
+
+const updateLeadStatus = async (id, status) => {
+  try {
+    const res = await fetch(`/api/admin/contacts/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Passcode': adminPasscode.value
+      },
+      body: JSON.stringify({ status })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const lead = leads.value.find(l => l.id === id);
+      if (lead) lead.status = status;
+    }
+  } catch (err) {
+    console.error('Lỗi khi cập nhật trạng thái:', err);
+  }
+};
+
+const deleteLead = async (id) => {
+  if (!confirm('Bạn có chắc chắn muốn xóa lượt đăng ký này?')) return;
+  try {
+    const res = await fetch(`/api/admin/contacts/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'X-Admin-Passcode': adminPasscode.value
+      }
+    });
+    const data = await res.json();
+    if (data.success) {
+      leads.value = leads.value.filter(l => l.id !== id);
+    } else {
+      alert(data.message || 'Không thể xóa lượt đăng ký.');
+    }
+  } catch (err) {
+    console.error('Lỗi khi xóa lượt đăng ký:', err);
+  }
+};
+
+const startPolling = () => {
+  stopPolling();
+  if (realtimeEnabled.value && selectedPage.value === 'admin' && activeAdminTab.value === 'leads') {
+    pollingInterval = setInterval(fetchLeads, 4000);
+  }
+};
+
+const stopPolling = () => {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
+  }
+};
+
+const logoutAdmin = () => {
+  sessionStorage.removeItem('admin_passcode');
+  sessionStorage.removeItem('admin_role');
+  sessionStorage.removeItem('admin_name');
+  adminPasscode.value = '';
+  adminRole.value = '';
+  adminName.value = '';
+  leads.value = [];
+  stopPolling();
+  stopChatPolling();
+  closePage();
+};
+
+const fetchEmployees = async () => {
+  if (!adminPasscode.value || adminRole.value !== 'admin') return;
+  employeesLoading.value = true;
+  try {
+    const res = await fetch('/api/admin/employees', {
+      headers: { 'X-Admin-Passcode': adminPasscode.value }
+    });
+    const data = await res.json();
+    if (data.success) {
+      employeesList.value = data.data;
+    }
+  } catch (err) {
+    console.error('Lỗi khi tải danh sách nhân viên:', err);
+  } finally {
+    employeesLoading.value = false;
+  }
+};
+
+const openAddEmployeeModal = () => {
+  employeeForm.value = { id: null, name: '', passcode: '', status: 'active' };
+  employeeErrors.value = {};
+  showEmployeeModal.value = true;
+};
+
+const openEditEmployeeModal = (emp) => {
+  employeeForm.value = { ...emp };
+  employeeErrors.value = {};
+  showEmployeeModal.value = true;
+};
+
+const saveEmployee = async () => {
+  employeeErrors.value = {};
+  if (!employeeForm.value.name.trim()) {
+    employeeErrors.value.name = 'Vui lòng nhập tên nhân viên.';
+  }
+  if (!employeeForm.value.passcode.trim()) {
+    employeeErrors.value.passcode = 'Vui lòng nhập mật mã.';
+  }
+  if (Object.keys(employeeErrors.value).length > 0) return;
+
+  const isEdit = employeeForm.value.id !== null;
+  const url = isEdit ? `/api/admin/employees/${employeeForm.value.id}` : '/api/admin/employees';
+  const method = isEdit ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Passcode': adminPasscode.value
+      },
+      body: JSON.stringify(employeeForm.value)
+    });
+    const data = await res.json();
+    if (data.success) {
+      showEmployeeModal.value = false;
+      fetchEmployees();
+    } else {
+      if (data.errors) {
+        employeeErrors.value = data.errors;
+      } else {
+        alert(data.message || 'Có lỗi xảy ra.');
+      }
+    }
+  } catch (err) {
+    console.error('Lỗi khi lưu nhân viên:', err);
+  }
+};
+
+const deleteEmployee = async (id) => {
+  if (!confirm('Bạn có chắc chắn muốn xóa nhân viên này?')) return;
+  try {
+    const res = await fetch(`/api/admin/employees/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-Admin-Passcode': adminPasscode.value }
+    });
+    const data = await res.json();
+    if (data.success) {
+      fetchEmployees();
+    }
+  } catch (err) {
+    console.error('Lỗi khi xóa nhân viên:', err);
+  }
+};
+
+// Quản lý Chat (Phía Admin/Employee)
+const chatSessions = ref([]);
+const activeSessionId = ref(null);
+const activeSessionMessages = ref([]);
+const adminChatInput = ref('');
+const chatSessionsLoading = ref(false);
+let chatPollingInterval = null;
+
+const fetchChatSessions = async () => {
+  if (!adminPasscode.value) return;
+  chatSessionsLoading.value = true;
+  try {
+    const res = await fetch('/api/admin/chats', {
+      headers: { 'X-Admin-Passcode': adminPasscode.value }
+    });
+    const data = await res.json();
+    if (data.success) {
+      chatSessions.value = data.data;
+    }
+  } catch (err) {
+    console.error('Lỗi tải danh sách chat:', err);
+  } finally {
+    chatSessionsLoading.value = false;
+  }
+};
+
+const selectChatSession = async (sessionId) => {
+  activeSessionId.value = sessionId;
+  await fetchMessagesForActiveSession();
+  
+  // Đánh dấu đã đọc
+  try {
+    await fetch(`/api/admin/chats/${sessionId}/read`, {
+      method: 'POST',
+      headers: { 'X-Admin-Passcode': adminPasscode.value }
+    });
+    // Tải lại danh sách chat không hiện loading để reset badge chưa đọc
+    const res = await fetch('/api/admin/chats', {
+      headers: { 'X-Admin-Passcode': adminPasscode.value }
+    });
+    const data = await res.json();
+    if (data.success) chatSessions.value = data.data;
+  } catch (err) {
+    console.error('Lỗi khi đánh dấu đã đọc:', err);
+  }
+};
+
+const fetchMessagesForActiveSession = async () => {
+  if (!activeSessionId.value || !adminPasscode.value) return;
+  try {
+    const res = await fetch(`/api/admin/chats/${activeSessionId.value}/messages`, {
+      headers: { 'X-Admin-Passcode': adminPasscode.value }
+    });
+    const data = await res.json();
+    if (data.success) {
+      activeSessionMessages.value = data.data;
+      scrollToChatBottom('admin-chat-messages');
+    }
+  } catch (err) {
+    console.error('Lỗi tải tin nhắn của phiên:', err);
+  }
+};
+
+const sendAdminMessage = async () => {
+  if (!adminChatInput.value.trim() || !activeSessionId.value) return;
+  const msgText = adminChatInput.value;
+  adminChatInput.value = '';
+  try {
+    const res = await fetch(`/api/admin/chats/${activeSessionId.value}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Passcode': adminPasscode.value
+      },
+      body: JSON.stringify({ message: msgText })
+    });
+    const data = await res.json();
+    if (data.success) {
+      activeSessionMessages.value.push(data.data);
+      scrollToChatBottom('admin-chat-messages');
+      fetchChatSessions(); // Cập nhật lại xem tin nhắn mới nhất ở sidebar
+    }
+  } catch (err) {
+    console.error('Lỗi gửi tin nhắn của admin:', err);
+  }
+};
+
+const startChatPolling = () => {
+  stopChatPolling();
+  if (selectedPage.value === 'admin' && adminPasscode.value && activeAdminTab.value === 'chat') {
+    chatPollingInterval = setInterval(() => {
+      fetchChatSessions();
+      if (activeSessionId.value) {
+        fetchMessagesForActiveSession();
+      }
+    }, 3000);
+  }
+};
+
+const stopChatPolling = () => {
+  if (chatPollingInterval) {
+    clearInterval(chatPollingInterval);
+    chatPollingInterval = null;
+  }
+};
+
+// Khách hàng Chat Widget State
+const isCustomerChatOpen = ref(false);
+const customerNameInput = ref('');
+const customerNameEntered = ref(localStorage.getItem('chat_customer_name') || '');
+const customerSessionId = ref(localStorage.getItem('chat_session_id') || '');
+const customerChatMessages = ref([]);
+const customerChatInput = ref('');
+let customerChatPollingInterval = null;
+
+const isFirstCustomerFetch = ref(true);
+const unreadCustomerMessagesCount = ref(0);
+
+const initializeCustomerSession = () => {
+  if (!customerSessionId.value) {
+    const randId = 'user_' + Math.random().toString(36).substr(2, 9);
+    customerSessionId.value = randId;
+    localStorage.setItem('chat_session_id', randId);
+  }
+};
+
+const toggleCustomerChat = () => {
+  isCustomerChatOpen.value = !isCustomerChatOpen.value;
+  if (isCustomerChatOpen.value) {
+    unreadCustomerMessagesCount.value = 0;
+    fetchCustomerChatMessages();
+    startCustomerChatPolling();
+  } else {
+    stopCustomerChatPolling();
+  }
+};
+
+const enterCustomerName = () => {
+  if (!customerNameInput.value.trim()) return;
+  const nameVal = customerNameInput.value.trim();
+  customerNameEntered.value = nameVal;
+  localStorage.setItem('chat_customer_name', nameVal);
+};
+
+const fetchCustomerChatMessages = async () => {
+  if (!customerSessionId.value) return;
+  try {
+    const res = await fetch(`/api/chat/messages?session_id=${customerSessionId.value}`);
+    const data = await res.json();
+    if (data.success) {
+      const oldLength = customerChatMessages.value.length;
+      customerChatMessages.value = data.data;
+      scrollToChatBottom('customer-chat-messages');
+
+      if (isFirstCustomerFetch.value) {
+        isFirstCustomerFetch.value = false;
+        unreadCustomerMessagesCount.value = 0;
+      } else if (!isCustomerChatOpen.value) {
+        const newMessages = data.data.slice(oldLength);
+        const adminNewCount = newMessages.filter(msg => msg.sender_type === 'employee' || msg.sender_type === 'admin').length;
+        unreadCustomerMessagesCount.value += adminNewCount;
+      }
+    }
+  } catch (err) {
+    console.error('Lỗi tải tin nhắn của khách:', err);
+  }
+};
+
+const sendCustomerMessage = async () => {
+  if (!customerChatInput.value.trim()) return;
+  const msgText = customerChatInput.value;
+  customerChatInput.value = '';
+  initializeCustomerSession();
+
+  const payload = {
+    session_id: customerSessionId.value,
+    customer_name: customerNameEntered.value || 'Khách vãng lai',
+    message: msgText
+  };
+
+  try {
+    const res = await fetch('/api/chat/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      customerChatMessages.value.push(data.data);
+      scrollToChatBottom('customer-chat-messages');
+    }
+  } catch (err) {
+    console.error('Lỗi gửi tin nhắn của khách:', err);
+  }
+};
+
+const startCustomerChatPolling = () => {
+  stopCustomerChatPolling();
+  customerChatPollingInterval = setInterval(fetchCustomerChatMessages, 3000);
+};
+
+const stopCustomerChatPolling = () => {
+  if (customerChatPollingInterval) {
+    clearInterval(customerChatPollingInterval);
+    customerChatPollingInterval = null;
+  }
+};
+
+const scrollToChatBottom = (containerId) => {
+  nextTick(() => {
+    const el = document.getElementById(containerId);
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
+  });
+};
+
+// Social Proof Toast State & Loop
+const showSocialProof = ref(false);
+const socialProofData = ref(null);
+const mockSocialProofs = [
+  { name: 'Anh Hoàng', location: 'Hà Nội', service: 'Tích Xanh Fanpage', time: '2 phút trước' },
+  { name: 'Chị Mai', location: 'TP. Hồ Chí Minh', service: 'Tích Xanh Instagram', time: '5 phút trước' },
+  { name: 'Anh Tuấn', location: 'Đà Nẵng', service: 'Combo Fanpage + IG', time: '12 phút trước' },
+  { name: 'Chị Lan', location: 'Cần Thơ', service: 'Tích Xanh Fanpage', time: '15 phút trước' },
+  { name: 'Anh Minh', location: 'Hải Phòng', service: 'Tích Xanh TikTok', time: '18 phút trước' },
+  { name: 'Chị Vy', location: 'Bình Dương', service: 'Tích Xanh Fanpage', time: '25 phút trước' },
+  { name: 'Anh Dũng', location: 'Nha Trang', service: 'Tích Xanh Instagram', time: '30 phút trước' },
+];
+
+const publicSocialProofs = ref([]);
+
+const fetchPublicSocialProofs = async () => {
+  try {
+    const res = await fetch('/api/contacts/recent');
+    const data = await res.json();
+    if (data.success && data.data) {
+      publicSocialProofs.value = data.data.map(item => {
+        const createdTime = new Date(item.created_at);
+        const diffMins = Math.max(1, Math.round((new Date() - createdTime) / 60000));
+        let timeStr = `${diffMins} phút trước`;
+        if (diffMins >= 60) {
+          const diffHours = Math.floor(diffMins / 60);
+          timeStr = `${diffHours} giờ trước`;
+          if (diffHours >= 24) {
+            timeStr = `${Math.floor(diffHours / 24)} ngày trước`;
+          }
+        }
+        return {
+          name: item.name,
+          location: 'Việt Nam',
+          service: item.service || 'Tư vấn tích xanh',
+          time: timeStr
+        };
+      });
+    }
+  } catch (err) {
+    console.error('Lỗi khi tải social proof từ API:', err);
+  }
+};
+
+const startSocialProofLoop = () => {
+  const trigger = () => {
+    let source = [...publicSocialProofs.value];
+    
+    if (leads.value && leads.value.length > 0) {
+      const adminSource = leads.value.slice(0, 10).map(lead => {
+        const nameParts = lead.name.split(' ');
+        const lastPart = nameParts.pop();
+        const anonName = nameParts.length > 0 
+          ? nameParts.join(' ') + ' ' + lastPart[0] + '***'
+          : lastPart[0] + '***';
+        
+        const createdTime = new Date(lead.created_at);
+        const diffMins = Math.max(1, Math.round((new Date() - createdTime) / 60000));
+        let timeStr = `${diffMins} phút trước`;
+        if (diffMins >= 60) {
+          const diffHours = Math.floor(diffMins / 60);
+          timeStr = `${diffHours} giờ trước`;
+          if (diffHours >= 24) {
+            timeStr = `${Math.floor(diffHours / 24)} ngày trước`;
+          }
+        }
+
+        return {
+          name: anonName,
+          location: 'Việt Nam',
+          service: lead.service || 'Tư vấn tích xanh',
+          time: timeStr
+        };
+      });
+      source = [...source, ...adminSource];
+    }
+
+    const finalPool = source.length > 0 ? source : mockSocialProofs;
+    const picked = finalPool[Math.floor(Math.random() * finalPool.length)];
+    socialProofData.value = picked;
+    showSocialProof.value = true;
+
+    setTimeout(() => {
+      showSocialProof.value = false;
+    }, 6000);
+
+    const nextDelay = 12000 + Math.random() * 6000; // 12-18 seconds interval
+    setTimeout(trigger, nextDelay);
+  };
+
+  setTimeout(trigger, 2000); // 2 seconds initial delay
+};
+
+// Xuất Excel CSV
+const exportLeadsToExcel = () => {
+  if (leads.value.length === 0) {
+    alert('Không có dữ liệu để xuất.');
+    return;
+  }
+  
+  const headers = ['ID', 'Họ tên', 'Số điện thoại', 'Link tài khoản / Fanpage', 'Email', 'Dịch vụ đăng ký', 'Lời nhắn', 'Trạng thái liên hệ', 'Ngày đăng ký'];
+  
+  const rows = leads.value.map(lead => {
+    let statusText = 'Chờ xử lý (Pending)';
+    if (lead.status === 'completed') statusText = 'Đã hoàn thành';
+    else if (lead.status === 'contacting' || lead.status === 'contacted' || lead.status === 'contacted') statusText = 'Đang liên hệ';
+
+    return [
+      lead.id,
+      `"${lead.name.replace(/"/g, '""')}"`,
+      `"${lead.phone}"`,
+      `"${lead.link.replace(/"/g, '""')}"`,
+      `"${(lead.email || '').replace(/"/g, '""')}"`,
+      `"${(lead.service || '').replace(/"/g, '""')}"`,
+      `"${(lead.message || '').replace(/"/g, '""')}"`,
+      `"${statusText}"`,
+      `"${lead.created_at}"`
+    ];
+  });
+  
+  const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  
+  const dateStr = new Date().toISOString().slice(0, 10);
+  link.setAttribute('download', `DangKyTichXanh_KhachHang_${dateStr}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+watch(realtimeEnabled, (val) => {
+  if (val) startPolling();
+  else stopPolling();
+});
+
+watch(activeAdminTab, (newTab) => {
+  stopPolling();
+  stopChatPolling();
+  if (selectedPage.value === 'admin' && isAdminAuthenticated.value) {
+    if (newTab === 'leads') {
+      fetchLeads();
+      startPolling();
+    } else if (newTab === 'chat') {
+      fetchChatSessions();
+      startChatPolling();
+    } else if (newTab === 'employees') {
+      fetchEmployees();
+    }
+  }
+});
+
+watch(selectedPage, (newPage) => {
+  if (newPage === 'admin') {
+    if (isAdminAuthenticated.value) {
+      if (activeAdminTab.value === 'leads') {
+        fetchLeads();
+        startPolling();
+      } else if (activeAdminTab.value === 'chat') {
+        fetchChatSessions();
+        startChatPolling();
+      } else if (activeAdminTab.value === 'employees') {
+        fetchEmployees();
+      }
+    }
+  } else {
+    stopPolling();
+    stopChatPolling();
+  }
+});
+const fetchBlogPosts = async () => {
+  try {
+    const res = await fetch('/api/blog');
+    const data = await res.json();
+    if (data.success && data.data && data.data.length > 0) {
+      // Map API blog posts to the frontend Article schema
+      articles.value = data.data.map(post => ({
+        id: post.slug, // map slug to id for routing
+        title: post.title,
+        description: post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...',
+        category: 'Kiến thức',
+        date: new Date(post.created_at).toLocaleDateString('vi-VN'),
+        author: 'Admin AZ Media',
+        readTime: Math.max(3, Math.ceil(post.content.replace(/<[^>]*>/g, '').length / 500)) + ' phút đọc',
+        banner: post.image_url || 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
+        content: post.content
+      }));
+      
+      // If we are currently on an article page, check if the loaded articles have it
+      const path = window.location.pathname;
+      if (path.startsWith('/tin-tuc/')) {
+        const id = path.split('/').pop();
+        const art = articles.value.find(a => a.id === id);
+        if (art) {
+          selectArticle(art);
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Lỗi khi tải bài viết từ API:', err);
+  }
+};
+
+// ───────────────────────────────────────────────────────────────────────────
+
+onMounted(() => {
+  // Tải danh sách bài viết từ API
+  fetchBlogPosts();
+
+  // Khởi tạo Chat Session cho khách hàng
+  initializeCustomerSession();
+  if (customerSessionId.value) {
+    fetchCustomerChatMessages();
+    // Bắt đầu kiểm tra tin nhắn nền (mỗi 10 giây)
+    setInterval(() => {
+      if (!isCustomerChatOpen.value) {
+        fetchCustomerChatMessages();
+      }
+    }, 10000);
+  }
+
+  // Tải thông tin đăng ký gần đây để làm social proof
+  fetchPublicSocialProofs();
+
+  // Bắt đầu vòng lặp thông báo nổi (Social Proof)
+  startSocialProofLoop();
+
+  const path = window.location.pathname;
+  
+  const serviceUrlMap = {
+    '/dang-ky-tich-xanh-fanpage': 0,
+    '/dang-ky-tich-xanh-ca-nhan': 1,
+    '/dang-ky-tich-xanh-instagram': 2,
+    '/dang-ky-tich-xanh-tiktok': 3
+  };
+  if (serviceUrlMap[path] !== undefined) {
+    selectService(serviceUrlMap[path]);
+    return;
+  }
+  
+  if (path.startsWith('/tin-tuc/')) {
+    const id = path.split('/').pop();
+    const art = articles.value.find(a => a.id === id) || null;
+    if (art) {
+      selectArticle(art);
+    } else {
+      window.history.replaceState({}, '', '/');
+      updateMeta();
+    }
+    return;
+  }
+  
+  const pageMap = {
+    '/blog': 'blog',
+    '/gioi-thieu': 'gioi-thieu',
+    '/legal/terms': 'legal-terms',
+    '/legal/privacy': 'legal-privacy',
+    '/legal/dmca': 'legal-dmca',
+    '/admin': 'admin'
+  };
+  if (pageMap[path]) {
+    openPage(pageMap[path]);
+    return;
+  }
+  
+  updateMeta();
+});
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 const handleToggleTheme = (isDark) => {
@@ -130,16 +936,59 @@ const onContactPhoneInput = (event) => {
   event.target.value = filtered;
 };
 
+const submitToFormspree = async (payload) => {
+  try {
+    const formspreeId = import.meta.env.VITE_FORMSPREE_ID || 'xkgwboqe';
+    await fetch(`https://formspree.io/f/${formspreeId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        name: payload.name,
+        phone: payload.phone,
+        message: `Link: ${payload.link || ''} | Service: ${payload.service || ''}`
+      })
+    });
+  } catch (err) {
+    console.error('Formspree fallback submission failed:', err);
+  }
+};
+
+const triggerImmediateSocialProof = (payload) => {
+  const nameParts = payload.name.trim().split(' ');
+  const lastName = nameParts.pop() || '';
+  const anonLastName = lastName.substring(0, 1) + '***';
+  const anonName = nameParts.length > 0 
+    ? nameParts.join(' ') + ' ' + anonLastName 
+    : anonLastName;
+
+  socialProofData.value = {
+    name: anonName,
+    location: 'Việt Nam',
+    service: payload.service || 'Tư vấn tích xanh',
+    time: 'Vừa xong'
+  };
+  
+  setTimeout(() => {
+    showSocialProof.value = true;
+    setTimeout(() => {
+      showSocialProof.value = false;
+    }, 6000);
+  }, 1500);
+
+  fetchPublicSocialProofs();
+};
+
 const handleContactSubmit = async () => {
   if (!contactName.value.trim() || !contactPhone.value.trim()) return;
   contactLoading.value = true;
+  const payload = {
+    name: contactName.value,
+    phone: contactPhone.value,
+    link: contactNote.value.trim() || 'N/A', // link là required nên cần giá trị mặc định
+    service: 'Tư vấn miễn phí'
+  };
+
   try {
-    const payload = {
-      name: contactName.value,
-      phone: contactPhone.value,
-      link: contactNote.value,
-      service: 'Tư vấn miễn phí'
-    };
     const response = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -148,12 +997,18 @@ const handleContactSubmit = async () => {
     const result = await response.json();
     if (response.ok && result.success) {
       contactSubmitted.value = true;
+      triggerImmediateSocialProof(payload);
     } else {
-      alert(result.message || 'Có lỗi xảy ra khi gửi yêu cầu.');
+      console.warn('Backend contact submission failed, falling back to Formspree:', result.message);
+      await submitToFormspree(payload);
+      contactSubmitted.value = true;
+      triggerImmediateSocialProof(payload);
     }
   } catch (error) {
-    console.error('Lỗi kết nối API:', error);
-    alert('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng hoặc server.');
+    console.error('Lỗi kết nối API, falling back to Formspree:', error);
+    await submitToFormspree(payload);
+    contactSubmitted.value = true;
+    triggerImmediateSocialProof(payload);
   } finally {
     contactLoading.value = false;
   }
@@ -162,16 +1017,15 @@ const handleContactSubmit = async () => {
 // Xử lý gửi Form (Gửi yêu cầu thực tế lên Backend API Laravel)
 const handleSubmit = async () => {
   isLoading.value = true;
+  const selectedService = services[formServiceIndex.value] || services[currentServiceIndex.value];
+  const payload = {
+    name: name.value,
+    phone: phone.value,
+    link: link.value,
+    service: selectedService ? selectedService.name : 'Tư vấn tích xanh'
+  };
 
   try {
-    const selectedService = services[formServiceIndex.value] || services[currentServiceIndex.value];
-    const payload = {
-      name: name.value,
-      phone: phone.value,
-      link: link.value,
-      service: selectedService ? selectedService.name : 'Tư vấn tích xanh'
-    };
-
     const response = await fetch('/api/contact', {
       method: 'POST',
       headers: {
@@ -185,12 +1039,18 @@ const handleSubmit = async () => {
 
     if (response.ok && result.success) {
       isSubmitted.value = true;
+      triggerImmediateSocialProof(payload);
     } else {
-      alert(result.message || 'Có lỗi xảy ra khi gửi đăng ký.');
+      console.warn('Backend contact submission failed, falling back to Formspree:', result.message);
+      await submitToFormspree(payload);
+      isSubmitted.value = true;
+      triggerImmediateSocialProof(payload);
     }
   } catch (error) {
-    console.error('Lỗi kết nối API:', error);
-    alert('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng hoặc server.');
+    console.error('Lỗi kết nối API, falling back to Formspree:', error);
+    await submitToFormspree(payload);
+    isSubmitted.value = true;
+    triggerImmediateSocialProof(payload);
   } finally {
     isLoading.value = false;
   }
@@ -330,15 +1190,740 @@ const faqs = [
       @select-service="selectService" 
       @toggle-theme="handleToggleTheme" 
       @open-register="openModal"
-      @click="handleHeaderClick"
+      @navigate-section="handleNavigateSection"
     />
 
     <template v-if="!selectedArticle">
-      <!-- Hero component -->
-      <HeroSection 
-        :service="services[currentServiceIndex]" 
-        @open-register="openModal" 
-      />
+      <!-- ADMIN DASHBOARD PAGE -->
+      <template v-if="selectedPage === 'admin'">
+        <main class="min-h-screen bg-[#060b13] text-slate-100 py-12">
+          <!-- VERIFY PASSCODE STATE -->
+          <div v-if="!isAdminAuthenticated" class="mx-auto max-w-md px-5 mt-12">
+            <div class="rounded-3xl border border-slate-800 bg-[#0c1524]/60 backdrop-blur-xl p-8 shadow-2xl text-center">
+              <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 mb-6">
+                <!-- Shield Lock Icon -->
+                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h1 class="text-2xl font-black text-white">Hệ Thống Quản Trị</h1>
+              <p class="text-xs text-slate-400 mt-2">Vui lòng nhập mật mã quản trị viên để tiếp tục truy cập danh sách đăng ký tư vấn.</p>
+              
+              <form @submit.prevent="verifyPasscode" class="mt-6 space-y-4">
+                <div>
+                  <input 
+                    type="password" 
+                    v-model="adminPasscode" 
+                    placeholder="Mật mã quản trị viên" 
+                    class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                  />
+                  <p v-if="adminError" class="mt-2 text-xs font-semibold text-rose-500 text-left flex items-center gap-1">
+                    <span class="text-rose-500">⚠</span> {{ adminError }}
+                  </p>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  class="w-full rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-3 text-sm font-extrabold text-white transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]"
+                >
+                  Xác Minh Quyền Truy Cập
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- ADMIN DASHBOARD PANEL -->
+          <div v-else-if="isAdminAuthenticated" class="mx-auto max-w-[1140px] px-5">
+            <!-- Header section -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-6 mb-6">
+              <div>
+                <h1 class="text-2xl font-black text-white flex items-center gap-2">
+                  <span>Dashboard Quản Trị</span>
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-400">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Realtime {{ realtimeEnabled ? 'Đang bật' : 'Tắt' }}
+                  </span>
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">
+                  Đang đăng nhập với vai trò: 
+                  <span class="font-extrabold text-blue-400">{{ adminRole === 'admin' ? 'Quản trị viên (Admin)' : 'Nhân viên (Employee)' }}</span> 
+                  - {{ adminName }}
+                </p>
+              </div>
+              
+              <div class="flex items-center gap-3">
+                <!-- Toggle Realtime -->
+                <label v-if="activeAdminTab === 'leads'" class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="realtimeEnabled" class="sr-only peer">
+                  <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 peer-checked:after:bg-white"></div>
+                  <span class="ml-2 text-xs font-semibold text-slate-400 select-none">Tự cập nhật</span>
+                </label>
+
+                <!-- Export CSV/Excel Button -->
+                <button 
+                  v-if="activeAdminTab === 'leads'"
+                  @click="exportLeadsToExcel" 
+                  class="flex h-9 items-center justify-center rounded-lg border border-slate-800 bg-[#0c1524] px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors gap-1.5"
+                  title="Xuất danh sách ra tệp Excel CSV"
+                >
+                  <Download class="h-3.5 w-3.5 text-emerald-400" />
+                  Xuất Excel
+                </button>
+
+                <!-- Refresh Button -->
+                <button 
+                  @click="activeAdminTab === 'leads' ? fetchLeads() : (activeAdminTab === 'chat' ? fetchChatSessions() : fetchEmployees())" 
+                  class="flex h-9 items-center justify-center rounded-lg border border-slate-800 bg-[#0c1524] px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors gap-1.5"
+                >
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3m0 0l3 3m-3-3v8" />
+                  </svg>
+                  Làm mới
+                </button>
+
+                <!-- Logout Button -->
+                <button 
+                  @click="logoutAdmin" 
+                  class="flex h-9 items-center justify-center rounded-lg border border-slate-800 bg-[#0c1524] px-3 text-xs font-semibold text-rose-400 hover:bg-rose-950/20 hover:border-rose-900 transition-colors gap-1.5"
+                >
+                  <LogOut class="h-3.5 w-3.5" />
+                  Đăng xuất
+                </button>
+              </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="flex border-b border-slate-800 mb-6 gap-2">
+              <button 
+                @click="activeAdminTab = 'leads'"
+                class="px-4 py-2 text-xs font-bold transition-all border-b-2"
+                :class="activeAdminTab === 'leads' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'"
+              >
+                Đăng ký tư vấn
+              </button>
+              <button 
+                v-if="adminRole === 'admin'"
+                @click="activeAdminTab = 'employees'"
+                class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5"
+                :class="activeAdminTab === 'employees' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'"
+              >
+                <Users class="h-3.5 w-3.5" />
+                Quản lý nhân viên
+              </button>
+              <button 
+                @click="activeAdminTab = 'chat'"
+                class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5"
+                :class="activeAdminTab === 'chat' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'"
+              >
+                <MessageSquare class="h-3.5 w-3.5" />
+                Hỗ trợ khách hàng
+              </button>
+            </div>
+
+            <!-- TAB 1: LEADS (ĐĂNG KÝ) -->
+            <div v-if="activeAdminTab === 'leads'" class="space-y-6">
+              <!-- Stats Row -->
+              <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm">
+                  <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tổng Đăng Ký</p>
+                  <p class="mt-2 text-2xl font-black text-white">{{ leads.length }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm">
+                  <p class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Chờ Xử Lý</p>
+                  <p class="mt-2 text-2xl font-black text-amber-400">{{ leads.filter(l => l.status === 'pending').length }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm">
+                  <p class="text-[11px] font-bold text-blue-500 uppercase tracking-wider">Đang Liên Hệ</p>
+                  <p class="mt-2 text-2xl font-black text-blue-400">{{ leads.filter(l => l.status === 'contacting' || l.status === 'contacted').length }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm">
+                  <p class="text-[11px] font-bold text-emerald-500 uppercase tracking-wider">Đã Hoàn Thành</p>
+                  <p class="mt-2 text-2xl font-black text-emerald-400">{{ leads.filter(l => l.status === 'completed').length }}</p>
+                </div>
+              </div>
+
+              <!-- Leads Table / Mobile Grid -->
+              <div class="rounded-3xl border border-slate-800 bg-[#0c1524]/40 overflow-hidden">
+                <!-- Desktop Table view -->
+                <div class="hidden md:block overflow-x-auto">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 uppercase font-bold text-[10px]">
+                        <th class="p-4">Thời gian</th>
+                        <th class="p-4">Họ và tên</th>
+                        <th class="p-4">Số điện thoại</th>
+                        <th class="p-4">Tài khoản / Link</th>
+                        <th class="p-4">Dịch vụ</th>
+                        <th class="p-4">Lời nhắn</th>
+                        <th class="p-4">Trạng thái</th>
+                        <th v-if="adminRole === 'admin'" class="p-4 text-right">Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="lead in leads" :key="lead.id" class="border-b border-slate-900/60 hover:bg-slate-900/20 transition-colors">
+                        <td class="p-4 text-slate-400 font-medium whitespace-nowrap">
+                          {{ new Date(lead.created_at).toLocaleString('vi-VN', {hour: '2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'}) }}
+                        </td>
+                        <td class="p-4">
+                          <button 
+                            @click="openLeadDetail(lead)" 
+                            class="font-black text-white hover:text-blue-400 hover:underline text-[13px] text-left focus:outline-none transition-colors"
+                            title="Xem thông tin chi tiết khách hàng"
+                          >
+                            {{ lead.name }}
+                          </button>
+                        </td>
+                        <td class="p-4 whitespace-nowrap">
+                          <div class="flex flex-col gap-1">
+                            <a 
+                              :href="'tel:' + lead.phone" 
+                              class="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-bold text-blue-400 hover:bg-blue-500 hover:text-white transition-all"
+                              title="Click để gọi điện thoại trên di động"
+                            >
+                              <Phone class="h-3.5 w-3.5" />
+                              <span class="tracking-wider">{{ lead.phone }}</span>
+                            </a>
+                            <a 
+                              :href="'https://zalo.me/' + lead.phone" 
+                              target="_blank" 
+                              class="inline-flex items-center justify-center gap-1 rounded bg-blue-600/10 hover:bg-blue-600 px-2 py-1 text-[10px] font-bold text-blue-400 hover:text-white transition-all"
+                              title="Mở Zalo chat"
+                            >
+                              <MessageSquare class="h-3 w-3" />
+                              Zalo chat
+                            </a>
+                          </div>
+                        </td>
+                        <td class="p-4">
+                          <div class="flex flex-col gap-1">
+                            <a 
+                              :href="lead.link" 
+                              target="_blank" 
+                              class="inline-flex items-center gap-1 max-w-[200px] truncate text-slate-400 hover:text-blue-400 transition-colors"
+                              :title="lead.link"
+                            >
+                              <span class="truncate font-semibold">{{ lead.link }}</span>
+                              <ExternalLink class="h-3.5 w-3.5 flex-shrink-0" />
+                            </a>
+                            <div class="flex gap-1">
+                              <span class="rounded bg-slate-800 text-slate-400 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider scale-90 origin-left">
+                                {{ lead.link.includes('facebook.com') || lead.link.includes('fb.com') ? 'Facebook' : 'Link/Website' }}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="p-4 font-semibold text-slate-300">{{ lead.service }}</td>
+                        <td class="p-4 text-slate-400 max-w-[200px] truncate" :title="lead.message">{{ lead.message || '-' }}</td>
+                        <td class="p-4 whitespace-nowrap">
+                          <select 
+                            :value="lead.status" 
+                            @change="updateLeadStatus(lead.id, $event.target.value)"
+                            class="rounded-lg border border-slate-800 bg-[#060b13] px-2 py-1 text-xs font-bold focus:outline-none transition-colors"
+                            :class="{
+                              'text-amber-400 border-amber-500/30 bg-amber-500/5': lead.status === 'pending',
+                              'text-blue-400 border-blue-500/30 bg-blue-500/5': lead.status === 'contacting' || lead.status === 'contacted',
+                              'text-emerald-400 border-emerald-500/30 bg-emerald-500/5': lead.status === 'completed'
+                            }"
+                          >
+                            <option value="pending">Chờ xử lý</option>
+                            <option value="contacting">Đang liên hệ</option>
+                            <option value="completed">Đã hoàn thành</option>
+                          </select>
+                        </td>
+                        <td v-if="adminRole === 'admin'" class="p-4 text-right">
+                          <button 
+                            @click="deleteLead(lead.id)"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all active:scale-95"
+                            title="Xóa lượt đăng ký"
+                          >
+                            <Trash2 class="h-3.5 w-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Mobile Grid Card view -->
+                <div class="block md:hidden divide-y divide-slate-800">
+                  <div v-for="lead in leads" :key="lead.id" class="p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                      <span class="text-[10px] font-bold text-slate-500">
+                        {{ new Date(lead.created_at).toLocaleString('vi-VN', {hour: '2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'}) }}
+                      </span>
+                      <button 
+                        v-if="adminRole === 'admin'"
+                        @click="deleteLead(lead.id)"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
+                      >
+                        <Trash2 class="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    
+                    <div>
+                      <button 
+                        @click="openLeadDetail(lead)"
+                        class="font-black text-white text-[15px] text-left hover:text-blue-400 hover:underline focus:outline-none"
+                      >
+                        {{ lead.name }}
+                      </button>
+                      <p class="text-[11px] font-semibold text-slate-400 mt-0.5">{{ lead.service }}</p>
+                      <p v-if="lead.message" class="text-xs text-slate-400 mt-1 italic">"{{ lead.message }}"</p>
+                    </div>
+                    
+                    <div class="flex flex-col gap-2 pt-1">
+                      <div class="grid grid-cols-2 gap-2">
+                        <a 
+                          :href="'tel:' + lead.phone" 
+                          class="flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 py-2.5 text-xs font-bold text-white transition-all shadow-lg active:scale-95"
+                        >
+                          <Phone class="h-3.5 w-3.5" />
+                          Gọi điện
+                        </a>
+                        <a 
+                          :href="'https://zalo.me/' + lead.phone" 
+                          target="_blank"
+                          class="flex items-center justify-center gap-1.5 rounded-xl bg-blue-600/10 border border-blue-500/25 py-2.5 text-xs font-bold text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
+                        >
+                          <MessageSquare class="h-3.5 w-3.5" />
+                          Zalo
+                        </a>
+                      </div>
+
+                      <a :href="lead.link" target="_blank" class="flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-[#060b13] py-2.5 text-xs font-semibold text-slate-300 hover:text-white transition-all">
+                        <span>Facebook / Link đăng ký</span>
+                        <ExternalLink class="h-3.5 w-3.5" />
+                      </a>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-slate-900/60 pt-3">
+                      <span class="text-xs font-semibold text-slate-400">Trạng thái:</span>
+                      <select 
+                        :value="lead.status" 
+                        @change="updateLeadStatus(lead.id, $event.target.value)"
+                        class="rounded-lg border border-slate-800 bg-[#060b13] px-2.5 py-1 text-xs font-bold focus:outline-none transition-colors"
+                        :class="{
+                          'text-amber-400 border-amber-500/30 bg-amber-500/5': lead.status === 'pending',
+                          'text-blue-400 border-blue-500/30 bg-blue-500/5': lead.status === 'contacting' || lead.status === 'contacted',
+                          'text-emerald-400 border-emerald-500/30 bg-emerald-500/5': lead.status === 'completed'
+                        }"
+                      >
+                        <option value="pending">Chờ xử lý</option>
+                        <option value="contacting">Đang liên hệ</option>
+                        <option value="completed">Đã hoàn thành</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div v-if="leads.length === 0" class="text-center py-12 px-5">
+                  <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-800 text-slate-400 mb-4">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-4a2 2 0 00-2 2v1a2 2 0 01-2 2H9a2 2 0 01-2-2v-1a2 2 0 00-2-2H2" />
+                    </svg>
+                  </div>
+                  <h3 class="text-sm font-bold text-white">Chưa có lượt đăng ký nào</h3>
+                  <p class="text-xs text-slate-500 mt-1">Thông tin khách hàng đăng ký tư vấn sẽ xuất hiện tại đây.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 2: EMPLOYEES (NHÂN VIÊN) -->
+            <div v-else-if="activeAdminTab === 'employees' && adminRole === 'admin'" class="space-y-6">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-white">Danh Sách Nhân Viên</h2>
+                <button 
+                  @click="openAddEmployeeModal"
+                  class="flex h-9 items-center justify-center rounded-lg bg-blue-600 px-4 text-xs font-bold text-white hover:bg-blue-500 transition-colors gap-1.5"
+                >
+                  <Plus class="h-3.5 w-3.5" />
+                  Thêm nhân viên
+                </button>
+              </div>
+
+              <!-- Employees Table -->
+              <div class="rounded-3xl border border-slate-800 bg-[#0c1524]/40 overflow-hidden">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 uppercase font-bold text-[10px]">
+                        <th class="p-4">Họ và tên</th>
+                        <th class="p-4">Mật mã đăng nhập</th>
+                        <th class="p-4">Trạng thái</th>
+                        <th class="p-4">Ngày tạo</th>
+                        <th class="p-4 text-right">Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="emp in employeesList" :key="emp.id" class="border-b border-slate-900/60 hover:bg-slate-900/20 transition-colors">
+                        <td class="p-4 font-black text-white text-[13px]">{{ emp.name }}</td>
+                        <td class="p-4 text-slate-400 font-mono select-all">{{ emp.passcode }}</td>
+                        <td class="p-4">
+                          <span 
+                            class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold"
+                            :class="emp.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'"
+                          >
+                            {{ emp.status === 'active' ? 'Hoạt động' : 'Tạm khóa' }}
+                          </span>
+                        </td>
+                        <td class="p-4 text-slate-400">
+                          {{ new Date(emp.created_at).toLocaleDateString('vi-VN') }}
+                        </td>
+                        <td class="p-4 text-right space-x-2">
+                          <button 
+                            @click="openEditEmployeeModal(emp)"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-all"
+                            title="Sửa thông tin"
+                          >
+                            <Edit class="h-3.5 w-3.5" />
+                          </button>
+                          <button 
+                            @click="deleteEmployee(emp.id)"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
+                            title="Xóa nhân viên"
+                          >
+                            <Trash2 class="h-3.5 w-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                      <tr v-if="employeesList.length === 0">
+                        <td colspan="5" class="p-8 text-center text-slate-500">
+                          Chưa có tài khoản nhân viên nào. Hãy thêm mới để nhân viên có thể đăng nhập.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 3: CUSTOMER CHAT (TIN NHẮN KHÁCH HÀNG) -->
+            <div v-else-if="activeAdminTab === 'chat'" class="grid grid-cols-1 md:grid-cols-12 gap-6 h-[600px] border border-slate-800 rounded-3xl overflow-hidden bg-[#0c1524]/20 backdrop-blur-xl">
+              <!-- Left Panel: Session list -->
+              <div class="md:col-span-4 border-r border-slate-800 flex flex-col h-full bg-[#0c1524]/40">
+                <div class="p-4 border-b border-slate-800 font-black text-white text-sm flex items-center justify-between">
+                  <span>Phiên Hội Thoại</span>
+                  <span class="text-[10px] text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-full font-bold">
+                    {{ chatSessions.length }}
+                  </span>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto divide-y divide-slate-900/60">
+                  <div 
+                    v-for="session in chatSessions" 
+                    :key="session.session_id"
+                    @click="selectChatSession(session.session_id)"
+                    class="p-4 cursor-pointer hover:bg-slate-800/30 transition-all flex flex-col gap-1"
+                    :class="activeSessionId === session.session_id ? 'bg-blue-500/10 border-l-4 border-blue-500' : ''"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="font-extrabold text-[13px]" :class="session.unread_count > 0 ? 'text-white' : 'text-slate-300'">
+                        {{ session.customer_name }}
+                      </span>
+                      <span class="text-[9px] text-slate-500 font-medium whitespace-nowrap">
+                        {{ new Date(session.updated_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) }}
+                      </span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                      <p class="text-[11px] text-slate-400 truncate flex-1">
+                        {{ session.last_message }}
+                      </p>
+                      <span 
+                        v-if="session.unread_count > 0"
+                        class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[8px] font-bold text-white"
+                      >
+                        {{ session.unread_count }}
+                      </span>
+                    </div>
+                  </div>
+                  <div v-if="chatSessions.length === 0" class="text-center p-8 text-slate-500 text-xs">
+                    Chưa có cuộc trò chuyện nào từ khách hàng.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Panel: Message Thread -->
+              <div class="md:col-span-8 flex flex-col h-full bg-slate-950/20">
+                <!-- Thread Header -->
+                <div v-if="activeSessionId" class="p-4 border-b border-slate-800 flex items-center justify-between bg-[#0c1524]/20">
+                  <div>
+                    <h3 class="font-extrabold text-white text-[13px]">
+                      {{ chatSessions.find(s => s.session_id === activeSessionId)?.customer_name || 'Đang hội thoại' }}
+                    </h3>
+                    <p class="text-[10px] text-slate-500 mt-0.5">ID: {{ activeSessionId }}</p>
+                  </div>
+                </div>
+                
+                <!-- Messages Stream -->
+                <div 
+                  id="admin-chat-messages" 
+                  class="flex-1 p-4 overflow-y-auto space-y-4"
+                >
+                  <div v-if="!activeSessionId" class="h-full flex flex-col items-center justify-center text-slate-500 text-center p-6">
+                    <MessageSquare class="h-10 w-10 text-slate-600 mb-2" />
+                    <p class="text-xs font-semibold">Vui lòng chọn một phiên hội thoại ở cột trái để bắt đầu chat với khách hàng.</p>
+                  </div>
+                  
+                  <template v-else>
+                    <div 
+                      v-for="msg in activeSessionMessages" 
+                      :key="msg.id"
+                      class="flex flex-col max-w-[80%]"
+                      :class="msg.sender_type === 'employee' || msg.sender_type === 'admin' ? 'ml-auto items-end' : 'items-start'"
+                    >
+                      <span class="text-[9px] text-slate-500 mb-0.5 px-1 font-semibold">
+                        {{ msg.sender_type === 'customer' ? msg.customer_name : (msg.sender_name || 'Quản trị viên') }} • {{ new Date(msg.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) }}
+                      </span>
+                      <div 
+                        class="rounded-2xl px-4 py-2.5 text-xs text-left"
+                        :class="msg.sender_type === 'employee' || msg.sender_type === 'admin' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none'"
+                      >
+                        {{ msg.message }}
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- Input area -->
+                <div v-if="activeSessionId" class="p-4 border-t border-slate-800 bg-[#0c1524]/40">
+                  <form @submit.prevent="sendAdminMessage" class="flex gap-2">
+                    <input 
+                      type="text" 
+                      v-model="adminChatInput"
+                      placeholder="Nhập nội dung tin nhắn gửi khách hàng..."
+                      class="flex-1 rounded-xl border border-slate-800 bg-[#060b13] px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    />
+                    <button 
+                      type="submit"
+                      class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white hover:bg-blue-500 transition-all active:scale-95 flex-shrink-0"
+                    >
+                      <Send class="h-3.5 w-3.5" />
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Employee Form Modal -->
+            <div v-if="showEmployeeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+              <div class="w-full max-w-md rounded-3xl border border-slate-800 bg-[#0c1524] p-6 shadow-2xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                  <h3 class="text-base font-bold text-white">
+                    {{ employeeForm.id ? 'Cập Nhật Nhân Viên' : 'Thêm Nhân Viên Mới' }}
+                  </h3>
+                  <button @click="showEmployeeModal = false" class="text-slate-400 hover:text-white">
+                    <X class="h-5 w-5" />
+                  </button>
+                </div>
+                
+                <form @submit.prevent="saveEmployee" class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Tên nhân viên</label>
+                    <input 
+                      type="text" 
+                      v-model="employeeForm.name" 
+                      placeholder="Nhập tên đầy đủ"
+                      class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                    />
+                    <p v-if="employeeErrors.name" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ employeeErrors.name }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Mật mã đăng nhập</label>
+                    <input 
+                      type="text" 
+                      v-model="employeeForm.passcode" 
+                      placeholder="Mật mã đăng nhập duy nhất"
+                      class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none font-mono"
+                    />
+                    <p v-if="employeeErrors.passcode" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ employeeErrors.passcode }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Trạng thái</label>
+                    <select 
+                      v-model="employeeForm.status"
+                      class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-3 py-2 text-sm text-white focus:outline-none"
+                    >
+                      <option value="active">Hoạt động (Active)</option>
+                      <option value="inactive">Tạm khóa (Inactive)</option>
+                    </select>
+                  </div>
+                  
+                  <div class="flex justify-end gap-3 pt-2">
+                    <button 
+                      type="button" 
+                      @click="showEmployeeModal = false"
+                      class="rounded-xl border border-slate-800 px-4 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800"
+                    >
+                      Hủy bỏ
+                    </button>
+                    <button 
+                      type="submit" 
+                      class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500"
+                    >
+                      Lưu thông tin
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </main>
+      </template>
+
+      <!-- BLOG PAGE -->
+      <template v-else-if="selectedPage === 'blog'">
+        <main class="min-h-screen bg-[#060b13] text-slate-100 py-12">
+          <div class="mx-auto max-w-[760px] px-5">
+            <nav class="mb-6 flex items-center gap-2 text-[11px] font-semibold text-slate-500">
+              <button @click="closePage" class="hover:text-blue-500">Trang chủ</button>
+              <span>/</span>
+              <span class="text-slate-300">Tin tức & Kiến thức</span>
+            </nav>
+            <h1 class="text-3xl font-extrabold text-white">Tin Tức & Kiến Thức</h1>
+            <p class="mt-2 text-[13px] font-medium text-slate-400">Cập nhật mới nhất về đăng ký tích xanh Facebook, Instagram, TikTok & WhatsApp</p>
+            
+            <div class="mt-8 grid gap-6 sm:grid-cols-2">
+              <article v-for="item in articles" :key="item.id"
+                class="group cursor-pointer rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 hover:-translate-y-1"
+                @click="selectArticle(item)">
+                <img :src="item.banner" :alt="item.title" class="mb-4 h-40 w-full rounded-xl object-cover" loading="lazy" />
+                <span class="inline-block rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-400">{{ item.category }}</span>
+                <h2 class="mt-2 text-[14px] font-black leading-snug text-white group-hover:text-blue-400 transition-colors">{{ item.title }}</h2>
+                <p class="mt-1.5 text-[11px] font-medium leading-5 text-slate-400 line-clamp-2">{{ item.description }}</p>
+                <div class="mt-4 flex items-center gap-2 text-[10px] font-semibold text-slate-500">
+                  <span>{{ item.author }}</span><span>·</span><span>{{ item.date }}</span><span>·</span><span>{{ item.readTime }}</span>
+                </div>
+              </article>
+            </div>
+            
+            <div class="mt-12 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center text-white shadow-xl shadow-blue-500/10">
+              <p class="text-lg font-black">Cần hỗ trợ đăng ký tích xanh?</p>
+              <p class="text-sm text-blue-100 mt-1">Liên hệ ngay để được chuyên viên AZ Media kiểm tra hồ sơ miễn phí</p>
+              <a href="tel:0968825068" class="mt-4 inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-extrabold text-blue-600 hover:bg-blue-50 transition-all duration-300 shadow-md">
+                Gọi 0968.825.068
+              </a>
+            </div>
+          </div>
+        </main>
+      </template>
+
+      <!-- GIỚI THIỆU PAGE -->
+      <template v-else-if="selectedPage === 'gioi-thieu'">
+        <main class="min-h-screen bg-[#060b13] text-slate-100 py-12">
+          <div class="mx-auto max-w-[760px] px-5">
+            <nav class="mb-6 flex items-center gap-2 text-[11px] font-semibold text-slate-500">
+              <button @click="closePage" class="hover:text-blue-500">Trang chủ</button>
+              <span>/</span>
+              <span class="text-slate-300">Giới thiệu</span>
+            </nav>
+            <h1 class="text-3xl font-extrabold text-white">Về Chúng Tôi</h1>
+            <p class="mt-4 text-[14px] font-medium leading-7 text-slate-300">
+              <strong>AZ Media</strong> là đơn vị chuyên tư vấn và hỗ trợ đăng ký tích xanh (Meta Verified) cho Fanpage Facebook, Instagram, TikTok và WhatsApp tại Việt Nam. Với 5+ năm kinh nghiệm, chúng tôi đã hỗ trợ hơn <strong>2.368 khách hàng</strong> thành công.
+            </p>
+            
+            <div class="mt-8 grid gap-4 grid-cols-3">
+              <div v-for="[num, label] in [['2.368+', 'Khách hàng'], ['100%', 'Tỉ lệ thành công'], ['5+', 'Năm kinh nghiệm']]" :key="label"
+                class="rounded-xl border border-slate-800 bg-[#0c1524] p-5 text-center shadow-sm">
+                <p class="text-2xl font-black text-blue-400">{{ num }}</p>
+                <p class="mt-1 text-[11px] font-semibold text-slate-400">{{ label }}</p>
+              </div>
+            </div>
+            
+            <div class="mt-8 space-y-6 text-[14px] font-medium leading-7 text-slate-300">
+              <h2 class="text-xl font-extrabold text-white">Cam kết của chúng tôi</h2>
+              <ul class="space-y-3.5">
+                <li v-for="item in ['Làm xong tích xanh mới thu phí — không mất tiền oan', 'Không yêu cầu mật khẩu, đảm bảo an toàn tài khoản', 'Hỗ trợ 24/7, bảo hành trọn đời', 'Chỉ dùng phương pháp chính thức của Meta']" :key="item"
+                  class="flex items-start gap-2.5">
+                  <span class="mt-0.5 text-emerald-400">✓</span>
+                  <span>{{ item }}</span>
+                </li>
+              </ul>
+              
+              <h2 class="mt-8 text-xl font-extrabold text-white">Thông tin công ty</h2>
+              <div class="rounded-xl border border-slate-800 bg-[#0c1524] p-6 space-y-3 text-[13px]">
+                <p><strong class="text-white">Mã số doanh nghiệp:</strong> 0314247738 — 002</p>
+                <p><strong class="text-white">Địa chỉ ĐKKD:</strong> 127 Lê Trọng Tấn, Phường An Khê, Đà Nẵng</p>
+                <p><strong class="text-white">Văn phòng giao dịch:</strong> 84 Nguyễn Hữu Dật, Hòa Cường Bắc, Hải Châu, Đà Nẵng</p>
+                <p><strong class="text-white">Điện thoại:</strong> <a href="tel:0968825068" class="text-blue-400 hover:underline">0968.825.068</a> (Mr. Quang — CEO)</p>
+                <p><strong class="text-white">Email:</strong> <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></p>
+                <p><strong class="text-white">Facebook:</strong> <a href="https://fb.com/congtyazmedia" target="_blank" class="text-blue-400 hover:underline">fb.com/congtyazmedia</a></p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </template>
+
+      <!-- LEGAL PAGES -->
+      <template v-else-if="selectedPage && selectedPage.startsWith('legal-')">
+        <main class="min-h-screen bg-[#060b13] text-slate-100 py-12">
+          <div class="mx-auto max-w-[760px] px-5">
+            <nav class="mb-6 flex items-center gap-2 text-[11px] font-semibold text-slate-500">
+              <button @click="closePage" class="hover:text-blue-500">Trang chủ</button>
+              <span>/</span>
+              <span class="text-slate-300">{{ selectedPage === 'legal-terms' ? 'Điều khoản dịch vụ' : selectedPage === 'legal-privacy' ? 'Chính sách bảo mật' : 'DMCA' }}</span>
+            </nav>
+            
+            <!-- TERMS -->
+            <template v-if="selectedPage === 'legal-terms'">
+              <h1 class="text-3xl font-extrabold text-white">Điều Khoản Dịch Vụ</h1>
+              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-300">
+                <p>Bằng việc sử dụng dịch vụ của <strong>Đăng Ký Tích Xanh (AZ Media)</strong>, bạn đồng ý với các điều khoản sau:</p>
+                <h2 class="text-base font-bold text-white mt-6">1. Phạm vi dịch vụ</h2>
+                <p>Chúng tôi cung cấp dịch vụ tư vấn và hỗ trợ đăng ký tích xanh (Meta Verified) cho Fanpage Facebook, Instagram, TikTok và WhatsApp Business thông qua các phương pháp chính thức của Meta.</p>
+                <h2 class="text-base font-bold text-white mt-6">2. Chính sách thanh toán</h2>
+                <p>Khách hàng <strong>chỉ thanh toán sau khi tích xanh đã hiển thị thành công</strong> trên tài khoản. Không thu bất kỳ khoản tiền nào trước khi hoàn thành.</p>
+                <h2 class="text-base font-bold text-white mt-6">3. Bảo hành & hỗ trợ</h2>
+                <p>Chúng tôi cam kết hỗ trợ trọn đời trong trường hợp tích xanh bị mất do lỗi kỹ thuật từ phía chúng tôi.</p>
+                <h2 class="text-base font-bold text-white mt-6">4. Giới hạn trách nhiệm</h2>
+                <p>Chúng tôi không chịu trách nhiệm cho các thay đổi chính sách đột ngột từ phía Meta/Facebook làm ảnh hưởng đến tích xanh sau khi đã hoàn thành dịch vụ.</p>
+              </div>
+            </template>
+            
+            <!-- PRIVACY -->
+            <template v-else-if="selectedPage === 'legal-privacy'">
+              <h1 class="text-3xl font-extrabold text-white">Chính Sách Bảo Mật</h1>
+              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-300">
+                <p>Chúng tôi cam kết bảo vệ thông tin cá nhân của khách hàng theo các nguyên tắc sau:</p>
+                <h2 class="text-base font-bold text-white mt-6">1. Thông tin thu thập</h2>
+                <p>Chúng tôi chỉ thu thập: Họ tên, số điện thoại, link Fanpage/tài khoản cần đăng ký. <strong>Tuyệt đối không yêu cầu mật khẩu.</strong></p>
+                <h2 class="text-base font-bold text-white mt-6">2. Mục đích sử dụng</h2>
+                <p>Thông tin chỉ được dùng để liên hệ tư vấn và thực hiện dịch vụ. Không chia sẻ cho bên thứ ba.</p>
+                <h2 class="text-base font-bold text-white mt-6">3. Bảo mật dữ liệu</h2>
+                <p>Thông tin khách hàng được lưu trữ an toàn và xóa sau khi hoàn thành dịch vụ theo yêu cầu.</p>
+                <h2 class="text-base font-bold text-white mt-6">4. Liên hệ</h2>
+                <p>Mọi thắc mắc về bảo mật: <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></p>
+              </div>
+            </template>
+            
+            <!-- DMCA -->
+            <template v-else>
+              <h1 class="text-3xl font-extrabold text-white">DMCA</h1>
+              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-300">
+                <p>Tất cả nội dung trên website <strong>dangkytichxanh.vn</strong> bao gồm văn bản, hình ảnh, logo và thiết kế đều thuộc quyền sở hữu của AZ Media.</p>
+                <h2 class="text-base font-bold text-white mt-6">Báo cáo vi phạm bản quyền</h2>
+                <p>Nếu bạn phát hiện nội dung của chúng tôi bị sao chép trái phép, vui lòng liên hệ:</p>
+                <ul class="space-y-1.5 pl-4 list-disc">
+                  <li>Email: <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></li>
+                  <li>Hotline: <a href="tel:0968825068" class="text-blue-400 hover:underline">0968.825.068</a></li>
+                </ul>
+                <p>Chúng tôi sẽ xử lý trong vòng 72 giờ làm việc.</p>
+              </div>
+            </template>
+          </div>
+        </main>
+      </template>
+
+      <!-- MAIN LANDING PAGE -->
+      <template v-else>
+        <!-- Hero component -->
+        <HeroSection 
+          :service="services[currentServiceIndex]" 
+          @open-register="openModal" 
+        />
 
     <!-- Stats Bar component -->
     <StatsBar />
@@ -600,7 +2185,10 @@ const faqs = [
             <!-- Left: contact info cards -->
             <div class="flex flex-col gap-4">
               <!-- Hotline -->
-              <div class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)]">
+              <a 
+                href="tel:0968825068"
+                class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
+              >
                 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 border border-blue-500/20">
                   <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -608,12 +2196,16 @@ const faqs = [
                 </div>
                 <div>
                   <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Hotline</p>
-                  <p class="text-sm font-bold text-white">O968.825.O68</p>
+                  <p class="text-sm font-bold text-white">0968.825.068</p>
                 </div>
-              </div>
+              </a>
 
               <!-- Zalo -->
-              <div class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)]">
+              <a 
+                href="https://zalo.me/0968825068"
+                target="_blank"
+                class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
+              >
                 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 border border-blue-500/20">
                   <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.02 2 11c0 2.77 1.28 5.27 3.3 7.02L4 22l4.22-1.4A10.3 10.3 0 0012 21c5.52 0 10-4.02 10-9S17.52 2 12 2zm.92 13.36l-.44-.45c-.36-.37-.77-.56-1.2-.56-.27 0-.55.07-.84.22l-1.45.74c-.1.05-.2.05-.3-.02l-.3-.25c-1.68-1.47-2.8-3.35-2.8-4.6 0-.14.04-.27.12-.38l.88-1.13c.22-.28.27-.6.13-.9L5.6 7.05a.48.48 0 00-.5-.28c-.52.05-1 .3-1.38.7C3.26 8 3 8.88 3 9.87c0 1.3.46 2.66 1.26 3.87 1.17 1.77 2.87 3.23 4.83 4.1.97.44 1.9.66 2.76.66.9 0 1.7-.24 2.3-.68.5-.36.82-.88.9-1.46z"/>
@@ -621,12 +2213,15 @@ const faqs = [
                 </div>
                 <div>
                   <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Zalo</p>
-                  <p class="text-sm font-bold text-white">O968.825.O68</p>
+                  <p class="text-sm font-bold text-white">0968.825.068</p>
                 </div>
-              </div>
+              </a>
 
               <!-- Email -->
-              <div class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)]">
+              <a 
+                href="mailto:azmedia.com.vn@gmail.com"
+                class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
+              >
                 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 border border-blue-500/20">
                   <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -636,7 +2231,7 @@ const faqs = [
                   <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Email</p>
                   <p class="text-sm font-bold text-white">azmedia.com.vn@gmail.com</p>
                 </div>
-              </div>
+              </a>
 
               <!-- Địa chỉ -->
               <div class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)]">
@@ -761,6 +2356,7 @@ const faqs = [
         </div>
       </section>
     </main>
+      </template>
     </template>
 
     <template v-else>
@@ -775,7 +2371,11 @@ const faqs = [
     </template>
 
     <!-- Footer component -->
-    <Footer @open-register="openModal"/>
+    <Footer 
+      @open-register="openModal" 
+      @open-page="openPage" 
+      @select-service="selectService" 
+    />
 
     <!-- Inline Registry Form Modal -->
     <div 
@@ -940,6 +2540,328 @@ const faqs = [
           </div>
 
         </div>
+
+      </div>
+    </div>
+
+    <!-- Lead Detail Modal (Overlays Admin Page) -->
+    <div 
+      v-if="isLeadDetailModalOpen && selectedLeadDetail" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      @click.self="closeLeadDetail"
+    >
+      <div class="relative w-full max-w-lg rounded-3xl border border-slate-800 bg-[#070d1a] shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-slate-800 p-5">
+          <h3 class="text-base font-black text-white uppercase tracking-wider flex items-center gap-2">
+            <Shield class="h-5 w-5 text-blue-500" />
+            Chi tiết khách hàng đăng ký
+          </h3>
+          <button 
+            @click="closeLeadDetail" 
+            class="text-slate-400 hover:text-white hover:bg-white/5 rounded-lg p-1.5 transition-colors focus:outline-none"
+          >
+            <X class="h-5 w-5" />
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-5 text-left text-xs text-slate-300 max-h-[80vh] overflow-y-auto">
+          <!-- Customer Name & Date -->
+          <div class="space-y-1">
+            <h4 class="text-xl font-black text-white">{{ selectedLeadDetail.name }}</h4>
+            <p class="text-slate-500 font-semibold">
+              Đăng ký ngày: {{ new Date(selectedLeadDetail.created_at).toLocaleString('vi-VN', {hour: '2-digit', minute:'2-digit', second: '2-digit', day:'2-digit', month:'2-digit', year:'numeric'}) }}
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-b border-slate-900/60 py-4">
+            <!-- Phone Column -->
+            <div class="space-y-2">
+              <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Số điện thoại</span>
+              <span class="block text-sm font-bold text-white tracking-wide">{{ selectedLeadDetail.phone }}</span>
+              <div class="flex gap-2 pt-1">
+                <a 
+                  :href="'tel:' + selectedLeadDetail.phone"
+                  class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 px-3 py-2 text-[11px] font-bold text-white transition-all shadow-lg active:scale-95"
+                >
+                  <Phone class="h-3.5 w-3.5" />
+                  Gọi điện
+                </a>
+                <a 
+                  :href="'https://zalo.me/' + selectedLeadDetail.phone"
+                  target="_blank"
+                  class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600/10 border border-blue-500/20 px-3 py-2 text-[11px] font-bold text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
+                >
+                  <MessageSquare class="h-3.5 w-3.5" />
+                  Chat Zalo
+                </a>
+              </div>
+            </div>
+
+            <!-- Service Column -->
+            <div class="space-y-2">
+              <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Dịch vụ đăng ký</span>
+              <span class="block text-sm font-bold text-blue-400">{{ selectedLeadDetail.service }}</span>
+              
+              <!-- Status Selector inside Modal -->
+              <div class="pt-1">
+                <span class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Cập nhật trạng thái</span>
+                <select 
+                  v-model="selectedLeadDetail.status" 
+                  @change="updateLeadStatus(selectedLeadDetail.id, $event.target.value)"
+                  class="w-full rounded-lg border border-slate-800 bg-[#0c1524] px-2.5 py-1.5 text-xs font-bold focus:outline-none transition-colors"
+                  :class="{
+                    'text-amber-400 border-amber-500/30 bg-amber-500/5': selectedLeadDetail.status === 'pending',
+                    'text-blue-400 border-blue-500/30 bg-blue-500/5': selectedLeadDetail.status === 'contacting' || selectedLeadDetail.status === 'contacted',
+                    'text-emerald-400 border-emerald-500/30 bg-emerald-500/5': selectedLeadDetail.status === 'completed'
+                  }"
+                >
+                  <option value="pending">Chờ xử lý (Pending)</option>
+                  <option value="contacting">Đang liên hệ (Contacting)</option>
+                  <option value="completed">Đã hoàn thành (Completed)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account link details -->
+          <div class="space-y-2">
+            <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tài khoản / Link đăng ký</span>
+            <div class="rounded-xl border border-slate-800 bg-[#0c1524] p-3 flex items-center justify-between gap-3">
+              <span class="text-xs text-slate-300 break-all select-all font-mono leading-relaxed">{{ selectedLeadDetail.link }}</span>
+              <a 
+                :href="selectedLeadDetail.link" 
+                target="_blank"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-all shrink-0"
+                title="Mở đường dẫn mới"
+              >
+                <ExternalLink class="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+
+          <!-- Message details -->
+          <div class="space-y-2">
+            <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Lời nhắn của khách</span>
+            <div class="rounded-xl border border-slate-800 bg-[#0c1524] p-3 text-slate-400 whitespace-pre-wrap leading-relaxed">
+              {{ selectedLeadDetail.message || 'Không có lời nhắn.' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-3 border-t border-slate-800 p-4 bg-slate-900/40">
+          <button 
+            @click="closeLeadDetail"
+            class="rounded-xl border border-slate-800 bg-[#0c1524] px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+          >
+            Đóng cửa sổ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Proof Notification (Bottom-Left) -->
+    <div 
+      class="fixed bottom-6 left-6 z-40 max-w-[320px] rounded-2xl border border-slate-800 bg-[#0c1524]/90 backdrop-blur-xl p-4 shadow-2xl transition-all duration-500 flex items-center gap-3"
+      :class="showSocialProof && socialProofData ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-12 opacity-0 scale-95 pointer-events-none'"
+    >
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs text-white font-extrabold truncate">
+          {{ socialProofData?.name }} <span class="text-slate-400 font-semibold">({{ socialProofData?.location }})</span>
+        </p>
+        <p class="text-[11px] text-slate-300 font-medium mt-0.5 leading-snug">
+          Vừa đăng ký: <strong class="text-blue-400">{{ socialProofData?.service }}</strong>
+        </p>
+        <p class="text-[9px] text-slate-500 font-bold mt-1 uppercase tracking-wider">
+          {{ socialProofData?.time }}
+        </p>
+      </div>
+      <button 
+        @click="showSocialProof = false" 
+        class="text-slate-500 hover:text-slate-300 self-start p-0.5"
+      >
+        <X class="h-3 w-3" />
+      </button>
+    </div>
+
+    <!-- Floating Contact Actions & Chat Toggle (Bottom-Right) -->
+    <div class="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 pointer-events-none">
+      
+      <!-- Hotline floating bubble -->
+      <a 
+        href="tel:0968825068"
+        class="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-600 text-white shadow-xl hover:bg-rose-500 transition-all hover:scale-110 relative group"
+        title="Gọi điện hotline: 0968.825.068"
+      >
+        <Phone class="h-5 w-5 animate-pulse" />
+        <span class="absolute right-14 bg-[#0c1524] border border-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+          Hotline: 0968.825.068
+        </span>
+        <!-- Pulsing ring effect -->
+        <span class="absolute -inset-1 rounded-full border border-rose-500/30 animate-ping opacity-75"></span>
+      </a>
+
+      <!-- Zalo floating bubble -->
+      <a 
+        href="https://zalo.me/0968825068"
+        target="_blank"
+        class="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#0068ff] text-white shadow-xl hover:bg-[#1a7aff] transition-all hover:scale-110 relative group"
+        title="Chat Zalo hỗ trợ"
+      >
+        <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.02 2 11c0 2.77 1.28 5.27 3.3 7.02L4 22l4.22-1.4A10.3 10.3 0 0012 21c5.52 0 10-4.02 10-9S17.52 2 12 2zm.92 13.36l-.44-.45c-.36-.37-.77-.56-1.2-.56-.27 0-.55.07-.84.22l-1.45.74c-.1.05-.2.05-.3-.02l-.3-.25c-1.68-1.47-2.8-3.35-2.8-4.6 0-.14.04-.27.12-.38l.88-1.13c.22-.28.27-.6.13-.9L5.6 7.05a.48.48 0 00-.5-.28c-.52.05-1 .3-1.38.7C3.26 8 3 8.88 3 9.87c0 1.3.46 2.66 1.26 3.87 1.17 1.77 2.87 3.23 4.83 4.1.97.44 1.9.66 2.76.66.9 0 1.7-.24 2.3-.68.5-.36.82-.88.9-1.46z"/>
+        </svg>
+        <span class="absolute right-14 bg-[#0c1524] border border-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+          Chat Zalo qua sđt
+        </span>
+      </a>
+
+      <!-- Facebook floating bubble -->
+      <a 
+        href="https://fb.com/congtyazmedia"
+        target="_blank"
+        class="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#1877f2] text-white shadow-xl hover:bg-[#3b82f6] transition-all hover:scale-110 relative group"
+        title="Trang Facebook Công ty"
+      >
+        <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24">
+          <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
+        </svg>
+        <span class="absolute right-14 bg-[#0c1524] border border-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+          Facebook Công ty
+        </span>
+      </a>
+
+      <!-- Chat toggle floating bubble -->
+      <button 
+        @click="toggleCustomerChat"
+        class="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-2xl hover:bg-blue-500 transition-all hover:scale-115 relative"
+        :class="isCustomerChatOpen ? 'rotate-90 bg-slate-800 hover:bg-slate-700' : ''"
+        title="Hỗ trợ trực tuyến"
+      >
+        <X v-if="isCustomerChatOpen" class="h-6 w-6" />
+        <MessageSquare v-else class="h-6 w-6" />
+
+        <!-- Unread badge -->
+        <span 
+          v-if="!isCustomerChatOpen && unreadCustomerMessagesCount > 0"
+          class="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 text-[10px] font-black text-white border-2 border-[#030712] animate-bounce"
+        >
+          {{ unreadCustomerMessagesCount }}
+        </span>
+      </button>
+
+    </div>
+
+    <!-- Customer Chat Window Panel -->
+    <div 
+      class="fixed bottom-24 right-6 z-50 w-[350px] max-w-[calc(100vw-2rem)] h-[480px] rounded-3xl border border-slate-800 bg-[#0c1524]/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform"
+      :class="isCustomerChatOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-90 pointer-events-none'"
+    >
+      <!-- Chat Header -->
+      <div class="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between shadow-md">
+        <div class="flex items-center gap-2">
+          <div class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></div>
+          <div>
+            <h4 class="text-xs font-black">Hỗ Trợ Trực Tuyến</h4>
+            <p class="text-[9px] text-blue-100 font-semibold mt-0.5">Chúng tôi online phản hồi ngay</p>
+          </div>
+        </div>
+        <button @click="isCustomerChatOpen = false" class="text-white/80 hover:text-white transition-colors">
+          <X class="h-4 w-4" />
+        </button>
+      </div>
+
+      <!-- Chat Body -->
+      <div class="flex-1 flex flex-col min-h-0 bg-[#060b13]/40">
+        
+        <!-- Welcome / Input Name Screen -->
+        <div v-if="!customerNameEntered" class="flex-1 flex flex-col justify-center p-6 text-center space-y-4">
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <MessageSquare class="h-6 w-6" />
+          </div>
+          <div>
+            <h5 class="text-xs font-bold text-white">Bắt Đầu Trò Chuyện</h5>
+            <p class="text-[10px] text-slate-400 mt-1">Vui lòng nhập tên của bạn để nhân viên tiện tư vấn hỗ trợ đăng ký tích xanh.</p>
+          </div>
+          
+          <form @submit.prevent="enterCustomerName" class="space-y-3">
+            <input 
+              type="text" 
+              v-model="customerNameInput"
+              placeholder="Tên của bạn..."
+              required
+              class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+            />
+            <button 
+              type="submit"
+              class="w-full rounded-xl bg-blue-600 hover:bg-blue-500 py-2.5 text-xs font-bold text-white transition-all"
+            >
+              Kết nối tư vấn viên
+            </button>
+          </form>
+        </div>
+
+        <!-- Messages Thread Screen -->
+        <template v-else>
+          <!-- Messages list -->
+          <div 
+            id="customer-chat-messages" 
+            class="flex-1 p-4 overflow-y-auto space-y-3"
+          >
+            <div class="text-center py-2">
+              <span class="inline-block bg-slate-900/60 text-[9px] text-slate-500 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+                Kết nối thành công với: {{ customerNameEntered }}
+              </span>
+            </div>
+            
+            <div v-if="customerChatMessages.length === 0" class="text-center text-slate-500 py-4 text-[10px] italic">
+              Nhập câu hỏi của bạn bên dưới để nhận hỗ trợ...
+            </div>
+
+            <div 
+              v-for="msg in customerChatMessages" 
+              :key="msg.id"
+              class="flex flex-col max-w-[80%]"
+              :class="msg.sender_type === 'customer' ? 'ml-auto items-end' : 'items-start'"
+            >
+              <span class="text-[8px] text-slate-500 mb-0.5 px-1 font-semibold">
+                {{ msg.sender_type === 'customer' ? 'Bạn' : 'Tư vấn viên (' + (msg.sender_name || 'Hỗ trợ') + ')' }} • {{ new Date(msg.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) }}
+              </span>
+              <div 
+                class="rounded-2xl px-3 py-2 text-xs text-left"
+                :class="msg.sender_type === 'customer' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none'"
+              >
+                {{ msg.message }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Input area -->
+          <div class="p-3 border-t border-slate-800/80 bg-[#0c1524]/60">
+            <form @submit.prevent="sendCustomerMessage" class="flex gap-2">
+              <input 
+                type="text" 
+                v-model="customerChatInput"
+                placeholder="Nhập câu hỏi của bạn..."
+                required
+                class="flex-1 rounded-xl border border-slate-800 bg-[#060b13] px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+              />
+              <button 
+                type="submit"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white hover:bg-blue-500 transition-all active:scale-95 flex-shrink-0"
+              >
+                <Send class="h-3.5 w-3.5" />
+              </button>
+            </form>
+          </div>
+        </template>
 
       </div>
     </div>

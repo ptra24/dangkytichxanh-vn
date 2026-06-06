@@ -18,7 +18,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['select-service', 'toggle-theme', 'open-register']);
+const emit = defineEmits(['select-service', 'toggle-theme', 'open-register', 'navigate-section']);
 
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
@@ -69,7 +69,7 @@ onUnmounted(() => {
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
       
       <!-- Logo -->
-      <a href="#" class="flex items-center gap-2 group">
+      <a href="#" @click.prevent="emit('navigate-section', 'top')" class="flex items-center gap-2 group">
         <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
           <!-- Custom Premium SVG Check Badge -->
           <svg class="h-5.5 w-5.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -83,7 +83,7 @@ onUnmounted(() => {
 
       <!-- Desktop Navigation -->
       <nav class="hidden md:flex items-center gap-6">
-        <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Trang chủ</a>
+        <a href="#" @click.prevent="emit('navigate-section', 'top')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Trang chủ</a>
         
         <!-- Interactive Dropdown -->
         <div class="relative" ref="dropdownRef">
@@ -176,10 +176,10 @@ onUnmounted(() => {
           </Transition>
         </div>
 
-        <a href="#loi-ich" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Lợi ích</a>
-        <a href="#bang-gia" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Bảng giá</a>
-        <a href="#quy-trinh" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Quy trình</a>
-        <a href="#tin-tuc" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Tin tức</a>
+        <a href="#loi-ich" @click.prevent="emit('navigate-section', 'loi-ich')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Lợi ích</a>
+        <a href="#bang-gia" @click.prevent="emit('navigate-section', 'bang-gia')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Bảng giá</a>
+        <a href="#quy-trinh" @click.prevent="emit('navigate-section', 'quy-trinh')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Quy trình</a>
+        <a href="#tin-tuc" @click.prevent="emit('navigate-section', 'tin-tuc')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Tin tức</a>
       </nav>
 
       <!-- Right Header Actions (Desktop) -->
@@ -205,11 +205,11 @@ onUnmounted(() => {
 
         <!-- Phone Button -->
         <a 
-          href="tel:0921169999" 
+          href="tel:0968825068" 
           class="flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-sm font-extrabold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 hover:shadow-blue-500/30 transition-all duration-300 transform active:scale-95"
         >
           <Phone class="h-4 w-4 fill-white/10" />
-          092.116.9999
+          0968.825.068
         </a>
       </div>
 
@@ -224,7 +224,7 @@ onUnmounted(() => {
         </button>
 
         <a 
-          href="tel:0921169999" 
+          href="tel:0968825068" 
           class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-500 transition-colors"
           title="Gọi ngay"
         >
@@ -323,28 +323,28 @@ onUnmounted(() => {
 
       <a 
         href="#loi-ich" 
-        @click="isMobileMenuOpen = false" 
+        @click.prevent="emit('navigate-section', 'loi-ich'); isMobileMenuOpen = false" 
         class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
       >
         Lợi ích
       </a>
       <a 
         href="#bang-gia" 
-        @click="isMobileMenuOpen = false" 
+        @click.prevent="emit('navigate-section', 'bang-gia'); isMobileMenuOpen = false" 
         class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
       >
         Bảng giá
       </a>
       <a 
         href="#quy-trinh" 
-        @click="isMobileMenuOpen = false" 
+        @click.prevent="emit('navigate-section', 'quy-trinh'); isMobileMenuOpen = false" 
         class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
       >
         Quy trình
       </a>
       <a 
         href="#tin-tuc" 
-        @click="isMobileMenuOpen = false" 
+        @click.prevent="emit('navigate-section', 'tin-tuc'); isMobileMenuOpen = false" 
         class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
       >
         Tin tức
