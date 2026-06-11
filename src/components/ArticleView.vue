@@ -33,23 +33,23 @@ const handleSelectArticle = (otherArticle) => {
 </script>
 
 <template>
-  <div class="py-12 bg-[#060b13] relative overflow-hidden">
+  <div class="py-12 bg-white text-slate-900 dark:bg-[#060b13] dark:text-white relative overflow-hidden">
     <!-- Subtle glow backgrounds -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-10 right-10 w-[300px] h-[300px] bg-[#8b5cf6]/5 rounded-full blur-[100px] pointer-events-none"></div>
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#ff7d00]/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-10 right-10 w-[300px] h-[300px] bg-[#ff8e38]/5 rounded-full blur-[100px] pointer-events-none"></div>
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
       <!-- Breadcrumb & Back button -->
       <div class="flex items-center justify-between mb-8">
         <button 
           @click="emit('back')" 
-          class="inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200 group bg-slate-900/40 hover:bg-slate-900/80 px-4 py-2 rounded-xl border border-white/5"
+          class="inline-flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-white transition-colors duration-200 group bg-slate-900/40 hover:bg-slate-900/80 px-4 py-2.5 rounded-xl border border-orange-500/15 hover:border-orange-500/40 shadow-md"
         >
-          <ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          <ArrowLeft class="h-4 w-4 text-[#ff7d00] transition-transform group-hover:-translate-x-1" />
           <span>Quay lại trang chủ</span>
         </button>
 
-        <span class="text-xs font-bold uppercase tracking-wider text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#ff7d00] bg-[#ff7d00]/10 px-3 py-1 rounded-full border border-[#ff7d00]/20">
           {{ article.category }}
         </span>
       </div>
@@ -58,10 +58,10 @@ const handleSelectArticle = (otherArticle) => {
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- Left: Article Content -->
-        <article class="lg:col-span-8 bg-[#070d1a]/50 border border-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-2xl">
+        <article class="lg:col-span-8 bg-white dark:bg-[#070d1a]/70 border border-orange-500/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-lg dark:shadow-[0_20px_50px_rgba(255,125,0,0.03)] hover:border-orange-500/20 transition-all duration-300">
           <!-- Article Header -->
           <div class="space-y-4 mb-6">
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-[#ff7d00] to-slate-900 dark:from-white dark:via-[#ff7d00] dark:to-white bg-clip-text text-transparent leading-tight">
               {{ article.title }}
             </h1>
             
@@ -84,16 +84,16 @@ const handleSelectArticle = (otherArticle) => {
           ></div>
 
           <!-- Article Share / CTA bottom -->
-          <div class="mt-12 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-[#1e293b]/60 to-[#0f172a]/60 border border-blue-500/20 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="mt-12 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#1e293b]/60 dark:to-[#0f172a]/60 border border-[#ff7d00]/25 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-[#ff7d00]/10 rounded-full blur-2xl pointer-events-none"></div>
             <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div class="space-y-2">
-                <h3 class="text-lg sm:text-xl font-bold text-white">Đăng ký lên Tích Xanh ngay hôm nay</h3>
-                <p class="text-xs sm:text-sm text-slate-400 font-medium">Bảo mật tuyệt đối, làm xong mới thanh toán, hỗ trợ chuẩn hóa tên 100%.</p>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Đăng ký lên Tích Xanh ngay hôm nay</h3>
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Bảo mật tuyệt đối, làm xong mới thanh toán, hỗ trợ chuẩn hóa tên 100%.</p>
               </div>
               <button 
                 @click="emit('open-register')"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-6 py-3.5 text-xs font-black text-white shadow-lg shadow-blue-500/20 active:scale-98 transition-all shrink-0"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ff7d00] to-[#ff8e38] hover:from-[#ff8e38] hover:to-[#ff7d00] px-6 py-3.5 text-xs font-black text-white shadow-lg shadow-[#ff7d00]/20 active:scale-98 transition-all shrink-0"
               >
                 <PhoneCall class="h-4 w-4" />
                 Nhận Tư Vấn Miễn Phí
@@ -109,9 +109,9 @@ const handleSelectArticle = (otherArticle) => {
           <div class="sticky top-24 space-y-6">
             
             <!-- Quick CTA Service Widget -->
-            <div class="rounded-2xl border border-white/5 bg-[#070d1a]/40 p-5 backdrop-blur-md">
-              <h3 class="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
-                <Bookmark class="h-4 w-4 text-blue-500" />
+            <div class="rounded-2xl border border-orange-500/10 bg-[#f8fafc] dark:bg-[#070d1a]/60 p-6 backdrop-blur-xl shadow-lg hover:border-orange-500/20 transition-all duration-300">
+              <h3 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+                <Bookmark class="h-4 w-4 text-[#ff7d00]" />
                 Dịch Vụ Của Chúng Tôi
               </h3>
               
@@ -121,11 +121,11 @@ const handleSelectArticle = (otherArticle) => {
                   :key="service.id"
                   href="#top"
                   @click="emit('select-service', idx); emit('back'); window.scrollTo({ top: 0 });"
-                  class="flex items-center justify-between p-3 rounded-xl border border-white/5 bg-[#141f36]/20 transition-all hover:bg-blue-600/10 hover:border-blue-500/30 group"
+                  class="flex items-center justify-between p-3 rounded-xl border border-orange-500/5 bg-[#f1f5f9] dark:bg-[#141f36]/20 transition-all hover:bg-[#ff7d00]/10 hover:border-[#ff7d00]/30 group"
                 >
                   <div class="space-y-0.5">
-                    <span class="text-xs font-bold text-slate-200 group-hover:text-white transition-colors">{{ service.name }}</span>
-                    <p class="text-[10px] text-slate-400 font-medium">{{ service.speed }} hoàn thành</p>
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{{ service.name }}</span>
+                    <p class="text-[10px] text-[#ff7d00] dark:text-slate-400 font-medium">{{ service.speed }} hoàn thành</p>
                   </div>
                   <ChevronRight class="h-4 w-4 text-slate-500 group-hover:text-white transition-all transform group-hover:translate-x-0.5" />
                 </a>
@@ -133,9 +133,9 @@ const handleSelectArticle = (otherArticle) => {
             </div>
 
             <!-- Other Helpful Articles -->
-            <div class="rounded-2xl border border-white/5 bg-[#070d1a]/40 p-5 backdrop-blur-md">
-              <h3 class="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
-                <Bookmark class="h-4 w-4 text-blue-500" />
+            <div class="rounded-2xl border border-orange-500/10 bg-[#f8fafc] dark:bg-[#070d1a]/60 p-6 backdrop-blur-xl shadow-lg hover:border-orange-500/20 transition-all duration-300">
+              <h3 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+                <Bookmark class="h-4 w-4 text-[#ff7d00]" />
                 Bài viết cùng chuyên mục
               </h3>
 
@@ -151,10 +151,10 @@ const handleSelectArticle = (otherArticle) => {
                     <img :src="item.banner" :alt="item.title" class="w-full h-full object-cover" />
                   </div>
                   <div class="space-y-1">
-                    <h4 class="text-xs font-bold text-slate-300 group-hover:text-white transition-colors line-clamp-2 leading-tight">
+                    <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors line-clamp-2 leading-tight">
                       {{ item.title }}
                     </h4>
-                    <p class="text-[9px] font-semibold text-slate-500 flex items-center gap-1">
+                    <p class="text-[9px] font-semibold text-slate-500 dark:text-slate-500 flex items-center gap-1">
                       {{ item.date }}
                     </p>
                   </div>

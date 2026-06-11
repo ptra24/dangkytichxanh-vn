@@ -7,9 +7,14 @@
 html {
   font-family: 'Inter', 'Outfit', sans-serif;
   scroll-behavior: smooth;
-  background-color: #030712; /* Fallback dark */
-  color: #f3f4f6;
+  background-color: #ffffff;
+  color: #0f172a;
   -webkit-font-smoothing: antialiased;
+}
+
+html.dark {
+  background-color: #030712;
+  color: #f3f4f6;
 }
 
 /* Custom scrollbars */

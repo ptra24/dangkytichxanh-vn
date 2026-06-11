@@ -57,9 +57,14 @@ const steps = [
 <style scoped>
 /* ── Section ─────────────────────────────────── */
 .process-section {
-  background-color: #0d1829;
+  background-color: #f1f5f9;
   padding: 72px 24px 80px;
   font-family: 'Inter', 'Segoe UI', sans-serif;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .process-section {
+  background-color: #0d1829;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -70,12 +75,20 @@ const steps = [
 }
 
 .process-title {
-  font-size: 1.875rem;
+  font-size: 2.25rem;
   font-weight: 800;
-  color: #ffffff;
+  background: linear-gradient(135deg, #ff7d00 0%, #fd7e14 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
   letter-spacing: -0.02em;
   margin: 0 0 10px;
   line-height: 1.2;
+}
+
+.dark .process-title {
+  color: #ffffff;
 }
 
 .process-subtitle {
@@ -112,14 +125,14 @@ const steps = [
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb 0%, #4338ca 100%);
+  background: linear-gradient(135deg, #ff7d00 0%, #ff8e38 100%);
   color: #ffffff;
   font-size: 0.9375rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 18px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 0 18px rgba(255, 125, 0, 0.45);
   flex-shrink: 0;
   position: relative;
   z-index: 1;
@@ -129,7 +142,7 @@ const steps = [
   width: 2px;
   flex: 1;
   min-height: 40px;
-  background: linear-gradient(to bottom, rgba(37, 99, 235, 0.6) 0%, rgba(37, 99, 235, 0.15) 100%);
+  background: linear-gradient(to bottom, rgba(255, 125, 0, 0.6) 0%, rgba(255, 125, 0, 0.15) 100%);
   margin: 4px 0;
 }
 
@@ -146,9 +159,13 @@ const steps = [
 .step-title {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: #1e293b;
   margin: 0 0 5px;
   letter-spacing: -0.01em;
+}
+
+.dark .step-title {
+  color: #e2e8f0;
 }
 
 .step-desc {

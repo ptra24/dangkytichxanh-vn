@@ -42,21 +42,21 @@ const reviews = [
     name: 'Nguyễn Văn Minh',
     role: 'Chủ shop thời trang',
     initials: 'NV',
-    color: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+    color: 'linear-gradient(135deg, #ff7d00, #ff8e38)',
   },
   {
     quote: 'Thủ tục cực nhanh, đúng 20 phút là có tích xanh. Quan trọng là không phải trả tiền trước.',
     name: 'Trần Thị Lan',
     role: 'Chủ spa làm đẹp',
     initials: 'TT',
-    color: 'linear-gradient(135deg, #0891b2, #0e7490)',
+    color: 'linear-gradient(135deg, #e87f0c, #dd8d13)',
   },
   {
     quote: 'Nhờ có tích xanh mà nhãn hàng chịu booking giá cao hơn trước. ROI quá hời.',
     name: 'Phạm Hồng Quân',
     role: 'KOL 60K followers',
     initials: 'PH',
-    color: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+    color: 'linear-gradient(135deg, #ff8e38, #5c0096)',
   },
 ];
 </script>
@@ -64,9 +64,14 @@ const reviews = [
 <style scoped>
 /* ── Section ─────────────────────────────────── */
 .testimonials-section {
-  background-color: #060b13;
+  background-color: #f8fafc;
   padding: 72px 24px 80px;
   font-family: 'Inter', 'Segoe UI', sans-serif;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .testimonials-section {
+  background-color: #060b13;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -77,9 +82,13 @@ const reviews = [
 }
 
 .testimonials-title {
-  font-size: 1.875rem;
+  font-size: 2.25rem;
   font-weight: 800;
-  color: #ffffff;
+  background: linear-gradient(135deg, #ff7d00 0%, #fd7e14 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.2;
@@ -96,19 +105,32 @@ const reviews = [
 
 /* ── Card ────────────────────────────────────── */
 .review-card {
-  background-color: #131f35;
-  border: 1px solid #1e2d47;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 14px;
   padding: 26px 24px 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  transition: border-color 0.25s ease, transform 0.25s ease;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.dark .review-card {
+  background-color: #131f35;
+  border: 1px solid #1e2d47;
+  box-shadow: none;
 }
 
 .review-card:hover {
-  border-color: #2d4a7a;
+  border-color: #cbd5e1;
   transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .review-card:hover {
+  border-color: #2d4a7a;
+  box-shadow: none;
 }
 
 /* ── Stars ───────────────────────────────────── */
@@ -118,7 +140,7 @@ const reviews = [
 }
 
 .star {
-  color: #f59e0b;
+  color: #ff7d00;
   font-size: 1rem;
   line-height: 1;
 }
@@ -126,11 +148,15 @@ const reviews = [
 /* ── Quote ───────────────────────────────────── */
 .review-quote {
   font-size: 0.875rem;
-  color: #cbd5e1;
+  color: #334155;
   line-height: 1.65;
   margin: 0;
   font-weight: 400;
   flex: 1;
+}
+
+.dark .review-quote {
+  color: #cbd5e1;
 }
 
 /* ── Author ──────────────────────────────────── */
@@ -164,8 +190,12 @@ const reviews = [
 .author-name {
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: #0f172a;
   line-height: 1;
+}
+
+.dark .author-name {
+  color: #e2e8f0;
 }
 
 .author-role {
@@ -173,6 +203,10 @@ const reviews = [
   color: #64748b;
   font-weight: 400;
   line-height: 1;
+}
+
+.dark .author-role {
+  color: #64748b;
 }
 
 /* ── Responsive ──────────────────────────────── */

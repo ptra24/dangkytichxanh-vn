@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Đăng Ký Tích Xanh VN - API Documentation",
-    "description": "Tài liệu đặc tả toàn bộ các APIs Backend phục vụ việc đăng ký tư vấn dịch vụ tích xanh và hệ thống hiển thị bài viết tin tức (Blog) của dự án dangkytichxanh.vn.",
+    "title": "AZ Media - Đăng Ký Tích Xanh VN - API Documentation",
+    "description": "Tài liệu đặc tả toàn bộ các APIs Backend phục vụ việc đăng ký tư vấn dịch vụ tích xanh và hệ thống hiển thị bài viết tin tức (Blog) của dự án dangkytichxanh.vn, được vận hành và tối ưu bởi AZ Media.",
     "version": "1.0.0"
   },
   "servers": [
