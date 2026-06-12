@@ -2,6 +2,13 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Đăng Ký Tích Xanh Fanpage, Instagram 15 Phút | Đăng Ký Tích Xanh</title>
     <meta name="description" content="Đăng ký tích xanh Facebook, Instagram 15 phút. Không cần báo chí, làm xong thanh toán. 100% thành công, 2.368 khách. Hotline 0968.825.068.">
@@ -26,7 +33,7 @@
     <meta name="twitter:image" content="https://www.dangkytichxanh.vn/og-image.jpg">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%232563eb'/%3E%3Ctext y='.9em' font-size='60' x='22' fill='white'%3E✓%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23f97316'/%3E%3Ctext y='.9em' font-size='60' x='22' fill='white'%3E✓%3C/text%3E%3C/svg%3E">
 
     <!-- JSON-LD Structured Data -->
     @verbatim

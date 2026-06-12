@@ -40,12 +40,12 @@
             font-family: ui-sans-serif, system-ui, sans-serif;
         }
         .brand-logo span {
-            color: #2563eb;
+            color: #f97316;
         }
         .badge {
-            background: rgba(37, 99, 235, 0.15);
-            border: 1px solid rgba(37, 99, 235, 0.3);
-            color: #60a5fa;
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            color: #fb923c;
             font-size: 11px;
             padding: 2px 8px;
             border-radius: 9999px;
