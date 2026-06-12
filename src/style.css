@@ -7,9 +7,15 @@
 html {
   font-family: 'Inter', 'Outfit', sans-serif;
   scroll-behavior: smooth;
-  background-color: #030712; /* Fallback dark */
-  color: #f3f4f6;
+  background-color: #f8fafc; /* Light mode default */
+  color: #0f172a;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Dark mode: applied when <html class="dark"> */
+html.dark {
+  background-color: #030712;
+  color: #f3f4f6;
 }
 
 /* Custom scrollbars */
@@ -27,11 +33,16 @@ html {
   background: #334155;
 }
 
-/* Glassmorphism utility */
+/* Glassmorphism utility — light mode: trắng nhạt, dark mode: xanh đen */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(248, 250, 252, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+html.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 

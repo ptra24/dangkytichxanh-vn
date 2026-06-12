@@ -120,7 +120,7 @@
             <!-- Header -->
             <div class="header">
                 <h1>⚡ Đăng Ký Tích Xanh Mới</h1>
-                <p>Hệ thống dangkytichxanh.vn vừa ghi nhận một yêu cầu tư vấn</p>
+                <p>Hệ thống AZ Tích Xanh vừa ghi nhận một yêu cầu tư vấn</p>
             </div>
 
             <!-- Content -->
@@ -173,8 +173,8 @@
 
             <!-- Footer -->
             <div class="footer">
-                <p>Email này được tự động gửi từ hệ thống quản trị <a href="https://dangkytichxanh.vn">dangkytichxanh.vn</a>.</p>
-                <p>&copy; {{ date('Y') }} dangkytichxanh.vn. All rights reserved.</p>
+                <p>Email này được tự động gửi từ hệ thống quản trị <a href="https://aztichxanh.vn">aztichxanh.vn</a>.</p>
+                <p>&copy; {{ date('Y') }} aztichxanh.vn. All rights reserved.</p>
             </div>
         </div>
     </div>

@@ -15,7 +15,12 @@ export default {
           card: '#0f172a',      // Dark card container background
           border: '#1e293b',    // Slate dark border
           hover: '#1e293b',     // Hover color for dark elements
-          accent: '#2563eb'     // Accent blue for general features
+          accent: '#f97316'     // AZ Media accent orange (was blue)
+        },
+        az: {
+          orange: '#f97316',    // Primary AZ Media brand orange
+          orangeHover: '#ea580c',
+          navy: '#0a1628',      // AZ Media navy dark
         },
         meta: {
           blue: '#1877f2',      // Official Facebook blue
@@ -41,6 +46,7 @@ export default {
       },
       boxShadow: {
         'premium': '0 10px 30px -10px rgba(0, 0, 0, 0.7)',
+        'orange-glow': '0 0 20px rgba(249, 115, 22, 0.3)',
         'blue-glow': '0 0 20px rgba(37, 99, 235, 0.2)',
         'green-glow': '0 0 20px rgba(37, 211, 102, 0.2)',
         'cyan-glow': '0 0 20px rgba(0, 242, 254, 0.2)',
