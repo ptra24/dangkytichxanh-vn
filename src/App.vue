@@ -1183,7 +1183,7 @@ const faqs = [
 </script>
 
 <template>
-  <div id="top" class="min-h-screen bg-[#060b13] text-slate-100 flex flex-col selection:bg-blue-600/30 selection:text-blue-200">
+  <div id="top" class="min-h-screen bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-slate-100 flex flex-col selection:bg-orange-500/30 selection:text-orange-900 dark:selection:bg-blue-600/30 dark:selection:text-blue-200 transition-colors duration-300">
     <!-- Header component -->
     <Header 
       :currentServiceIndex="currentServiceIndex" 
@@ -1933,13 +1933,13 @@ const faqs = [
 
     <main class="w-full">
       <!-- Bảng giá (Pricing) Section -->
-      <section id="bang-gia" class="py-20 bg-[#060b13] relative overflow-hidden">
+      <section id="bang-gia" class="py-20 bg-slate-50 dark:bg-[#060b13] relative overflow-hidden transition-colors duration-300">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="text-center max-w-3xl mx-auto mb-12 space-y-2">
-            <h2 class="font-sans text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h2 class="font-sans text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Bảng giá dịch vụ Tích Xanh
             </h2>
-            <p class="text-slate-400 text-sm sm:text-base font-medium">
+            <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium">
               Làm xong mới thanh toán, cam kết 100% thành công
             </p>
           </div>
@@ -1948,8 +1948,8 @@ const faqs = [
             <div 
               v-for="card in pricingCards" 
               :key="card.title"
-              class="glass-panel rounded-2xl p-6 flex flex-col justify-between hover:border-white/15 hover:bg-slate-900/60 transition-all duration-300 transform hover:-translate-y-1 relative bg-slate-950/40 border"
-              :class="card.isPopular ? 'border-blue-500 shadow-[0_0_25px_rgba(37,99,235,0.15)] ring-1 ring-blue-500/30' : 'border-white/5'"
+              class="rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1 relative border bg-white dark:bg-slate-950/40 hover:border-slate-300 dark:hover:border-white/15 hover:shadow-lg dark:hover:bg-slate-900/60"
+              :class="card.isPopular ? 'border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.15)] ring-1 ring-orange-500/30' : 'border-slate-200 dark:border-white/5'"
             >
               <!-- Popular badge -->
               <span 
@@ -1960,20 +1960,20 @@ const faqs = [
               </span>
 
               <div>
-                <h3 class="text-lg font-bold text-white tracking-tight">{{ card.title }}</h3>
-                <p class="text-xs text-slate-400 mt-1 mb-6 font-medium">{{ card.subtitle }}</p>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{{ card.title }}</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6 font-medium">{{ card.subtitle }}</p>
                 
                 <div class="flex items-baseline flex-wrap gap-1 mb-6">
-                  <span class="text-3xl font-black text-blue-500 tracking-tight">{{ card.price }}</span>
+                  <span class="text-3xl font-black text-orange-500 tracking-tight">{{ card.price }}</span>
                   <div class="flex flex-col ml-1">
-                    <span class="text-xs text-slate-400 font-semibold">{{ card.unit }}</span>
-                    <span v-if="card.subPriceLine" class="text-[10px] text-slate-400 font-bold leading-none mt-0.5">{{ card.subPriceLine }}</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold">{{ card.unit }}</span>
+                    <span v-if="card.subPriceLine" class="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-none mt-0.5">{{ card.subPriceLine }}</span>
                   </div>
                 </div>
 
-                <div class="h-px w-full bg-white/5 mb-6"></div>
+                <div class="h-px w-full bg-slate-200 dark:bg-white/5 mb-6"></div>
 
-                <ul class="space-y-3 mb-8 text-xs font-semibold text-slate-300">
+                <ul class="space-y-3 mb-8 text-xs font-semibold text-slate-600 dark:text-slate-300">
                   <li v-for="feat in card.features" :key="feat" class="flex items-center gap-2">
                     <svg class="h-4 w-4 text-emerald-400 stroke-[3] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -1985,7 +1985,7 @@ const faqs = [
 
               <div>
                 <!-- Subtext badge before CTA button -->
-                <div class="bg-slate-800/40 border border-white/5 rounded-lg py-2 px-3 text-center text-[10px] text-slate-400 mb-5 font-semibold">
+                <div class="bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 rounded-lg py-2 px-3 text-center text-[10px] text-slate-500 dark:text-slate-400 mb-5 font-semibold">
                   {{ card.metaFee }}
                 </div>
 
@@ -1993,8 +1993,8 @@ const faqs = [
                   @click="selectService(card.serviceIndex); openModal();"
                   class="w-full py-3 rounded-xl text-xs font-extrabold transition-all duration-300 transform active:scale-98"
                   :class="card.isPopular 
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/10' 
-                    : 'border border-blue-500/50 hover:bg-blue-500/10 text-white'"
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-500/20' 
+                    : 'border border-orange-500/50 hover:bg-orange-500/10 text-orange-600 dark:text-white'"
                 >
                   {{ card.btnText }}
                 </button>
@@ -2011,14 +2011,14 @@ const faqs = [
       <Testimonials />
 
       <!-- FAQ Accordion Section -->
-      <section id="faq" class="py-20 bg-[#0d1829] relative overflow-hidden border-t border-white/5">
+      <section id="faq" class="py-20 bg-white dark:bg-[#0d1829] relative overflow-hidden border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative">
           <!-- Heading -->
           <div class="text-center max-w-2xl mx-auto mb-14 space-y-2">
-            <h2 class="font-sans text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h2 class="font-sans text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Đăng Ký Tích Xanh Có An Toàn Không?
             </h2>
-            <p class="text-blue-500 text-lg sm:text-xl font-bold tracking-tight">
+            <p class="text-orange-500 text-lg sm:text-xl font-bold tracking-tight">
               — Giải Đáp 8 Câu Hỏi Top
             </p>
           </div>
@@ -2028,18 +2028,18 @@ const faqs = [
             <div 
               v-for="(faq, index) in faqs" 
               :key="index"
-              class="rounded-2xl border transition-all duration-300 overflow-hidden bg-[#1e2a44]"
-              :class="isFaqOpen(index) ? 'border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-white/5 hover:border-white/10 hover:bg-[#1e2a44]/80'"
+              class="rounded-2xl border transition-all duration-300 overflow-hidden bg-slate-50 dark:bg-[#1e2a44]"
+              :class="isFaqOpen(index) ? 'border-orange-500/30 shadow-[0_0_20px_rgba(249,115,22,0.10)] dark:shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10'"
             >
               <!-- Accordion Header -->
               <button 
                 @click="toggleFaq(index)"
-                class="w-full flex items-center justify-between p-5 text-left font-bold text-xs sm:text-sm text-white focus:outline-none select-none transition-colors"
+                class="w-full flex items-center justify-between p-5 text-left font-bold text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none select-none transition-colors"
               >
                 <span>{{ faq.question }}</span>
                 <span 
                   class="flex h-5 w-5 items-center justify-center rounded-full transition-all duration-300"
-                  :class="isFaqOpen(index) ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' : 'bg-slate-800/40 text-slate-500 border border-white/5'"
+                  :class="isFaqOpen(index) ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' : 'bg-slate-200 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 border border-slate-300 dark:border-white/5'"
                 >
                   <svg 
                     v-if="isFaqOpen(index)"
@@ -2063,7 +2063,7 @@ const faqs = [
                   opacity: isFaqOpen(index) ? 1 : 0
                 }"
               >
-                <div class="px-5 pb-5 pt-1 text-slate-400 text-xs sm:text-sm leading-relaxed border-t border-white/5">
+                <div class="px-5 pb-5 pt-1 text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed border-t border-slate-200 dark:border-white/5">
                   {{ faq.answer }}
                 </div>
               </div>
@@ -2073,52 +2073,52 @@ const faqs = [
       </section>
 
       <!-- Bài viết hữu ích (Useful Articles) Section -->
-      <section id="tin-tuc" class="py-20 bg-[#060b13] relative overflow-hidden border-t border-white/5">
+      <section id="tin-tuc" class="py-20 bg-white dark:bg-[#060b13] relative overflow-hidden border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <!-- Heading -->
           <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
-            <h2 class="font-sans text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Bài viết hữu ích</h2>
-            <p class="text-slate-400 text-sm sm:text-base font-medium">Kiến thức cần biết trước khi đăng ký tích xanh</p>
+            <h2 class="font-sans text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">Bài viết hữu ích</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium">Kiến thức cần biết trước khi đăng ký tích xanh</p>
           </div>
 
           <!-- Top grid: 6 thin article cards (2 rows of 3) -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mb-8">
             <!-- Row 1 -->
-            <a href="#top" @click="selectArticle(articles[0]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-[#24324f] bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">Tích xanh Facebook là gì?</span>
-              <svg class="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <a href="#top" @click="selectArticle(articles[0]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
+              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Tích xanh Facebook là gì?</span>
+              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
-            <a href="#top" @click="selectArticle(articles[1]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-[#24324f] bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">Hướng dẫn đăng ký từ A-Z</span>
-              <svg class="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <a href="#top" @click="selectArticle(articles[1]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
+              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Hướng dẫn đăng ký từ A-Z</span>
+              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
-            <a href="#top" @click="selectArticle(articles[2]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-[#24324f] bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">So sánh tích xanh vs tích xám</span>
-              <svg class="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <a href="#top" @click="selectArticle(articles[2]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
+              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">So sánh tích xanh vs tích xám</span>
+              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
 
             <!-- Row 2 -->
-            <a href="#top" @click="selectArticle(articles[3]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-[#24324f] bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">Giá tích xanh 2026</span>
-              <svg class="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <a href="#top" @click="selectArticle(articles[3]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
+              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Giá tích xanh 2026</span>
+              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
-            <a href="#top" @click="selectArticle(articles[4]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-[#24324f] bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">Đăng ký có an toàn không?</span>
-              <svg class="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <a href="#top" @click="selectArticle(articles[4]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
+              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Đăng ký có an toàn không?</span>
+              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
-            <a href="#top" @click="selectArticle(articles[5]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-[#24324f] bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">Lợi ích cho Fanpage kinh doanh</span>
-              <svg class="h-3.5 w-3.5 text-slate-500 group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <a href="#top" @click="selectArticle(articles[5]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
+              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Lợi ích cho Fanpage kinh doanh</span>
+              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
@@ -2171,14 +2171,14 @@ const faqs = [
       </section>
 
       <!-- Liên hệ Section -->
-      <section id="lien-he" class="py-20 bg-[#0d1829] relative overflow-hidden">
+      <section id="lien-he" class="py-20 bg-slate-50 dark:bg-[#0d1829] relative overflow-hidden transition-colors duration-300">
         <!-- subtle grid bg -->
         <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <!-- Heading -->
           <div class="text-center max-w-2xl mx-auto mb-14 space-y-2">
-            <h2 class="font-sans text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Liên hệ</h2>
-            <p class="text-slate-400 text-sm sm:text-base font-medium">Chúng tôi trả lời trong 15 phút</p>
+            <h2 class="font-sans text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">Liên hệ</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium">Chúng tôi trả lời trong 15 phút</p>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start max-w-5xl mx-auto">
@@ -2187,16 +2187,16 @@ const faqs = [
               <!-- Hotline -->
               <a 
                 href="tel:0968825068"
-                class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
+                class="flex items-center gap-4 rounded-2xl border border-slate-200 dark:border-[#24324f] bg-white dark:bg-[#141f36] px-5 py-4 shadow-sm dark:shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
               >
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 border border-blue-500/20">
-                  <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-blue-600/15 border border-orange-400/30 dark:border-blue-500/20">
+                  <svg class="h-5 w-5 text-orange-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Hotline</p>
-                  <p class="text-sm font-bold text-white">0968.825.068</p>
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">Hotline</p>
+                  <p class="text-sm font-bold text-slate-900 dark:text-white">0968.825.068</p>
                 </div>
               </a>
 
@@ -2204,83 +2204,83 @@ const faqs = [
               <a 
                 href="https://zalo.me/0968825068"
                 target="_blank"
-                class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
+                class="flex items-center gap-4 rounded-2xl border border-slate-200 dark:border-[#24324f] bg-white dark:bg-[#141f36] px-5 py-4 shadow-sm dark:shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
               >
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 border border-blue-500/20">
-                  <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-blue-600/15 border border-orange-400/30 dark:border-blue-500/20">
+                  <svg class="h-5 w-5 text-orange-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.02 2 11c0 2.77 1.28 5.27 3.3 7.02L4 22l4.22-1.4A10.3 10.3 0 0012 21c5.52 0 10-4.02 10-9S17.52 2 12 2zm.92 13.36l-.44-.45c-.36-.37-.77-.56-1.2-.56-.27 0-.55.07-.84.22l-1.45.74c-.1.05-.2.05-.3-.02l-.3-.25c-1.68-1.47-2.8-3.35-2.8-4.6 0-.14.04-.27.12-.38l.88-1.13c.22-.28.27-.6.13-.9L5.6 7.05a.48.48 0 00-.5-.28c-.52.05-1 .3-1.38.7C3.26 8 3 8.88 3 9.87c0 1.3.46 2.66 1.26 3.87 1.17 1.77 2.87 3.23 4.83 4.1.97.44 1.9.66 2.76.66.9 0 1.7-.24 2.3-.68.5-.36.82-.88.9-1.46z"/>
                   </svg>
                 </div>
                 <div>
-                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Zalo</p>
-                  <p class="text-sm font-bold text-white">0968.825.068</p>
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">Zalo</p>
+                  <p class="text-sm font-bold text-slate-900 dark:text-white">0968.825.068</p>
                 </div>
               </a>
 
               <!-- Email -->
               <a 
                 href="mailto:azmedia.com.vn@gmail.com"
-                class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
+                class="flex items-center gap-4 rounded-2xl border border-slate-200 dark:border-[#24324f] bg-white dark:bg-[#141f36] px-5 py-4 shadow-sm dark:shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer"
               >
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 border border-blue-500/20">
-                  <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-blue-600/15 border border-orange-400/30 dark:border-blue-500/20">
+                  <svg class="h-5 w-5 text-orange-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Email</p>
-                  <p class="text-sm font-bold text-white">azmedia.com.vn@gmail.com</p>
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">Email</p>
+                  <p class="text-sm font-bold text-slate-900 dark:text-white">azmedia.com.vn@gmail.com</p>
                 </div>
               </a>
 
               <!-- Địa chỉ -->
-              <div class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)]">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 border border-blue-500/20">
-                  <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <div class="flex items-center gap-4 rounded-2xl border border-slate-200 dark:border-[#24324f] bg-white dark:bg-[#141f36] px-5 py-4 shadow-sm dark:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-blue-600/15 border border-orange-400/30 dark:border-blue-500/20">
+                  <svg class="h-5 w-5 text-orange-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Địa Chỉ</p>
-                  <p class="text-sm font-bold text-white">127 Lê Trọng Tấn, Phường An Khê, Đà Nẵng</p>
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">Địa Chỉ</p>
+                  <p class="text-sm font-bold text-slate-900 dark:text-white">127 Lê Trọng Tấn, Phường An Khê, Đà Nẵng</p>
                 </div>
               </div>
 
               <!-- Giờ làm việc -->
-              <div class="flex items-center gap-4 rounded-2xl border border-[#24324f] bg-[#141f36] px-5 py-4 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)]">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 border border-blue-500/20">
-                  <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <div class="flex items-center gap-4 rounded-2xl border border-slate-200 dark:border-[#24324f] bg-white dark:bg-[#141f36] px-5 py-4 shadow-sm dark:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-blue-600/15 border border-orange-400/30 dark:border-blue-500/20">
+                  <svg class="h-5 w-5 text-orange-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Giờ Làm Việc</p>
-                  <p class="text-sm font-bold text-white">08:00 – 18:00 (T2–T7)</p>
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">Giờ Làm Việc</p>
+                  <p class="text-sm font-bold text-slate-900 dark:text-white">08:00 – 18:00 (T2–T7)</p>
                 </div>
               </div>
             </div>
 
             <!-- Right: registration form -->
-            <div class="rounded-2xl border border-[#24324f] bg-[#070d1a] p-6 sm:p-8">
+            <div class="rounded-2xl border border-slate-200 dark:border-[#24324f] bg-white dark:bg-[#070d1a] p-6 sm:p-8 shadow-sm">
               <template v-if="!contactSubmitted">
-                <h3 class="text-xl font-black tracking-tight text-white mb-1">Đăng ký tư vấn miễn phí</h3>
-                <p class="text-xs text-slate-400 mb-6">Điền 3 thông tin, chúng tôi gọi lại trong 15 phút</p>
+                <h3 class="text-xl font-black tracking-tight text-slate-900 dark:text-white mb-1">Đăng ký tư vấn miễn phí</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">Điền 3 thông tin, chúng tôi gọi lại trong 15 phút</p>
 
                 <form @submit.prevent="handleContactSubmit" class="space-y-4">
                   <div>
-                    <label class="block text-xs font-bold text-white uppercase tracking-wider mb-1.5">Họ tên <span class="text-blue-400">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-white uppercase tracking-wider mb-1.5">Họ tên <span class="text-orange-500">*</span></label>
                     <input
                       type="text"
                       v-model="contactName"
                       placeholder="Nguyễn Văn A"
                       required
-                      class="w-full rounded-xl border border-white/5 bg-[#141f36] px-4 py-3 text-sm text-white placeholder-[#9aa8c7] transition-colors focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50"
                     />
                   </div>
 
                   <div>
-                    <label class="block text-xs font-bold text-white uppercase tracking-wider mb-1.5">Số điện thoại <span class="text-blue-400">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-white uppercase tracking-wider mb-1.5">Số điện thoại <span class="text-orange-500">*</span></label>
                     <input
                       type="tel"
                       :value="contactPhone"
@@ -2289,17 +2289,17 @@ const faqs = [
                       maxlength="11"
                       placeholder="0912345678"
                       required
-                      class="w-full rounded-xl border border-white/5 bg-[#141f36] px-4 py-3 text-sm text-white placeholder-[#9aa8c7] transition-colors focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50"
                     />
                   </div>
 
                   <div>
-                    <label class="block text-xs font-bold text-white uppercase tracking-wider mb-1.5">Lời nhắn <span class="text-blue-400">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-white uppercase tracking-wider mb-1.5">Lời nhắn <span class="text-orange-500">*</span></label>
                     <textarea
                       v-model="contactNote"
                       placeholder="VD: Tôi muốn đăng ký tích xanh cho Fanpage ABC..."
                       rows="3"
-                      class="w-full rounded-xl border border-white/5 bg-[#141f36] px-4 py-3 text-sm text-white placeholder-[#9aa8c7] transition-colors focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 resize-none"
+                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50 resize-none"
                     ></textarea>
                   </div>
 
@@ -2308,16 +2308,16 @@ const faqs = [
                       id="contact-robot"
                       type="checkbox"
                       v-model="contactRobot"
-                      class="h-4 w-4 rounded border border-[#64748b]/40 bg-[#141f36] accent-blue-600 cursor-pointer transition-colors"
-                      :class="contactRobot ? 'border-blue-500' : 'border-[#64748b]/40'"
+                      class="h-4 w-4 rounded border bg-slate-50 dark:bg-[#141f36] accent-orange-500 cursor-pointer transition-colors"
+                      :class="contactRobot ? 'border-orange-500' : 'border-slate-300 dark:border-[#64748b]/40'"
                     />
-                    <label for="contact-robot" class="text-xs text-[#64748b] cursor-pointer select-none">Tôi xác nhận không phải robot</label>
+                    <label for="contact-robot" class="text-xs text-slate-500 dark:text-[#64748b] cursor-pointer select-none">Tôi xác nhận không phải robot</label>
                   </div>
 
                   <button
                     type="submit"
                     :disabled="contactLoading || !contactRobot"
-                    class="w-full rounded-xl bg-blue-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:bg-blue-500 active:scale-98 disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="w-full rounded-xl bg-orange-500 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-orange-500/20 transition-all duration-300 hover:bg-orange-600 active:scale-98 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <span v-if="!contactLoading">Gửi yêu cầu tư vấn</span>
                     <span v-else class="flex items-center justify-center gap-2">
@@ -2341,11 +2341,11 @@ const faqs = [
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3 class="text-xl font-black text-white">Gửi thành công!</h3>
-                  <p class="text-sm text-slate-300">Cảm ơn <strong class="text-white">{{ contactName }}</strong>. Chuyên viên sẽ gọi lại cho bạn trong vòng 15 phút.</p>
+                  <h3 class="text-xl font-black text-slate-900 dark:text-white">Gửi thành công!</h3>
+                  <p class="text-sm text-slate-600 dark:text-slate-300">Cảm ơn <strong class="text-slate-900 dark:text-white">{{ contactName }}</strong>. Chuyên viên sẽ gọi lại cho bạn trong vòng 15 phút.</p>
                   <button
                     @click="contactSubmitted = false; contactName = ''; contactPhone = ''; contactNote = ''; contactRobot = false;"
-                    class="inline-flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 px-6 py-2.5 text-sm font-semibold text-white transition-colors mt-2"
+                    class="inline-flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 px-6 py-2.5 text-sm font-semibold text-slate-800 dark:text-white transition-colors mt-2"
                   >
                     Gửi yêu cầu khác
                   </button>
@@ -2380,11 +2380,11 @@ const faqs = [
     <!-- Inline Registry Form Modal -->
     <div 
       v-if="isModalOpen" 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#030712]/80 backdrop-blur-md"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#030712]/85 backdrop-blur-md"
       @click.self="closeModal"
     >
       <div 
-        class="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0f172a] shadow-2xl transition-all duration-300 transform scale-100"
+        class="relative w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] shadow-2xl transition-colors duration-300 transform scale-100"
       >
         <!-- Top color bar matching selected service -->
         <div 
@@ -2400,7 +2400,7 @@ const faqs = [
         <!-- Close Button -->
         <button 
           @click="closeModal" 
-          class="absolute top-4 right-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg p-1.5 transition-colors focus:outline-none"
+          class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg p-1.5 transition-colors focus:outline-none"
         >
           <X class="h-5 w-5" />
         </button>
@@ -2409,10 +2409,10 @@ const faqs = [
         <div class="p-6 sm:p-8 text-left">
           
           <div v-if="!isSubmitted">
-            <h3 class="text-2xl font-black tracking-tight text-white mb-2">
+            <h3 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-2">
               Đăng Ký Tích Xanh
             </h3>
-            <p class="text-sm text-slate-400 mb-6">
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
               Vui lòng điền thông tin bên dưới, chuyên viên của chúng tôi sẽ liên hệ tư vấn trong 5 - 15 phút.
             </p>
 
@@ -2420,7 +2420,7 @@ const faqs = [
               <!-- Service Selector -->
 
               <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                   Họ Và Tên
                 </label>
                 <input 
@@ -2428,12 +2428,12 @@ const faqs = [
                   v-model="name"
                   placeholder="Nguyễn Văn A"
                   required
-                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                   Số Điện Thoại
                 </label>
                 <input 
@@ -2446,24 +2446,25 @@ const faqs = [
                   required
                   pattern="[0-9]{9,11}"
                   title="Vui lòng nhập số điện thoại hợp lệ từ 9 đến 11 số"
-                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                   Dịch vụ quan tâm
                 </label>
                 <select 
                   v-model="formServiceIndex" 
                   required
-                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
-                  <option value="" disabled>-- Chọn dịch vụ --</option>
+                  <option value="" disabled class="text-slate-500 dark:bg-slate-900">-- Chọn dịch vụ --</option>
                   <option 
                     v-for="(service, idx) in services" 
                     :key="service.id" 
                     :value="idx"
+                    class="text-slate-900 dark:text-white dark:bg-slate-900"
                   >
                     {{ service.name }}
                   </option>
@@ -2471,7 +2472,7 @@ const faqs = [
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                   Link Trang Cá Nhân / Fanpage
                 </label>
                 <input 
@@ -2479,18 +2480,18 @@ const faqs = [
                   v-model="link"
                   placeholder="Ví dụ: facebook.com/dangkytichxanh"
                   required
-                  class="w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <!-- Quick Info Badge -->
-              <div class="rounded-xl bg-slate-950/40 p-4 border border-white/5 space-y-2">
-                <div class="flex items-center gap-2 text-xs font-semibold text-slate-300">
-                  <Check class="h-4 w-4 text-emerald-400 stroke-[3]" />
+              <div class="rounded-xl bg-slate-100 dark:bg-slate-950/40 p-4 border border-slate-200 dark:border-white/5 space-y-2">
+                <div class="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  <Check class="h-4 w-4 text-emerald-500 dark:text-emerald-400 stroke-[3]" />
                   <span>Trọn gói {{ services[currentServiceIndex].price }}, không phát sinh thêm phí.</span>
                 </div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-slate-300">
-                  <Check class="h-4 w-4 text-emerald-400 stroke-[3]" />
+                <div class="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  <Check class="h-4 w-4 text-emerald-500 dark:text-emerald-400 stroke-[3]" />
                   <span>Làm xong mới thanh toán – An toàn 100%.</span>
                 </div>
               </div>
@@ -2519,21 +2520,21 @@ const faqs = [
 
           <!-- Success Screen -->
           <div v-else class="text-center py-6 space-y-4">
-            <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 mb-2">
+            <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 mb-2">
               <CheckCircle2 class="h-10 w-10" />
             </div>
-            <h3 class="text-2xl font-black text-white tracking-tight">
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Đăng Ký Thành Công!
             </h3>
-            <p class="text-slate-300 max-w-sm mx-auto leading-relaxed">
-              Cảm ơn <strong class="text-white">{{ name }}</strong>. Chúng tôi đã nhận được thông tin liên hệ cho dịch vụ <strong class="text-white">{{ services[currentServiceIndex].name }}</strong>. 
+            <p class="text-slate-650 dark:text-slate-300 max-w-sm mx-auto leading-relaxed">
+              Cảm ơn <strong class="text-slate-900 dark:text-white">{{ name }}</strong>. Chúng tôi đã nhận được thông tin liên hệ cho dịch vụ <strong class="text-slate-900 dark:text-white">{{ services[currentServiceIndex].name }}</strong>. 
             </p>
-            <p class="text-xs text-slate-400 leading-normal">
-              Chuyên viên hỗ trợ tích xanh sẽ liên hệ trực tiếp cho bạn qua số <strong class="text-slate-200">{{ phone }}</strong> trong vòng 15 phút tới.
+            <p class="text-xs text-slate-550 dark:text-slate-400 leading-normal">
+              Chuyên viên hỗ trợ tích xanh sẽ liên hệ trực tiếp cho bạn qua số <strong class="text-slate-700 dark:text-slate-200">{{ phone }}</strong> trong vòng 15 phút tới.
             </p>
             <button 
               @click="closeModal" 
-              class="inline-flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 px-6 py-2.5 text-sm font-semibold text-white transition-colors mt-4"
+              class="inline-flex items-center justify-center rounded-xl bg-slate-200 hover:bg-slate-350 dark:bg-slate-800 dark:hover:bg-slate-700 px-6 py-2.5 text-sm font-semibold text-slate-850 dark:text-white transition-colors mt-4"
             >
               Đóng cửa sổ
             </button>
@@ -2550,36 +2551,36 @@ const faqs = [
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
       @click.self="closeLeadDetail"
     >
-      <div class="relative w-full max-w-lg rounded-3xl border border-slate-800 bg-[#070d1a] shadow-2xl overflow-hidden">
+      <div class="relative w-full max-w-lg rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#070d1a] shadow-2xl overflow-hidden transition-colors duration-300">
         <!-- Header -->
-        <div class="flex items-center justify-between border-b border-slate-800 p-5">
-          <h3 class="text-base font-black text-white uppercase tracking-wider flex items-center gap-2">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 p-5">
+          <h3 class="text-base font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Shield class="h-5 w-5 text-blue-500" />
             Chi tiết khách hàng đăng ký
           </h3>
           <button 
             @click="closeLeadDetail" 
-            class="text-slate-400 hover:text-white hover:bg-white/5 rounded-lg p-1.5 transition-colors focus:outline-none"
+            class="text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg p-1.5 transition-colors focus:outline-none"
           >
             <X class="h-5 w-5" />
           </button>
         </div>
 
         <!-- Body -->
-        <div class="p-6 space-y-5 text-left text-xs text-slate-300 max-h-[80vh] overflow-y-auto">
+        <div class="p-6 space-y-5 text-left text-xs text-slate-650 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
           <!-- Customer Name & Date -->
           <div class="space-y-1">
-            <h4 class="text-xl font-black text-white">{{ selectedLeadDetail.name }}</h4>
+            <h4 class="text-xl font-black text-slate-900 dark:text-white">{{ selectedLeadDetail.name }}</h4>
             <p class="text-slate-500 font-semibold">
               Đăng ký ngày: {{ new Date(selectedLeadDetail.created_at).toLocaleString('vi-VN', {hour: '2-digit', minute:'2-digit', second: '2-digit', day:'2-digit', month:'2-digit', year:'numeric'}) }}
             </p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-b border-slate-900/60 py-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-b border-slate-200 dark:border-slate-900/60 py-4">
             <!-- Phone Column -->
             <div class="space-y-2">
               <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Số điện thoại</span>
-              <span class="block text-sm font-bold text-white tracking-wide">{{ selectedLeadDetail.phone }}</span>
+              <span class="block text-sm font-bold text-slate-900 dark:text-white tracking-wide">{{ selectedLeadDetail.phone }}</span>
               <div class="flex gap-2 pt-1">
                 <a 
                   :href="'tel:' + selectedLeadDetail.phone"
@@ -2591,7 +2592,7 @@ const faqs = [
                 <a 
                   :href="'https://zalo.me/' + selectedLeadDetail.phone"
                   target="_blank"
-                  class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600/10 border border-blue-500/20 px-3 py-2 text-[11px] font-bold text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
+                  class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-650/10 border border-blue-500/20 px-3 py-2 text-[11px] font-bold text-blue-500 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
                 >
                   <MessageSquare class="h-3.5 w-3.5" />
                   Chat Zalo
@@ -2602,7 +2603,7 @@ const faqs = [
             <!-- Service Column -->
             <div class="space-y-2">
               <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Dịch vụ đăng ký</span>
-              <span class="block text-sm font-bold text-blue-400">{{ selectedLeadDetail.service }}</span>
+              <span class="block text-sm font-bold text-blue-600 dark:text-blue-400">{{ selectedLeadDetail.service }}</span>
               
               <!-- Status Selector inside Modal -->
               <div class="pt-1">
@@ -2610,16 +2611,16 @@ const faqs = [
                 <select 
                   v-model="selectedLeadDetail.status" 
                   @change="updateLeadStatus(selectedLeadDetail.id, $event.target.value)"
-                  class="w-full rounded-lg border border-slate-800 bg-[#0c1524] px-2.5 py-1.5 text-xs font-bold focus:outline-none transition-colors"
+                  class="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0c1524] text-slate-800 dark:text-slate-350 px-2.5 py-1.5 text-xs font-bold focus:outline-none transition-colors"
                   :class="{
-                    'text-amber-400 border-amber-500/30 bg-amber-500/5': selectedLeadDetail.status === 'pending',
-                    'text-blue-400 border-blue-500/30 bg-blue-500/5': selectedLeadDetail.status === 'contacting' || selectedLeadDetail.status === 'contacted',
-                    'text-emerald-400 border-emerald-500/30 bg-emerald-500/5': selectedLeadDetail.status === 'completed'
+                    'text-amber-600 dark:text-amber-400 border-amber-500/30 bg-amber-500/5': selectedLeadDetail.status === 'pending',
+                    'text-blue-600 dark:text-blue-400 border-blue-500/30 bg-blue-500/5': selectedLeadDetail.status === 'contacting' || selectedLeadDetail.status === 'contacted',
+                    'text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/5': selectedLeadDetail.status === 'completed'
                   }"
                 >
-                  <option value="pending">Chờ xử lý (Pending)</option>
-                  <option value="contacting">Đang liên hệ (Contacting)</option>
-                  <option value="completed">Đã hoàn thành (Completed)</option>
+                  <option value="pending" class="text-slate-900 dark:text-white dark:bg-slate-950">Chờ xử lý (Pending)</option>
+                  <option value="contacting" class="text-slate-900 dark:text-white dark:bg-slate-950">Đang liên hệ (Contacting)</option>
+                  <option value="completed" class="text-slate-900 dark:text-white dark:bg-slate-950">Đã hoàn thành (Completed)</option>
                 </select>
               </div>
             </div>
@@ -2628,12 +2629,12 @@ const faqs = [
           <!-- Account link details -->
           <div class="space-y-2">
             <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tài khoản / Link đăng ký</span>
-            <div class="rounded-xl border border-slate-800 bg-[#0c1524] p-3 flex items-center justify-between gap-3">
-              <span class="text-xs text-slate-300 break-all select-all font-mono leading-relaxed">{{ selectedLeadDetail.link }}</span>
+            <div class="rounded-xl border border-slate-200 dark:border-slate-850 bg-slate-50 dark:bg-[#0c1524] p-3 flex items-center justify-between gap-3">
+              <span class="text-xs text-slate-800 dark:text-slate-300 break-all select-all font-mono leading-relaxed">{{ selectedLeadDetail.link }}</span>
               <a 
                 :href="selectedLeadDetail.link" 
                 target="_blank"
-                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-all shrink-0"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white transition-all shrink-0"
                 title="Mở đường dẫn mới"
               >
                 <ExternalLink class="h-4 w-4" />
@@ -2644,17 +2645,17 @@ const faqs = [
           <!-- Message details -->
           <div class="space-y-2">
             <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Lời nhắn của khách</span>
-            <div class="rounded-xl border border-slate-800 bg-[#0c1524] p-3 text-slate-400 whitespace-pre-wrap leading-relaxed">
+            <div class="rounded-xl border border-slate-200 dark:border-slate-850 bg-slate-50 dark:bg-[#0c1524] p-3 text-slate-700 dark:text-slate-400 whitespace-pre-wrap leading-relaxed">
               {{ selectedLeadDetail.message || 'Không có lời nhắn.' }}
             </div>
           </div>
         </div>
 
         <!-- Footer -->
-        <div class="flex items-center justify-end gap-3 border-t border-slate-800 p-4 bg-slate-900/40">
+        <div class="flex items-center justify-end gap-3 border-t border-slate-200 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/40">
           <button 
             @click="closeLeadDetail"
-            class="rounded-xl border border-slate-800 bg-[#0c1524] px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+            class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-[#0c1524] px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             Đóng cửa sổ
           </button>
@@ -2664,28 +2665,28 @@ const faqs = [
 
     <!-- Social Proof Notification (Bottom-Left) -->
     <div 
-      class="fixed bottom-6 left-6 z-40 max-w-[320px] rounded-2xl border border-slate-800 bg-[#0c1524]/90 backdrop-blur-xl p-4 shadow-2xl transition-all duration-500 flex items-center gap-3"
+      class="fixed bottom-6 left-6 z-40 max-w-[320px] rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0c1524]/90 backdrop-blur-xl p-4 shadow-2xl transition-all duration-500 flex items-center gap-3"
       :class="showSocialProof && socialProofData ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-12 opacity-0 scale-95 pointer-events-none'"
     >
-      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
         </svg>
       </div>
       <div class="flex-1 min-w-0">
-        <p class="text-xs text-white font-extrabold truncate">
-          {{ socialProofData?.name }} <span class="text-slate-400 font-semibold">({{ socialProofData?.location }})</span>
+        <p class="text-xs text-slate-900 dark:text-white font-extrabold truncate">
+          {{ socialProofData?.name }} <span class="text-slate-500 dark:text-slate-400 font-semibold">({{ socialProofData?.location }})</span>
         </p>
-        <p class="text-[11px] text-slate-300 font-medium mt-0.5 leading-snug">
-          Vừa đăng ký: <strong class="text-blue-400">{{ socialProofData?.service }}</strong>
+        <p class="text-[11px] text-slate-700 dark:text-slate-300 font-medium mt-0.5 leading-snug">
+          Vừa đăng ký: <strong class="text-orange-600 dark:text-orange-400">{{ socialProofData?.service }}</strong>
         </p>
-        <p class="text-[9px] text-slate-500 font-bold mt-1 uppercase tracking-wider">
+        <p class="text-[9px] text-slate-400 dark:text-slate-500 font-bold mt-1 uppercase tracking-wider">
           {{ socialProofData?.time }}
         </p>
       </div>
       <button 
         @click="showSocialProof = false" 
-        class="text-slate-500 hover:text-slate-300 self-start p-0.5"
+        class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 self-start p-0.5"
       >
         <X class="h-3 w-3" />
       </button>

@@ -23,7 +23,7 @@ const emit = defineEmits(['select-service', 'toggle-theme', 'open-register', 'na
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
 const isMobileServicesOpen = ref(false);
-const isDarkMode = ref(true);
+const isDarkMode = ref(typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : true);
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
@@ -44,6 +44,14 @@ const handleSelectService = (index) => {
 
 const toggleTheme = () => {
   isDarkMode.value = !isDarkMode.value;
+  // Apply directly here too, for instant response
+  if (isDarkMode.value) {
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+  }
   emit('toggle-theme', isDarkMode.value);
 };
 
@@ -57,6 +65,15 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
+  // Initialize theme from localStorage or system preference
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    isDarkMode.value = true;
+    document.documentElement.classList.add('dark');
+  } else {
+    isDarkMode.value = false;
+    document.documentElement.classList.remove('dark');
+  }
 });
 
 onUnmounted(() => {
@@ -65,55 +82,52 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="sticky top-0 z-50 w-full border-b border-white/5 bg-[#090f1d]/85 backdrop-blur-md">
+  <header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-white/5 bg-white/90 dark:bg-[#090f1d]/85 backdrop-blur-md transition-colors duration-300">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
       
       <!-- Logo -->
       <a href="#" @click.prevent="emit('navigate-section', 'top')" class="flex items-center gap-2 group">
-        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
-          <!-- Custom Premium SVG Check Badge -->
-          <svg class="h-5.5 w-5.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+        <div class="flex h-10 w-32 items-center justify-center overflow-hidden bg-white rounded-xl shadow-md shadow-orange-500/5 group-hover:scale-105 transition-transform duration-300 border border-slate-200 dark:border-white/10 p-1">
+          <img src="/logo.png" alt="AZ Media Logo" class="h-full w-full object-contain" />
         </div>
-        <span class="font-sans text-lg font-extrabold tracking-tight text-white sm:text-xl">
-          Đăng Ký Tích Xanh<span class="text-xs font-semibold text-slate-500 group-hover:text-blue-400 transition-colors">.vn</span>
+        <span class="font-sans text-lg font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-xl">
+          AZ Tích Xanh<span class="text-xs font-semibold text-slate-500 group-hover:text-orange-400 transition-colors">.vn</span>
         </span>
       </a>
 
       <!-- Desktop Navigation -->
       <nav class="hidden md:flex items-center gap-6">
-        <a href="#" @click.prevent="emit('navigate-section', 'top')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Trang chủ</a>
+        <a href="#" @click.prevent="emit('navigate-section', 'top')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Trang chủ</a>
         
         <!-- Interactive Dropdown -->
         <div class="relative" ref="dropdownRef">
           <button 
             @click="toggleDropdown" 
-            class="flex items-center gap-1 text-sm font-medium text-slate-300 hover:text-white transition-colors focus:outline-none"
-            :class="{ 'text-blue-400': isDropdownOpen }"
+            class="flex items-center gap-1 text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors focus:outline-none"
+            :class="{ 'text-orange-400': isDropdownOpen }"
           >
             Dịch vụ
-            <ChevronDown class="h-4 w-4 transition-transform duration-200" :class="{ 'rotate-180 text-blue-400': isDropdownOpen }" />
+            <ChevronDown class="h-4 w-4 transition-transform duration-200" :class="{ 'rotate-180 text-orange-400': isDropdownOpen }" />
           </button>
 
           <!-- Dropdown Options -->
           <Transition name="fade">
             <div 
               v-if="isDropdownOpen" 
-              class="absolute left-1/2 mt-3 w-64 -translate-x-1/2 rounded-xl border border-white/10 bg-slate-900/95 p-2 shadow-2xl backdrop-blur-xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+              class="absolute left-1/2 mt-3 w-64 -translate-x-1/2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/95 p-2 shadow-xl dark:shadow-2xl backdrop-blur-xl ring-1 ring-black ring-opacity-5 focus:outline-none transition-colors duration-300"
             >
               <div class="py-1">
                 <button
                   v-for="(service, index) in services"
                   :key="service.id"
                   @click="handleSelectService(index)"
-                  class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-all duration-200"
-                  :class="{ 'bg-blue-600/10 text-blue-400 font-semibold': currentServiceIndex === index }"
+                  class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-all duration-200"
+                  :class="{ 'bg-orange-500/10 text-orange-400 font-semibold': currentServiceIndex === index }"
                 >
                   <!-- Custom Brand SVG Container -->
                   <div 
                     class="flex h-8 w-8 items-center justify-center rounded-lg"
-                    :class="currentServiceIndex === index ? service.mockup.bgColor : 'bg-slate-800'"
+                    :class="currentServiceIndex === index ? service.mockup.bgColor : 'bg-slate-100 dark:bg-slate-800'"
                   >
                     <!-- Facebook Page Icon -->
                     <svg 
@@ -169,17 +183,17 @@ onUnmounted(() => {
                     <p class="font-medium leading-none">{{ service.name }}</p>
                     <span class="text-[10px] text-slate-500 font-normal">Hỗ trợ nhanh trong 15'</span>
                   </div>
-                  <div v-if="currentServiceIndex === index" class="h-2 w-2 rounded-full bg-blue-500"></div>
+                  <div v-if="currentServiceIndex === index" class="h-2 w-2 rounded-full bg-orange-500"></div>
                 </button>
               </div>
             </div>
           </Transition>
         </div>
 
-        <a href="#loi-ich" @click.prevent="emit('navigate-section', 'loi-ich')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Lợi ích</a>
-        <a href="#bang-gia" @click.prevent="emit('navigate-section', 'bang-gia')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Bảng giá</a>
-        <a href="#quy-trinh" @click.prevent="emit('navigate-section', 'quy-trinh')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Quy trình</a>
-        <a href="#tin-tuc" @click.prevent="emit('navigate-section', 'tin-tuc')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Tin tức</a>
+        <a href="#loi-ich" @click.prevent="emit('navigate-section', 'loi-ich')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Lợi ích</a>
+        <a href="#bang-gia" @click.prevent="emit('navigate-section', 'bang-gia')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Bảng giá</a>
+        <a href="#quy-trinh" @click.prevent="emit('navigate-section', 'quy-trinh')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Quy trình</a>
+        <a href="#tin-tuc" @click.prevent="emit('navigate-section', 'tin-tuc')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Tin tức</a>
       </nav>
 
       <!-- Right Header Actions (Desktop) -->
@@ -187,16 +201,16 @@ onUnmounted(() => {
         <!-- Quick Register Info -->
         <button 
           @click="emit('open-register')" 
-          class="flex items-center gap-1.5 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+          class="flex items-center gap-1.5 text-sm font-semibold text-orange-400 hover:text-orange-300 transition-colors"
         >
-          <Zap class="h-4 w-4 fill-blue-400/20" />
+          <Zap class="h-4 w-4 fill-orange-400/20" />
           Đăng ký nhanh
         </button>
 
         <!-- Theme Toggle -->
         <button 
           @click="toggleTheme" 
-          class="rounded-full p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+          class="rounded-full p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
           title="Đổi giao diện"
         >
           <Sun v-if="isDarkMode" class="h-4.5 w-4.5" />
@@ -206,7 +220,7 @@ onUnmounted(() => {
         <!-- Phone Button -->
         <a 
           href="tel:0968825068" 
-          class="flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-sm font-extrabold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 hover:shadow-blue-500/30 transition-all duration-300 transform active:scale-95"
+          class="flex items-center gap-2 rounded-full bg-orange-500 px-5 py-2 text-sm font-extrabold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-400 hover:shadow-orange-500/30 transition-all duration-300 transform active:scale-95"
         >
           <Phone class="h-4 w-4 fill-white/10" />
           0968.825.068
@@ -217,7 +231,7 @@ onUnmounted(() => {
       <div class="flex items-center gap-2 md:hidden">
         <button 
           @click="toggleTheme" 
-          class="rounded-full p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+          class="rounded-full p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           <Sun v-if="isDarkMode" class="h-4.5 w-4.5" />
           <Moon v-else class="h-4.5 w-4.5" />
@@ -225,7 +239,7 @@ onUnmounted(() => {
 
         <a 
           href="tel:0968825068" 
-          class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-500 transition-colors"
+          class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-500 text-white hover:bg-orange-400 transition-colors"
           title="Gọi ngay"
         >
           <Phone class="h-4 w-4 fill-white/10" />
@@ -233,7 +247,7 @@ onUnmounted(() => {
 
         <button 
           @click="isMobileMenuOpen = !isMobileMenuOpen" 
-          class="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+          class="rounded-lg p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           <Menu v-if="!isMobileMenuOpen" class="h-6 w-6" />
           <X v-else class="h-6 w-6" />
@@ -245,12 +259,12 @@ onUnmounted(() => {
     <!-- Mobile Drawer Menu -->
     <div 
       v-if="isMobileMenuOpen" 
-      class="md:hidden border-t border-white/5 bg-[#090f1d] px-4 py-4 space-y-3"
+      class="md:hidden border-t border-slate-200 dark:border-white/5 bg-white dark:bg-[#090f1d] px-4 py-4 space-y-3 transition-colors duration-300"
     >
       <a 
         href="#" 
         @click="isMobileMenuOpen = false" 
-        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         Trang chủ
       </a>
@@ -259,7 +273,7 @@ onUnmounted(() => {
       <div class="space-y-1">
         <button 
           @click="isMobileServicesOpen = !isMobileServicesOpen" 
-          class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+          class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           <span>Dịch vụ</span>
           <ChevronDown class="h-5 w-5 transition-transform duration-200" :class="{ 'rotate-180': isMobileServicesOpen }" />
@@ -267,14 +281,14 @@ onUnmounted(() => {
         
         <div 
           v-if="isMobileServicesOpen" 
-          class="pl-4 pr-2 py-1 space-y-1 bg-slate-950/40 rounded-lg"
+          class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 dark:bg-slate-950/40 rounded-lg transition-colors duration-300"
         >
           <button
             v-for="(service, index) in services"
             :key="service.id"
             @click="handleSelectService(index)"
-            class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-slate-400 hover:text-white"
-            :class="{ 'text-blue-400 font-semibold bg-blue-600/5': currentServiceIndex === index }"
+            class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-slate-650 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            :class="{ 'text-orange-500 dark:text-orange-400 font-semibold bg-orange-500/5': currentServiceIndex === index }"
           >
             <!-- Custom Dynamic Brand SVG for Mobile -->
             <svg 
@@ -324,28 +338,28 @@ onUnmounted(() => {
       <a 
         href="#loi-ich" 
         @click.prevent="emit('navigate-section', 'loi-ich'); isMobileMenuOpen = false" 
-        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         Lợi ích
       </a>
       <a 
         href="#bang-gia" 
         @click.prevent="emit('navigate-section', 'bang-gia'); isMobileMenuOpen = false" 
-        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         Bảng giá
       </a>
       <a 
         href="#quy-trinh" 
         @click.prevent="emit('navigate-section', 'quy-trinh'); isMobileMenuOpen = false" 
-        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         Quy trình
       </a>
       <a 
         href="#tin-tuc" 
         @click.prevent="emit('navigate-section', 'tin-tuc'); isMobileMenuOpen = false" 
-        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+        class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         Tin tức
       </a>
@@ -353,9 +367,9 @@ onUnmounted(() => {
       <!-- Quick Register mobile link -->
       <button 
         @click="emit('open-register'); isMobileMenuOpen = false" 
-        class="flex w-full items-center gap-1.5 px-3 py-2 text-base font-semibold text-blue-400"
+        class="flex w-full items-center gap-1.5 px-3 py-2 text-base font-semibold text-orange-500 dark:text-orange-400"
       >
-        <Zap class="h-4 w-4 fill-blue-400/20" />
+        <Zap class="h-4 w-4 fill-orange-500/20" />
         Đăng ký nhanh
       </button>
     </div>
