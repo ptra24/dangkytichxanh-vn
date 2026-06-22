@@ -30,6 +30,7 @@ import ArticleView from './components/ArticleView.vue';
 
 const articles = ref([...staticArticles]);
 const currentServiceIndex = ref(0);
+const billingCycle = ref('monthly');
 const isModalOpen = ref(false);
 const selectedArticle = ref(null);
 const selectedPage = ref(null); // 'blog' | 'gioi-thieu' | 'legal-terms' | 'legal-privacy' | 'legal-dmca' | 'admin'
@@ -905,12 +906,28 @@ const closeModal = () => {
   isModalOpen.value = false;
 };
 
+const openModalWithPackage = (pkgKey) => {
+  openModal();
+  formServiceIndex.value = pkgKey;
+};
+
 // Form state
 const name = ref('');
 const phone = ref('');
 const link = ref('');
-const isSubmitted = ref(false);
 const formServiceIndex = ref("");
+const isSubmitted = ref(false);
+
+const selectedPriceDisplay = computed(() => {
+  if (formServiceIndex.value && typeof formServiceIndex.value === 'string' && formServiceIndex.value.startsWith('package_')) {
+    const pkg = pricingCards.find(card => card.packageKey === formServiceIndex.value);
+    if (pkg) {
+      return billingCycle.value === 'monthly' ? `${pkg.priceMonthly} ${pkg.unitMonthly}` : `${pkg.priceYearly} ${pkg.unitYearly}`;
+    }
+  }
+  const svc = services[formServiceIndex.value] || services[currentServiceIndex.value];
+  return svc ? svc.price : '1.5tr';
+});
 
 // Biến quản lý trạng thái Loading hiển thị ở nút bấm
 const isLoading = ref(false);
@@ -1017,12 +1034,34 @@ const handleContactSubmit = async () => {
 // Xử lý gửi Form (Gửi yêu cầu thực tế lên Backend API Laravel)
 const handleSubmit = async () => {
   isLoading.value = true;
-  const selectedService = services[formServiceIndex.value] || services[currentServiceIndex.value];
+  let serviceName = 'Tư vấn tích xanh';
+  if (formServiceIndex.value !== '') {
+    if (typeof formServiceIndex.value === 'string' && formServiceIndex.value.startsWith('package_')) {
+      const packageMap = {
+        package_standard: 'Business Standard',
+        package_plus: 'Business Plus',
+        package_premium: 'Business Premium',
+        package_max: 'Business Max (Gói Cao Cấp)'
+      };
+      serviceName = packageMap[formServiceIndex.value] || 'Tư vấn tích xanh';
+    } else {
+      const selectedService = services[formServiceIndex.value];
+      if (selectedService) {
+        serviceName = selectedService.name;
+      }
+    }
+  } else {
+    const selectedService = services[currentServiceIndex.value];
+    if (selectedService) {
+      serviceName = selectedService.name;
+    }
+  }
+
   const payload = {
     name: name.value,
     phone: phone.value,
     link: link.value,
-    service: selectedService ? selectedService.name : 'Tư vấn tích xanh'
+    service: serviceName
   };
 
   try {
@@ -1084,53 +1123,75 @@ const validateForm = () => {
 // Pricing cards data (matching target design)
 const pricingCards = [
   {
-    title: 'Tích Xanh Fanpage',
-    subtitle: 'Cho Fanpage Facebook',
-    price: '1.500.000đ',
-    unit: '/ trọn gói',
+    title: 'Business Standard',
+    subtitle: 'Tích xanh cơ bản cho doanh nghiệp',
+    priceMonthly: '450.000',
+    priceYearly: '4.300.000',
+    unitMonthly: 'VND/tháng²',
+    unitYearly: 'VND/năm²',
     features: [
-      'Tên Fanpage nào cũng lên',
-      'Không cần báo chí',
-      '15 phút hoàn thành',
-      'Bảo hành trọn đời'
+      'Huy hiệu đã xác minh (Tích xanh)',
+      'Bảo vệ chống mạo danh tài khoản',
+      'Dịch vụ hỗ trợ trực tuyến từ Meta (Chat hoặc gửi email)',
+      'Áp dụng tối ưu hóa tìm kiếm trên Facebook & Instagram'
     ],
-    metaFee: 'Phí Meta Verified: ~100.000đ/tháng',
-    btnText: 'Đăng ký Fanpage',
+    metaFee: 'Thanh toán trực tiếp cho Meta Verified',
+    btnText: 'Đăng ký Standard',
     isPopular: false,
-    serviceIndex: 0
+    packageKey: 'package_standard'
   },
   {
-    title: 'Tích Xanh Instagram',
-    subtitle: 'Cho Instagram cá nhân & business',
-    price: '1.500.000đ',
-    unit: '/ trọn gói',
+    title: 'Business Plus',
+    subtitle: 'Tính năng mở rộng & ưu tiên',
+    priceMonthly: '1.250.000',
+    priceYearly: '13.500.000',
+    unitMonthly: 'VND/tháng²',
+    unitYearly: 'VND/năm²',
     features: [
-      'Cá nhân & business đều được',
-      'Tăng trust cho shop online',
-      '15 phút hoàn thành',
-      'Hỗ trợ 24/7'
+      'Bao gồm lợi ích Standard và:',
+      'Được ưu tiên hỗ trợ giải quyết vấn đề nhanh hơn',
+      'Mở rộng tính năng liên kết trang cá nhân (Chia sẻ đến 3 địa chỉ doanh nghiệp)',
+      'Hỗ trợ liên kết nổi bật trong Thước phim (Reels)'
     ],
-    metaFee: 'Phí Meta Verified: ~100.000đ/tháng',
-    btnText: 'Đăng ký Instagram',
+    metaFee: 'Thanh toán trực tiếp cho Meta Verified',
+    btnText: 'Đăng ký Plus',
     isPopular: false,
-    serviceIndex: 2
+    packageKey: 'package_plus'
   },
   {
-    title: 'Combo Fanpage + IG',
-    subtitle: '2 nền tảng, 1 lần thanh toán',
-    price: '2.500.000đ',
-    unit: '/ tiết kiệm',
-    subPriceLine: '500.000đ',
+    title: 'Business Premium',
+    subtitle: 'Hỗ trợ trực tiếp từ tổng đài viên',
+    priceMonthly: '3.300.000',
+    priceYearly: '39.000.000',
+    unitMonthly: 'VND/tháng²',
+    unitYearly: 'VND/năm²',
     features: [
-      'Đăng ký cả Fanpage + Instagram',
-      'Tiết kiệm 500.000đ',
-      'Khuyên dùng cho shop',
-      'Bảo hành trọn đời'
+      'Bao gồm lợi ích Plus và:',
+      'Dịch vụ hỗ trợ cao cấp: Yêu cầu tổng đài viên Meta gọi điện trực tiếp',
+      'Mở rộng tính năng liên kết trang cá nhân (Chia sẻ đến 5 địa chỉ doanh nghiệp)',
+      'Tăng số lượng liên kết trong Thước phim (4 liên kết mỗi tháng)'
     ],
-    metaFee: 'Phí Meta Verified: ~150.000đ/tháng',
-    btnText: 'Đăng ký Combo',
+    metaFee: 'Thanh toán trực tiếp cho Meta Verified',
+    btnText: 'Đăng ký Premium',
     isPopular: true,
-    serviceIndex: 0
+    packageKey: 'package_premium'
+  },
+  {
+    title: 'Business Max',
+    subtitle: 'Gói chuyên nghiệp nhất cho DN lớn',
+    priceMonthly: '9.800.000',
+    priceYearly: '118.000.000',
+    unitMonthly: 'VND/tháng²',
+    unitYearly: 'VND/năm²',
+    features: [
+      'Bao gồm lợi ích Premium và:',
+      'Gói chuyên nghiệp nhất dành cho hệ thống doanh nghiệp lớn',
+      'Mở rộng tối đa tính năng chia sẻ liên kết và vị trí doanh nghiệp'
+    ],
+    metaFee: 'Thanh toán trực tiếp cho Meta Verified',
+    btnText: 'Đăng ký Max',
+    isPopular: false,
+    packageKey: 'package_max'
   }
 ];
 
@@ -1157,11 +1218,11 @@ const faqs = [
   },
   {
     question: "Chi phí đăng ký cụ thể là bao nhiêu?",
-    answer: "1.500.000đ trọn gói cho Fanpage hoặc Instagram (combo 2 nền tảng: 2.500.000đ). Không phát sinh chi phí nào khác từ phía chúng tôi."
+    answer: "Chi phí đăng ký tùy thuộc vào gói dịch vụ Meta Verified doanh nghiệp bạn lựa chọn: gói Business Standard (450.000đ/tháng), Business Plus (1.250.000đ/tháng), Business Premium (3.300.000đ/tháng), hoặc Business Max (9.800.000đ/tháng). Có tùy chọn thanh toán hàng năm để tiết kiệm thêm."
   },
   {
-    question: "Phí 1.5tr là trọn gói hay còn gì thêm?",
-    answer: "1.5tr là phí dịch vụ trả 1 lần cho chúng tôi. Ngoài ra Meta thu phí duy trì ~100.000đ/tháng trực tiếp từ Facebook/Instagram (ai cũng trả, dù tự làm hay dùng dịch vụ)."
+    question: "Phí đăng ký là trọn gói hay còn gì thêm?",
+    answer: "Mức giá trên là trọn gói phí dịch vụ Meta Verified được thanh toán trực tiếp qua cổng thanh toán của Meta. Chúng tôi cam kết hỗ trợ thiết lập, tối ưu hồ sơ doanh nghiệp và đồng hành trọn đời mà không phát sinh thêm chi phí ẩn."
   },
   {
     question: "Tích xanh có bị mất không?",
@@ -1944,7 +2005,37 @@ const faqs = [
             </p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <!-- Billing cycle toggle -->
+          <div class="flex items-center justify-center gap-4 mb-12 select-none">
+            <button 
+              @click="billingCycle = 'monthly'"
+              class="text-sm font-extrabold transition-colors duration-200"
+              :class="billingCycle === 'monthly' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'"
+            >
+              Hàng tháng
+            </button>
+            <div 
+              @click="billingCycle = billingCycle === 'monthly' ? 'yearly' : 'monthly'"
+              class="w-14 h-7 rounded-full bg-slate-200 dark:bg-slate-800 p-1 cursor-pointer transition-colors duration-300 flex items-center relative"
+            >
+              <div 
+                class="w-5 h-5 rounded-full bg-orange-500 transition-all duration-300 shadow-md"
+                :style="{ transform: billingCycle === 'monthly' ? 'translateX(0)' : 'translateX(28px)' }"
+              ></div>
+            </div>
+            <button 
+              @click="billingCycle = 'yearly'"
+              class="text-sm font-extrabold transition-colors duration-200 flex items-center gap-1.5"
+              :class="billingCycle === 'yearly' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'"
+            >
+              Hàng năm
+              <span class="inline-block px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-500 text-[10px] font-black uppercase tracking-wider">
+                Tiết kiệm
+              </span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             <div 
               v-for="card in pricingCards" 
               :key="card.title"
@@ -1960,25 +2051,31 @@ const faqs = [
               </span>
 
               <div>
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{{ card.title }}</h3>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">{{ card.title }}</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6 font-medium">{{ card.subtitle }}</p>
                 
                 <div class="flex items-baseline flex-wrap gap-1 mb-6">
-                  <span class="text-3xl font-black text-orange-500 tracking-tight">{{ card.price }}</span>
+                  <span class="text-2xl font-black text-orange-500 tracking-tight">
+                    {{ billingCycle === 'monthly' ? card.priceMonthly : card.priceYearly }}
+                  </span>
                   <div class="flex flex-col ml-1">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold">{{ card.unit }}</span>
-                    <span v-if="card.subPriceLine" class="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-none mt-0.5">{{ card.subPriceLine }}</span>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-none">
+                      {{ billingCycle === 'monthly' ? card.unitMonthly : card.unitYearly }}
+                    </span>
+                    <span class="text-[9px] text-slate-400 dark:text-slate-500 font-medium mt-1">
+                      {{ billingCycle === 'monthly' ? 'Hoặc ' + card.priceYearly + ' ' + card.unitYearly : 'Hoặc ' + card.priceMonthly + ' ' + card.unitMonthly }}
+                    </span>
                   </div>
                 </div>
 
                 <div class="h-px w-full bg-slate-200 dark:bg-white/5 mb-6"></div>
 
                 <ul class="space-y-3 mb-8 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  <li v-for="feat in card.features" :key="feat" class="flex items-center gap-2">
-                    <svg class="h-4 w-4 text-emerald-400 stroke-[3] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <li v-for="feat in card.features" :key="feat" class="flex items-start gap-2">
+                    <svg class="h-4 w-4 text-emerald-400 stroke-[3] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>{{ feat }}</span>
+                    <span class="leading-tight">{{ feat }}</span>
                   </li>
                 </ul>
               </div>
@@ -1990,7 +2087,7 @@ const faqs = [
                 </div>
 
                 <button 
-                  @click="selectService(card.serviceIndex); openModal();"
+                  @click="openModalWithPackage(card.packageKey)"
                   class="w-full py-3 rounded-xl text-xs font-extrabold transition-all duration-300 transform active:scale-98"
                   :class="card.isPopular 
                     ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-500/20' 
@@ -2460,14 +2557,24 @@ const faqs = [
                   class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   <option value="" disabled class="text-slate-500 dark:bg-slate-900">-- Chọn dịch vụ --</option>
-                  <option 
-                    v-for="(service, idx) in services" 
-                    :key="service.id" 
-                    :value="idx"
-                    class="text-slate-900 dark:text-white dark:bg-slate-900"
-                  >
-                    {{ service.name }}
-                  </option>
+                  
+                  <optgroup label="Gói Meta Verified Doanh Nghiệp" class="text-slate-400 bg-slate-900 font-bold">
+                    <option value="package_standard" class="text-slate-900 dark:text-white dark:bg-slate-900 font-medium">Business Standard</option>
+                    <option value="package_plus" class="text-slate-900 dark:text-white dark:bg-slate-900 font-medium">Business Plus</option>
+                    <option value="package_premium" class="text-slate-900 dark:text-white dark:bg-slate-900 font-medium">Business Premium</option>
+                    <option value="package_max" class="text-slate-900 dark:text-white dark:bg-slate-900 font-medium">Business Max (VIP)</option>
+                  </optgroup>
+                  
+                  <optgroup label="Tích Xanh Theo Nền Tảng" class="text-slate-400 bg-slate-900 font-bold">
+                    <option 
+                      v-for="(service, idx) in services" 
+                      :key="service.id" 
+                      :value="idx"
+                      class="text-slate-900 dark:text-white dark:bg-slate-900 font-medium"
+                    >
+                      {{ service.name }}
+                    </option>
+                  </optgroup>
                 </select>
               </div>
 
@@ -2488,7 +2595,7 @@ const faqs = [
               <div class="rounded-xl bg-slate-100 dark:bg-slate-950/40 p-4 border border-slate-200 dark:border-white/5 space-y-2">
                 <div class="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
                   <Check class="h-4 w-4 text-emerald-500 dark:text-emerald-400 stroke-[3]" />
-                  <span>Trọn gói {{ services[currentServiceIndex].price }}, không phát sinh thêm phí.</span>
+                  <span>Trọn gói {{ selectedPriceDisplay }}, không phát sinh thêm phí.</span>
                 </div>
                 <div class="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
                   <Check class="h-4 w-4 text-emerald-500 dark:text-emerald-400 stroke-[3]" />
