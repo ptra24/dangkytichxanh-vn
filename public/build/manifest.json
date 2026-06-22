@@ -1,0 +1,18 @@
+{
+  "logo.png": {
+    "file": "assets/logo-C6fIJis9.png",
+    "src": "logo.png"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DOocBQxB.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-CcG0y_vS.css"
+    ],
+    "assets": [
+      "assets/logo-C6fIJis9.png"
+    ]
+  }
+}
