@@ -182,9 +182,12 @@ const showEmployeeModal = ref(false);
 const employeeForm = ref({ id: null, name: '', passcode: '', status: 'active' });
 const employeeErrors = ref({});
 
+const loginUsername = ref('');
+const loginPassword = ref('');
+
 const verifyPasscode = async () => {
-  if (!adminPasscode.value) {
-    adminError.value = 'Vui lòng nhập mật mã';
+  if (!loginUsername.value.trim() || !loginPassword.value.trim()) {
+    adminError.value = 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu';
     return;
   }
   try {
@@ -193,11 +196,15 @@ const verifyPasscode = async () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ passcode: adminPasscode.value })
+      body: JSON.stringify({
+        username: loginUsername.value,
+        password: loginPassword.value
+      })
     });
     const data = await res.json();
     if (res.ok && data.success) {
-      sessionStorage.setItem('admin_passcode', adminPasscode.value);
+      adminPasscode.value = data.passcode;
+      sessionStorage.setItem('admin_passcode', data.passcode);
       sessionStorage.setItem('admin_role', data.role);
       sessionStorage.setItem('admin_name', data.name);
       adminRole.value = data.role;
@@ -207,7 +214,7 @@ const verifyPasscode = async () => {
       fetchLeads();
       startPolling();
     } else {
-      adminError.value = data.message || 'Mật mã không hợp lệ';
+      adminError.value = data.message || 'Tên đăng nhập hoặc mật khẩu không chính xác';
     }
   } catch (err) {
     adminError.value = 'Không thể kết nối đến máy chủ';
@@ -300,6 +307,8 @@ const logoutAdmin = () => {
   adminPasscode.value = '';
   adminRole.value = '';
   adminName.value = '';
+  loginUsername.value = '';
+  loginPassword.value = '';
   leads.value = [];
   stopPolling();
   stopChatPolling();
@@ -1178,14 +1187,14 @@ const pricingCards = [
   },
   {
     title: 'Business Max',
-    subtitle: 'Gói chuyên nghiệp nhất cho DN lớn',
+    subtitle: 'Gói chuyên nghiệp cho DN lớn',
     priceMonthly: '9.800.000',
     priceYearly: '118.000.000',
     unitMonthly: 'VND/tháng²',
     unitYearly: 'VND/năm²',
     features: [
       'Bao gồm lợi ích Premium và:',
-      'Gói chuyên nghiệp nhất dành cho hệ thống doanh nghiệp lớn',
+      'Gói chuyên nghiệp dành cho hệ thống doanh nghiệp lớn',
       'Mở rộng tối đa tính năng chia sẻ liên kết và vị trí doanh nghiệp'
     ],
     metaFee: 'Thanh toán trực tiếp cho Meta Verified',
@@ -1234,7 +1243,7 @@ const faqs = [
   },
   {
     question: "Tích xanh khác tích xám như thế nào?",
-    answer: "Tích xanh (Blue) dành cho cá nhân nổi tiếng, thương hiệu – mức độ uy tín cao nhất. Tích xám (Gray) chỉ xác minh doanh nghiệp đơn thuần. Dịch vụ của chúng tôi là tích xanh."
+    answer: "Tích xanh (Blue) dành cho cá nhân nổi tiếng, thương hiệu – mức độ uy tín vượt trội. Tích xám (Gray) chỉ xác minh doanh nghiệp đơn thuần. Dịch vụ của chúng tôi là tích xanh."
   },
   {
     question: "Nếu không thành công thì sao?",
@@ -1271,11 +1280,17 @@ const faqs = [
               <p class="text-xs text-slate-400 mt-2">Vui lòng nhập mật mã quản trị viên để tiếp tục truy cập danh sách đăng ký tư vấn.</p>
               
               <form @submit.prevent="verifyPasscode" class="mt-6 space-y-4">
-                <div>
+                <div class="space-y-3">
+                  <input 
+                    type="text" 
+                    v-model="loginUsername" 
+                    placeholder="Tên đăng nhập" 
+                    class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                  />
                   <input 
                     type="password" 
-                    v-model="adminPasscode" 
-                    placeholder="Mật mã quản trị viên" 
+                    v-model="loginPassword" 
+                    placeholder="Mật khẩu" 
                     class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
                   />
                   <p v-if="adminError" class="mt-2 text-xs font-semibold text-rose-500 text-left flex items-center gap-1">
@@ -2047,7 +2062,7 @@ const faqs = [
                 v-if="card.isPopular" 
                 class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#10b981] text-[9px] font-black text-white uppercase tracking-wider shadow-md"
               >
-                Phổ biến nhất
+                Khuyên dùng
               </span>
 
               <div>
