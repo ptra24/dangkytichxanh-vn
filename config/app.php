@@ -105,7 +105,9 @@ return [
         ),
     ],
 
-    'admin_passcode' => env('ADMIN_PASSCODE', 'admin123'),
+    'admin_username' => env('ADMIN_USERNAME', 'admin'),
+    'admin_password' => env('ADMIN_PASSWORD', env('ADMIN_PASSCODE', 'admin123')),
+    'admin_passcode' => env('ADMIN_PASSCODE', env('ADMIN_PASSWORD', 'admin123')),
 
     /*
     |--------------------------------------------------------------------------

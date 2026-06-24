@@ -19,8 +19,9 @@ Route::get('/blog/{slug}', [BlogController::class, 'show']);
 Route::get('/chat/messages', [ChatController::class, 'getMessagesForCustomer']);
 Route::post('/chat/messages', [ChatController::class, 'sendMessageFromCustomer']);
 
-// Xác minh đăng nhập bằng Passcode (Admin / Employee)
+// Xác minh đăng nhập bằng Passcode hoặc Username/Password (Admin / Employee)
 Route::post('/admin/verify-passcode', [AuthController::class, 'verifyPasscode']);
+Route::put('/admin/reset-password', [AuthController::class, 'resetPassword']);
 
 // Quản lý thông tin đăng ký (Yêu cầu Header X-Admin-Passcode)
 Route::get('/admin/contacts', [ContactController::class, 'index']);
