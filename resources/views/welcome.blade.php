@@ -11,7 +11,7 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Đăng Ký Tích Xanh Fanpage, Instagram 15 Phút | Đăng Ký Tích Xanh</title>
-    <meta name="description" content="Đăng ký tích xanh Facebook, Instagram 15 phút. Không cần báo chí, làm xong thanh toán. 100% thành công, 2.368 khách. Hotline 0968.825.068.">
+    <meta name="description" content="Đăng ký tích xanh Facebook, Instagram 15 phút. Không cần báo chí, làm xong thanh toán. Tỉ lệ thành công vượt trội, 2.368 khách. Hotline 0968.825.068.">
     <meta name="keywords" content="đăng ký tích xanh, tích xanh facebook, tích xanh fanpage, tích xanh instagram, tích xanh tiktok, dịch vụ tích xanh">
     <meta name="author" content="AZ Media - Đăng Ký Tích Xanh">
     <meta name="robots" content="index, follow">
@@ -21,7 +21,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Đăng Ký Tích Xanh">
     <meta property="og:title" content="Đăng Ký Tích Xanh Fanpage, Instagram 15 Phút | Đăng Ký Tích Xanh">
-    <meta property="og:description" content="Đăng ký tích xanh Facebook, Instagram 15 phút. Không cần báo chí, làm xong thanh toán. 100% thành công, 2.368 khách. Hotline 0968.825.068.">
+    <meta property="og:description" content="Đăng ký tích xanh Facebook, Instagram 15 phút. Không cần báo chí, làm xong thanh toán. Tỉ lệ thành công vượt trội, 2.368 khách. Hotline 0968.825.068.">
     <meta property="og:url" content="https://www.dangkytichxanh.vn/">
     <meta property="og:image" content="https://www.dangkytichxanh.vn/og-image.jpg">
     <meta property="og:locale" content="vi_VN">

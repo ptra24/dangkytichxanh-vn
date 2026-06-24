@@ -7,7 +7,7 @@
       <!-- Heading -->
       <div class="why-us-heading">
         <h2 class="why-us-title">Tích Xanh Đem Lại Gì Cho Fanpage &amp; Business Của Bạn?</h2>
-        <p class="why-us-subtitle">Tin hiệu Uy Tín cao nhất trên Meta, tăng tiếp cận tự nhiên và doanh số ngay lập tức</p>
+        <p class="why-us-subtitle">Tín hiệu Uy Tín vượt trội trên Meta, tăng tiếp cận tự nhiên và doanh số ngay lập tức</p>
       </div>
 
       <!-- 4 cards row -->
