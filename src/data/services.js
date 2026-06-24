@@ -9,7 +9,7 @@ export const services = [
     price: '1.5tr',
     speed: '15 phút',
     successRate: '99%',
-    badgeLabel: 'Dịch Vụ Uy Tín #1 Việt Nam',
+    badgeLabel: 'Dịch Vụ Uy Tín Hàng Đầu Việt Nam',
     features: [
       'Hoàn thành 15 phút (không 1-7 ngày như tự làm)',
       'Tỉ lệ thành công 99%, làm xong thanh toán',
@@ -41,9 +41,9 @@ export const services = [
     price: '1.5tr',
     speed: '15 phút',
     successRate: '99%',
-    badgeLabel: 'Dịch Vụ Uy Tín #1 Việt Nam',
+    badgeLabel: 'Dịch Vụ Uy Tín Hàng Đầu Việt Nam',
     features: [
-      '15 phút xong – nhanh nhất thị trường, API Meta chính thức',
+      '15 phút xong – siêu tốc, quy trình chuẩn, API Meta chính thức',
       'Làm xong mới thanh toán – hoàn tiền 100% nếu thất bại',
       '1.500.000đ trọn gói – không phí ẩn, không phí hàng tháng',
       '99% thành công, bảo hành trọn đời, hỗ trợ 24/7',
@@ -52,7 +52,7 @@ export const services = [
     ],
     mockup: {
       avatarLetters: 'CN',
-      username: 'Nguyễn Văn A',
+      username: 'Mr. Quang (CEO)',
       verifiedType: 'Meta Verified · Cá nhân',
       badgeColor: '#1877f2',
       glowClass: 'shadow-blue-glow border-blue-500/20',
@@ -75,7 +75,7 @@ export const services = [
     price: '1.5tr',
     speed: '15 phút',
     successRate: '99%',
-    badgeLabel: 'Dịch Vụ Uy Tín #1 Việt Nam',
+    badgeLabel: 'Dịch Vụ Uy Tín Hàng Đầu Việt Nam',
     features: [
       'Hoàn thành trong 15 phút – nhanh gấp 10x tự làm',
       'Không cần báo chí hay truyền thông',
@@ -107,7 +107,7 @@ export const services = [
     price: '1.5tr',
     speed: '15 phút',
     successRate: '99%',
-    badgeLabel: 'Dịch Vụ Uy Tín #1 Việt Nam',
+    badgeLabel: 'Dịch Vụ Uy Tín Hàng Đầu Việt Nam',
     features: [
       'Hoàn thành trong 15 phút (không cần 1-7 ngày tự làm)',
       'Tỉ lệ thành công 99% - làm xong mới thanh toán',
@@ -139,7 +139,7 @@ export const services = [
     price: '1.5tr',
     speed: '15 phút',
     successRate: '99%',
-    badgeLabel: 'Dịch Vụ Uy Tín #1 Việt Nam',
+    badgeLabel: 'Dịch Vụ Uy Tín Hàng Đầu Việt Nam',
     features: [
       'Hoàn thành chỉ 15 phút, không cần 3-7 ngày',
       '1.5tr trọn gói, không phát sinh chi phí',

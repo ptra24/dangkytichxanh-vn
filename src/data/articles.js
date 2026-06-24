@@ -1,8 +1,8 @@
 export const articles = [
   {
     id: 'tich-xanh-facebook-la-gi',
-    title: 'Tích Xanh Facebook Là Gì? Hướng Dẫn Đăng Ký Từ A-Z Mới Nhất 2026',
-    description: 'Tất tần tật về tích xanh Facebook, lợi ích vượt trội, điều kiện chuẩn xác và hướng dẫn cách tự đăng ký lên tích xanh nhanh chóng nhất.',
+    title: 'Tích Xanh Facebook Là Gì? Hướng Dẫn Đăng Ký Từ A-Z Cập Nhật 2026',
+    description: 'Tất tần tật về tích xanh Facebook, lợi ích vượt trội, điều kiện chuẩn xác và hướng dẫn cách tự đăng ký lên tích xanh nhanh chóng.',
     category: 'Kiến thức Facebook',
     date: '30/05/2026',
     author: 'Admin AZ Media',
@@ -10,7 +10,7 @@ export const articles = [
     banner: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80',
     content: `
       <p class="lead text-lg text-slate-300 mb-6 leading-relaxed">
-        <strong>Tích xanh Facebook</strong> (Verified Badge) từ lâu đã trở thành biểu tượng của sự uy tín, chuyên nghiệp và tầm ảnh hưởng trên mạng xã hội lớn nhất thế giới này. Sở hữu một dấu tích xanh bên cạnh tên tài khoản không chỉ giúp khẳng định danh tính chính chủ mà còn mang lại vô số lợi thế vượt trội trong việc tiếp cận và chuyển đổi khách hàng.
+        <strong>Tích xanh Facebook</strong> (Verified Badge) từ lâu đã trở thành biểu tượng của sự uy tín, chuyên nghiệp và tầm ảnh hưởng trên mạng xã hội hàng đầu thế giới này. Sở hữu một dấu tích xanh bên cạnh tên tài khoản không chỉ giúp khẳng định danh tính chính chủ mà còn mang lại vô số lợi thế vượt trội trong việc tiếp cận và chuyển đổi khách hàng.
       </p>
 
       <div class="space-y-6 text-slate-300">
@@ -131,7 +131,7 @@ export const articles = [
   },
   {
     id: 'gia-tich-xanh-2026',
-    title: 'Chi Phí Lên Tích Xanh Facebook & Các Nền Tảng Mới Nhất 2026',
+    title: 'Chi Phí Lên Tích Xanh Facebook & Các Nền Tảng Cập Nhật 2026',
     description: 'Cập nhật bảng giá Meta Verified chính thức và chi phí trọn gói dịch vụ hỗ trợ làm tích xanh uy tín.',
     category: 'Bảng giá',
     date: '28/05/2026',
@@ -187,7 +187,7 @@ export const articles = [
     content: `
       <div class="space-y-6 text-slate-300">
         <h2 class="text-2xl font-bold text-white mt-8 mb-4 border-l-4 border-blue-500 pl-3">1. Cạnh tranh lành mạnh, đè bẹp đối thủ giả mạo</h2>
-        <p>Nhiều shop kinh doanh online thường xuyên bị đối thủ copy y hệt avatar, ảnh bìa, bài viết để đi lừa đảo khách hàng. Có tích xanh là lời khẳng định vững chắc nhất: "Tôi là thương hiệu duy nhất và uy tín nhất".</p>
+        <p>Nhiều shop kinh doanh online thường xuyên bị đối thủ copy y hệt avatar, ảnh bìa, bài viết để đi lừa đảo khách hàng. Có tích xanh là lời khẳng định vững chắc: "Tôi là thương hiệu uy tín hàng đầu".</p>
 
         <h2 class="text-2xl font-bold text-white mt-8 mb-4 border-l-4 border-blue-500 pl-3">2. Tối ưu hóa chi phí quảng cáo (ADS)</h2>
         <p>Fanpage có tích xanh được Facebook đánh giá điểm chất lượng trang cực kỳ cao. Khi chạy quảng cáo, chiến dịch trên page tích xanh thường phân phối nhanh hơn, giá thầu tin nhắn và tương tác rẻ hơn tới 15-30% so với page thường.</p>
