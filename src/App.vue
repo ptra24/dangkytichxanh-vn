@@ -2543,43 +2543,10 @@ const faqs = [
             <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium">Kiến thức cần biết trước khi đăng ký tích xanh</p>
           </div>
 
-          <!-- Top grid: 6 thin article cards (2 rows of 3) -->
+          <!-- Top grid: thin article cards -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mb-8">
-            <!-- Row 1 -->
-            <a href="#top" @click="selectArticle(articles[0]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Tích xanh Facebook là gì?</span>
-              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-            <a href="#top" @click="selectArticle(articles[1]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Hướng dẫn đăng ký từ A-Z</span>
-              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-            <a href="#top" @click="selectArticle(articles[2]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">So sánh tích xanh vs tích xám</span>
-              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-
-            <!-- Row 2 -->
-            <a href="#top" @click="selectArticle(articles[3]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Giá tích xanh 2026</span>
-              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-            <a href="#top" @click="selectArticle(articles[4]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Đăng ký có an toàn không?</span>
-              <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-            <a href="#top" @click="selectArticle(articles[5]); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
-              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">Lợi ích cho Fanpage kinh doanh</span>
+            <a v-for="article in articles" :key="article.id" href="#top" @click="selectArticle(article); scrollToTop();" class="flex items-center justify-between rounded-xl border border-slate-200 dark:border-[#24324f] bg-slate-50 dark:bg-[#141f36]/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-400 dark:hover:border-blue-500/60 hover:bg-orange-50 dark:hover:bg-[#141f36]/80 group">
+              <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-white transition-colors">{{ article.title }}</span>
               <svg class="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
