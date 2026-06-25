@@ -17,8 +17,9 @@ export const services = [
       'Tăng reach 20-40%, tỉ lệ chốt tăng 28%'
     ],
     mockup: {
-      avatarLetters: 'DK',
-      username: 'Đăng Ký Tích Xanh',
+      avatarLetters: 'MQ',
+      avatarImage: '/avatar-quang.png',
+      username: 'Mr. Quang (CEO)',
       verifiedType: 'Meta Verified · Trang chính chủ',
       badgeColor: '#1877f2',
       glowClass: 'shadow-blue-glow border-blue-500/20',
@@ -52,6 +53,7 @@ export const services = [
     ],
     mockup: {
       avatarLetters: 'CN',
+      avatarImage: '/avatar-quang.png',
       username: 'Mr. Quang (CEO)',
       verifiedType: 'Meta Verified · Cá nhân',
       badgeColor: '#1877f2',

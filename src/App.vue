@@ -15,7 +15,9 @@ import {
   Phone,
   Shield,
   Plus,
-  ExternalLink
+  ExternalLink,
+  BookOpen,
+  Globe
 } from '@lucide/vue';
 import Header from './components/Header.vue';
 import HeroSection from './components/HeroSection.vue';
@@ -34,6 +36,7 @@ const billingCycle = ref('monthly');
 const isModalOpen = ref(false);
 const selectedArticle = ref(null);
 const selectedPage = ref(null); // 'blog' | 'gioi-thieu' | 'legal-terms' | 'legal-privacy' | 'legal-dmca' | 'admin'
+const enableBlog = ref(typeof window !== 'undefined' ? window.ENABLE_BLOG !== false : true);
 
 // Modal chi tiết khách hàng đăng ký
 const isLeadDetailModalOpen = ref(false);
@@ -101,6 +104,11 @@ const selectService = (index) => {
 };
 
 const selectArticle = (article) => {
+  if (enableBlog.value === false) {
+    window.history.pushState({}, '', '/');
+    updateMeta();
+    return;
+  }
   selectedArticle.value = article;
   selectedPage.value = null;
   window.history.pushState({}, '', `/tin-tuc/${article.id}`);
@@ -114,6 +122,11 @@ const clearArticle = () => {
 };
 
 const openPage = (page) => {
+  if (page === 'blog' && enableBlog.value === false) {
+    window.history.pushState({}, '', '/');
+    updateMeta();
+    return;
+  }
   selectedArticle.value = null;
   selectedPage.value = page;
   const urlMap = { blog: '/blog', 'gioi-thieu': '/gioi-thieu', 'legal-terms': '/legal/terms', 'legal-privacy': '/legal/privacy', 'legal-dmca': '/legal/dmca', 'admin': '/admin' };
@@ -181,6 +194,22 @@ const employeesLoading = ref(false);
 const showEmployeeModal = ref(false);
 const employeeForm = ref({ id: null, name: '', passcode: '', status: 'active' });
 const employeeErrors = ref({});
+
+// Quản lý Bài viết & SEO State
+const rawBlogPosts = ref([]);
+const blogLoading = ref(false);
+const showBlogModal = ref(false);
+const blogForm = ref({
+  id: null,
+  title: '',
+  excerpt: '',
+  content: '',
+  image_url: '',
+  meta_title: '',
+  meta_description: '',
+  meta_keywords: ''
+});
+const blogErrors = ref({});
 
 const loginUsername = ref('');
 const loginPassword = ref('');
@@ -397,6 +426,101 @@ const deleteEmployee = async (id) => {
     }
   } catch (err) {
     console.error('Lỗi khi xóa nhân viên:', err);
+  }
+};
+
+// Quản lý Bài viết & SEO Actions
+const fetchRawBlogPosts = async () => {
+  if (!adminPasscode.value || adminRole.value !== 'admin') return;
+  blogLoading.value = true;
+  try {
+    const res = await fetch('/api/blog');
+    const data = await res.json();
+    if (data.success) {
+      rawBlogPosts.value = data.data;
+    }
+  } catch (err) {
+    console.error('Lỗi khi tải danh sách bài viết:', err);
+  } finally {
+    blogLoading.value = false;
+  }
+};
+
+const openAddBlogModal = () => {
+  blogForm.value = {
+    id: null,
+    title: '',
+    excerpt: '',
+    content: '',
+    image_url: '',
+    meta_title: '',
+    meta_description: '',
+    meta_keywords: ''
+  };
+  blogErrors.value = {};
+  showBlogModal.value = true;
+};
+
+const openEditBlogModal = (post) => {
+  blogForm.value = { ...post };
+  blogErrors.value = {};
+  showBlogModal.value = true;
+};
+
+const saveBlogPost = async () => {
+  blogErrors.value = {};
+  if (!blogForm.value.title || !blogForm.value.title.trim()) {
+    blogErrors.value.title = 'Vui lòng nhập tiêu đề.';
+  }
+  if (!blogForm.value.content || !blogForm.value.content.trim()) {
+    blogErrors.value.content = 'Vui lòng nhập nội dung.';
+  }
+  if (Object.keys(blogErrors.value).length > 0) return;
+
+  const isEdit = blogForm.value.id !== null;
+  const url = isEdit ? `/api/admin/blog/${blogForm.value.id}` : '/api/admin/blog';
+  const method = isEdit ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Passcode': adminPasscode.value
+      },
+      body: JSON.stringify(blogForm.value)
+    });
+    const data = await res.json();
+    if (data.success) {
+      showBlogModal.value = false;
+      fetchRawBlogPosts();
+      fetchBlogPosts();
+    } else {
+      if (data.errors) {
+        blogErrors.value = data.errors;
+      } else {
+        alert(data.message || 'Có lỗi xảy ra.');
+      }
+    }
+  } catch (err) {
+    console.error('Lỗi khi lưu bài viết:', err);
+  }
+};
+
+const deleteBlogPost = async (id) => {
+  if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) return;
+  try {
+    const res = await fetch(`/api/admin/blog/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-Admin-Passcode': adminPasscode.value }
+    });
+    const data = await res.json();
+    if (data.success) {
+      fetchRawBlogPosts();
+      fetchBlogPosts();
+    }
+  } catch (err) {
+    console.error('Lỗi khi xóa bài viết:', err);
   }
 };
 
@@ -767,6 +891,8 @@ watch(activeAdminTab, (newTab) => {
       startChatPolling();
     } else if (newTab === 'employees') {
       fetchEmployees();
+    } else if (newTab === 'blog') {
+      fetchRawBlogPosts();
     }
   }
 });
@@ -782,6 +908,8 @@ watch(selectedPage, (newPage) => {
         startChatPolling();
       } else if (activeAdminTab.value === 'employees') {
         fetchEmployees();
+      } else if (activeAdminTab.value === 'blog') {
+        fetchRawBlogPosts();
       }
     }
   } else {
@@ -847,6 +975,12 @@ onMounted(() => {
   startSocialProofLoop();
 
   const path = window.location.pathname;
+  
+  if (enableBlog.value === false && (path === '/blog' || path.startsWith('/tin-tuc/'))) {
+    window.history.replaceState({}, '', '/');
+    updateMeta();
+    return;
+  }
   
   const serviceUrlMap = {
     '/dang-ky-tich-xanh-fanpage': 0,
@@ -1266,18 +1400,18 @@ const faqs = [
     <template v-if="!selectedArticle">
       <!-- ADMIN DASHBOARD PAGE -->
       <template v-if="selectedPage === 'admin'">
-        <main class="min-h-screen bg-[#060b13] text-slate-100 py-12">
+        <main class="min-h-screen bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-slate-100 py-12 transition-colors duration-300">
           <!-- VERIFY PASSCODE STATE -->
           <div v-if="!isAdminAuthenticated" class="mx-auto max-w-md px-5 mt-12">
-            <div class="rounded-3xl border border-slate-800 bg-[#0c1524]/60 backdrop-blur-xl p-8 shadow-2xl text-center">
-              <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 mb-6">
+            <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524]/60 backdrop-blur-xl p-8 shadow-2xl text-center transition-colors">
+              <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500 dark:text-blue-400 mb-6">
                 <!-- Shield Lock Icon -->
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h1 class="text-2xl font-black text-white">Hệ Thống Quản Trị</h1>
-              <p class="text-xs text-slate-400 mt-2">Vui lòng nhập mật mã quản trị viên để tiếp tục truy cập danh sách đăng ký tư vấn.</p>
+              <h1 class="text-2xl font-black text-slate-900 dark:text-white">Hệ Thống Quản Trị</h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Vui lòng nhập mật mã quản trị viên để tiếp tục truy cập danh sách đăng ký tư vấn.</p>
               
               <form @submit.prevent="verifyPasscode" class="mt-6 space-y-4">
                 <div class="space-y-3">
@@ -1285,13 +1419,13 @@ const faqs = [
                     type="text" 
                     v-model="loginUsername" 
                     placeholder="Tên đăng nhập" 
-                    class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    class="w-full rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
                   />
                   <input 
                     type="password" 
                     v-model="loginPassword" 
                     placeholder="Mật khẩu" 
-                    class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    class="w-full rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
                   />
                   <p v-if="adminError" class="mt-2 text-xs font-semibold text-rose-500 text-left flex items-center gap-1">
                     <span class="text-rose-500">⚠</span> {{ adminError }}
@@ -1311,11 +1445,11 @@ const faqs = [
           <!-- ADMIN DASHBOARD PANEL -->
           <div v-else-if="isAdminAuthenticated" class="mx-auto max-w-[1140px] px-5">
             <!-- Header section -->
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-6 mb-6">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 dark:border-slate-800 pb-6 mb-6">
               <div>
-                <h1 class="text-2xl font-black text-white flex items-center gap-2">
+                <h1 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                   <span>Dashboard Quản Trị</span>
-                  <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-400">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-500 dark:text-blue-400">
                     <span class="relative flex h-2 w-2">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -1323,9 +1457,9 @@ const faqs = [
                     Realtime {{ realtimeEnabled ? 'Đang bật' : 'Tắt' }}
                   </span>
                 </h1>
-                <p class="text-xs text-slate-400 mt-1">
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Đang đăng nhập với vai trò: 
-                  <span class="font-extrabold text-blue-400">{{ adminRole === 'admin' ? 'Quản trị viên (Admin)' : 'Nhân viên (Employee)' }}</span> 
+                  <span class="font-extrabold text-blue-500 dark:text-blue-400">{{ adminRole === 'admin' ? 'Quản trị viên (Admin)' : 'Nhân viên (Employee)' }}</span> 
                   - {{ adminName }}
                 </p>
               </div>
@@ -1334,25 +1468,25 @@ const faqs = [
                 <!-- Toggle Realtime -->
                 <label v-if="activeAdminTab === 'leads'" class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" v-model="realtimeEnabled" class="sr-only peer">
-                  <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 peer-checked:after:bg-white"></div>
-                  <span class="ml-2 text-xs font-semibold text-slate-400 select-none">Tự cập nhật</span>
+                  <div class="w-9 h-5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 peer-checked:after:bg-white"></div>
+                  <span class="ml-2 text-xs font-semibold text-slate-500 dark:text-slate-400 select-none">Tự cập nhật</span>
                 </label>
 
                 <!-- Export CSV/Excel Button -->
                 <button 
                   v-if="activeAdminTab === 'leads'"
                   @click="exportLeadsToExcel" 
-                  class="flex h-9 items-center justify-center rounded-lg border border-slate-800 bg-[#0c1524] px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors gap-1.5"
+                  class="flex h-9 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#0c1524] px-3 text-xs font-semibold text-slate-750 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors gap-1.5"
                   title="Xuất danh sách ra tệp Excel CSV"
                 >
-                  <Download class="h-3.5 w-3.5 text-emerald-400" />
+                  <Download class="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" />
                   Xuất Excel
                 </button>
 
                 <!-- Refresh Button -->
                 <button 
-                  @click="activeAdminTab === 'leads' ? fetchLeads() : (activeAdminTab === 'chat' ? fetchChatSessions() : fetchEmployees())" 
-                  class="flex h-9 items-center justify-center rounded-lg border border-slate-800 bg-[#0c1524] px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors gap-1.5"
+                  @click="activeAdminTab === 'leads' ? fetchLeads() : (activeAdminTab === 'chat' ? fetchChatSessions() : (activeAdminTab === 'blog' ? fetchRawBlogPosts() : fetchEmployees()))" 
+                  class="flex h-9 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#0c1524] px-3 text-xs font-semibold text-slate-750 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors gap-1.5"
                 >
                   <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3m0 0l3 3m-3-3v8" />
@@ -1363,7 +1497,7 @@ const faqs = [
                 <!-- Logout Button -->
                 <button 
                   @click="logoutAdmin" 
-                  class="flex h-9 items-center justify-center rounded-lg border border-slate-800 bg-[#0c1524] px-3 text-xs font-semibold text-rose-400 hover:bg-rose-950/20 hover:border-rose-900 transition-colors gap-1.5"
+                  class="flex h-9 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#0c1524] px-3 text-xs font-semibold text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-300 dark:hover:border-rose-900 transition-colors gap-1.5"
                 >
                   <LogOut class="h-3.5 w-3.5" />
                   Đăng xuất
@@ -1372,11 +1506,11 @@ const faqs = [
             </div>
 
             <!-- Navigation Tabs -->
-            <div class="flex border-b border-slate-800 mb-6 gap-2">
+            <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6 gap-2">
               <button 
                 @click="activeAdminTab = 'leads'"
                 class="px-4 py-2 text-xs font-bold transition-all border-b-2"
-                :class="activeAdminTab === 'leads' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'"
+                :class="activeAdminTab === 'leads' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-200'"
               >
                 Đăng ký tư vấn
               </button>
@@ -1384,15 +1518,24 @@ const faqs = [
                 v-if="adminRole === 'admin'"
                 @click="activeAdminTab = 'employees'"
                 class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5"
-                :class="activeAdminTab === 'employees' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'"
+                :class="activeAdminTab === 'employees' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-200'"
               >
                 <Users class="h-3.5 w-3.5" />
                 Quản lý nhân viên
               </button>
               <button 
+                v-if="adminRole === 'admin'"
+                @click="activeAdminTab = 'blog'; fetchRawBlogPosts();"
+                class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5"
+                :class="activeAdminTab === 'blog' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-200'"
+              >
+                <BookOpen class="h-3.5 w-3.5" />
+                Quản lý bài viết & SEO
+              </button>
+              <button 
                 @click="activeAdminTab = 'chat'"
                 class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5"
-                :class="activeAdminTab === 'chat' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'"
+                :class="activeAdminTab === 'chat' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-200'"
               >
                 <MessageSquare class="h-3.5 w-3.5" />
                 Hỗ trợ khách hàng
@@ -1403,31 +1546,31 @@ const faqs = [
             <div v-if="activeAdminTab === 'leads'" class="space-y-6">
               <!-- Stats Row -->
               <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                <div class="rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm">
-                  <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tổng Đăng Ký</p>
-                  <p class="mt-2 text-2xl font-black text-white">{{ leads.length }}</p>
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-5 shadow-sm transition-colors">
+                  <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng Đăng Ký</p>
+                  <p class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ leads.length }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm">
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-5 shadow-sm transition-colors">
                   <p class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Chờ Xử Lý</p>
-                  <p class="mt-2 text-2xl font-black text-amber-400">{{ leads.filter(l => l.status === 'pending').length }}</p>
+                  <p class="mt-2 text-2xl font-black text-amber-500 dark:text-amber-400">{{ leads.filter(l => l.status === 'pending').length }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm">
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-5 shadow-sm transition-colors">
                   <p class="text-[11px] font-bold text-blue-500 uppercase tracking-wider">Đang Liên Hệ</p>
-                  <p class="mt-2 text-2xl font-black text-blue-400">{{ leads.filter(l => l.status === 'contacting' || l.status === 'contacted').length }}</p>
+                  <p class="mt-2 text-2xl font-black text-blue-600 dark:text-blue-400">{{ leads.filter(l => l.status === 'contacting' || l.status === 'contacted').length }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm">
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-5 shadow-sm transition-colors">
                   <p class="text-[11px] font-bold text-emerald-500 uppercase tracking-wider">Đã Hoàn Thành</p>
-                  <p class="mt-2 text-2xl font-black text-emerald-400">{{ leads.filter(l => l.status === 'completed').length }}</p>
+                  <p class="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">{{ leads.filter(l => l.status === 'completed').length }}</p>
                 </div>
               </div>
 
               <!-- Leads Table / Mobile Grid -->
-              <div class="rounded-3xl border border-slate-800 bg-[#0c1524]/40 overflow-hidden">
+              <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524]/40 overflow-hidden transition-colors">
                 <!-- Desktop Table view -->
                 <div class="hidden md:block overflow-x-auto">
-                  <table class="w-full text-left border-collapse text-xs">
+                   <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 uppercase font-bold text-[10px]">
+                      <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px]">
                         <th class="p-4">Thời gian</th>
                         <th class="p-4">Họ và tên</th>
                         <th class="p-4">Số điện thoại</th>
@@ -1439,14 +1582,14 @@ const faqs = [
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="lead in leads" :key="lead.id" class="border-b border-slate-900/60 hover:bg-slate-900/20 transition-colors">
-                        <td class="p-4 text-slate-400 font-medium whitespace-nowrap">
+                      <tr v-for="lead in leads" :key="lead.id" class="border-b border-slate-100 dark:border-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
+                        <td class="p-4 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
                           {{ new Date(lead.created_at).toLocaleString('vi-VN', {hour: '2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'}) }}
                         </td>
                         <td class="p-4">
                           <button 
                             @click="openLeadDetail(lead)" 
-                            class="font-black text-white hover:text-blue-400 hover:underline text-[13px] text-left focus:outline-none transition-colors"
+                            class="font-black text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline text-[13px] text-left focus:outline-none transition-colors"
                             title="Xem thông tin chi tiết khách hàng"
                           >
                             {{ lead.name }}
@@ -1456,7 +1599,7 @@ const faqs = [
                           <div class="flex flex-col gap-1">
                             <a 
                               :href="'tel:' + lead.phone" 
-                              class="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-bold text-blue-400 hover:bg-blue-500 hover:text-white transition-all"
+                              class="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
                               title="Click để gọi điện thoại trên di động"
                             >
                               <Phone class="h-3.5 w-3.5" />
@@ -1465,7 +1608,7 @@ const faqs = [
                             <a 
                               :href="'https://zalo.me/' + lead.phone" 
                               target="_blank" 
-                              class="inline-flex items-center justify-center gap-1 rounded bg-blue-600/10 hover:bg-blue-600 px-2 py-1 text-[10px] font-bold text-blue-400 hover:text-white transition-all"
+                              class="inline-flex items-center justify-center gap-1 rounded bg-blue-600/10 hover:bg-blue-600 px-2 py-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:text-white transition-all"
                               title="Mở Zalo chat"
                             >
                               <MessageSquare class="h-3 w-3" />
@@ -1478,30 +1621,30 @@ const faqs = [
                             <a 
                               :href="lead.link" 
                               target="_blank" 
-                              class="inline-flex items-center gap-1 max-w-[200px] truncate text-slate-400 hover:text-blue-400 transition-colors"
+                              class="inline-flex items-center gap-1 max-w-[200px] truncate text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                               :title="lead.link"
                             >
                               <span class="truncate font-semibold">{{ lead.link }}</span>
                               <ExternalLink class="h-3.5 w-3.5 flex-shrink-0" />
                             </a>
                             <div class="flex gap-1">
-                              <span class="rounded bg-slate-800 text-slate-400 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider scale-90 origin-left">
+                              <span class="rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider scale-90 origin-left">
                                 {{ lead.link.includes('facebook.com') || lead.link.includes('fb.com') ? 'Facebook' : 'Link/Website' }}
                               </span>
                             </div>
                           </div>
                         </td>
-                        <td class="p-4 font-semibold text-slate-300">{{ lead.service }}</td>
-                        <td class="p-4 text-slate-400 max-w-[200px] truncate" :title="lead.message">{{ lead.message || '-' }}</td>
+                        <td class="p-4 font-semibold text-slate-700 dark:text-slate-300">{{ lead.service }}</td>
+                        <td class="p-4 text-slate-500 dark:text-slate-400 max-w-[200px] truncate" :title="lead.message">{{ lead.message || '-' }}</td>
                         <td class="p-4 whitespace-nowrap">
                           <select 
                             :value="lead.status" 
                             @change="updateLeadStatus(lead.id, $event.target.value)"
-                            class="rounded-lg border border-slate-800 bg-[#060b13] px-2 py-1 text-xs font-bold focus:outline-none transition-colors"
+                            class="rounded-lg border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-2 py-1 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none transition-colors"
                             :class="{
-                              'text-amber-400 border-amber-500/30 bg-amber-500/5': lead.status === 'pending',
-                              'text-blue-400 border-blue-500/30 bg-blue-500/5': lead.status === 'contacting' || lead.status === 'contacted',
-                              'text-emerald-400 border-emerald-500/30 bg-emerald-500/5': lead.status === 'completed'
+                              'text-amber-500 border-amber-500/30 bg-amber-500/5': lead.status === 'pending',
+                              'text-blue-500 dark:text-blue-400 border-blue-555/30 bg-blue-500/5': lead.status === 'contacting' || lead.status === 'contacted',
+                              'text-emerald-500 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/5': lead.status === 'completed'
                             }"
                           >
                             <option value="pending">Chờ xử lý</option>
@@ -1512,7 +1655,7 @@ const faqs = [
                         <td v-if="adminRole === 'admin'" class="p-4 text-right">
                           <button 
                             @click="deleteLead(lead.id)"
-                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all active:scale-95"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-500 dark:text-rose-400 hover:bg-rose-500 hover:text-white transition-all active:scale-95"
                             title="Xóa lượt đăng ký"
                           >
                             <Trash2 class="h-3.5 w-3.5" />
@@ -1524,7 +1667,7 @@ const faqs = [
                 </div>
 
                 <!-- Mobile Grid Card view -->
-                <div class="block md:hidden divide-y divide-slate-800">
+                <div class="block md:hidden divide-y divide-slate-200 dark:divide-slate-800">
                   <div v-for="lead in leads" :key="lead.id" class="p-5 space-y-3">
                     <div class="flex items-center justify-between">
                       <span class="text-[10px] font-bold text-slate-500">
@@ -1533,7 +1676,7 @@ const faqs = [
                       <button 
                         v-if="adminRole === 'admin'"
                         @click="deleteLead(lead.id)"
-                        class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-500 dark:text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
                       >
                         <Trash2 class="h-3.5 w-3.5" />
                       </button>
@@ -1542,12 +1685,12 @@ const faqs = [
                     <div>
                       <button 
                         @click="openLeadDetail(lead)"
-                        class="font-black text-white text-[15px] text-left hover:text-blue-400 hover:underline focus:outline-none"
+                        class="font-black text-slate-900 dark:text-white text-[15px] text-left hover:text-blue-600 dark:hover:text-blue-400 hover:underline focus:outline-none"
                       >
                         {{ lead.name }}
                       </button>
-                      <p class="text-[11px] font-semibold text-slate-400 mt-0.5">{{ lead.service }}</p>
-                      <p v-if="lead.message" class="text-xs text-slate-400 mt-1 italic">"{{ lead.message }}"</p>
+                      <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{{ lead.service }}</p>
+                      <p v-if="lead.message" class="text-xs text-slate-550 dark:text-slate-400 mt-1 italic">"{{ lead.message }}"</p>
                     </div>
                     
                     <div class="flex flex-col gap-2 pt-1">
@@ -1562,29 +1705,29 @@ const faqs = [
                         <a 
                           :href="'https://zalo.me/' + lead.phone" 
                           target="_blank"
-                          class="flex items-center justify-center gap-1.5 rounded-xl bg-blue-600/10 border border-blue-500/25 py-2.5 text-xs font-bold text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
+                          class="flex items-center justify-center gap-1.5 rounded-xl bg-blue-600/10 border border-blue-500/25 py-2.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
                         >
                           <MessageSquare class="h-3.5 w-3.5" />
                           Zalo
                         </a>
                       </div>
 
-                      <a :href="lead.link" target="_blank" class="flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-[#060b13] py-2.5 text-xs font-semibold text-slate-300 hover:text-white transition-all">
+                      <a :href="lead.link" target="_blank" class="flex items-center justify-center gap-2 rounded-xl border border-slate-350 dark:border-slate-800 bg-slate-50 dark:bg-[#060b13] py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                         <span>Facebook / Link đăng ký</span>
                         <ExternalLink class="h-3.5 w-3.5" />
                       </a>
                     </div>
 
-                    <div class="flex items-center justify-between border-t border-slate-900/60 pt-3">
-                      <span class="text-xs font-semibold text-slate-400">Trạng thái:</span>
+                    <div class="flex items-center justify-between border-t border-slate-200 dark:border-slate-900/60 pt-3">
+                      <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Trạng thái:</span>
                       <select 
                         :value="lead.status" 
                         @change="updateLeadStatus(lead.id, $event.target.value)"
-                        class="rounded-lg border border-slate-800 bg-[#060b13] px-2.5 py-1 text-xs font-bold focus:outline-none transition-colors"
+                        class="rounded-lg border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-2.5 py-1 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none transition-colors"
                         :class="{
-                          'text-amber-400 border-amber-500/30 bg-amber-500/5': lead.status === 'pending',
-                          'text-blue-400 border-blue-500/30 bg-blue-500/5': lead.status === 'contacting' || lead.status === 'contacted',
-                          'text-emerald-400 border-emerald-500/30 bg-emerald-500/5': lead.status === 'completed'
+                          'text-amber-500 dark:text-amber-400 border-amber-500/30 bg-amber-500/5': lead.status === 'pending',
+                          'text-blue-500 dark:text-blue-400 border-blue-500/30 bg-blue-500/5': lead.status === 'contacting' || lead.status === 'contacted',
+                          'text-emerald-500 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/5': lead.status === 'completed'
                         }"
                       >
                         <option value="pending">Chờ xử lý</option>
@@ -1596,14 +1739,14 @@ const faqs = [
                 </div>
                 
                 <!-- Empty State -->
-                <div v-if="leads.length === 0" class="text-center py-12 px-5">
-                  <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-800 text-slate-400 mb-4">
+                <div v-if="leads.length === 0" class="text-center py-12 px-5 transition-colors">
+                  <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 mb-4">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-4a2 2 0 00-2 2v1a2 2 0 01-2 2H9a2 2 0 01-2-2v-1a2 2 0 00-2-2H2" />
                     </svg>
                   </div>
-                  <h3 class="text-sm font-bold text-white">Chưa có lượt đăng ký nào</h3>
-                  <p class="text-xs text-slate-500 mt-1">Thông tin khách hàng đăng ký tư vấn sẽ xuất hiện tại đây.</p>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">Chưa có lượt đăng ký nào</h3>
+                  <p class="text-xs text-slate-550 dark:text-slate-500 mt-1">Thông tin khách hàng đăng ký tư vấn sẽ xuất hiện tại đây.</p>
                 </div>
               </div>
             </div>
@@ -1611,7 +1754,7 @@ const faqs = [
             <!-- TAB 2: EMPLOYEES (NHÂN VIÊN) -->
             <div v-else-if="activeAdminTab === 'employees' && adminRole === 'admin'" class="space-y-6">
               <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-white">Danh Sách Nhân Viên</h2>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Danh Sách Nhân Viên</h2>
                 <button 
                   @click="openAddEmployeeModal"
                   class="flex h-9 items-center justify-center rounded-lg bg-blue-600 px-4 text-xs font-bold text-white hover:bg-blue-500 transition-colors gap-1.5"
@@ -1622,11 +1765,11 @@ const faqs = [
               </div>
 
               <!-- Employees Table -->
-              <div class="rounded-3xl border border-slate-800 bg-[#0c1524]/40 overflow-hidden">
+              <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524]/40 overflow-hidden transition-colors">
                 <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 uppercase font-bold text-[10px]">
+                      <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px]">
                         <th class="p-4">Họ và tên</th>
                         <th class="p-4">Mật mã đăng nhập</th>
                         <th class="p-4">Trạng thái</th>
@@ -1635,31 +1778,31 @@ const faqs = [
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="emp in employeesList" :key="emp.id" class="border-b border-slate-900/60 hover:bg-slate-900/20 transition-colors">
-                        <td class="p-4 font-black text-white text-[13px]">{{ emp.name }}</td>
-                        <td class="p-4 text-slate-400 font-mono select-all">{{ emp.passcode }}</td>
+                      <tr v-for="emp in employeesList" :key="emp.id" class="border-b border-slate-100 dark:border-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
+                        <td class="p-4 font-black text-slate-900 dark:text-white text-[13px]">{{ emp.name }}</td>
+                        <td class="p-4 text-slate-500 dark:text-slate-400 font-mono select-all">{{ emp.passcode }}</td>
                         <td class="p-4">
                           <span 
                             class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold"
-                            :class="emp.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'"
+                            :class="emp.status === 'active' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'"
                           >
                             {{ emp.status === 'active' ? 'Hoạt động' : 'Tạm khóa' }}
                           </span>
                         </td>
-                        <td class="p-4 text-slate-400">
+                        <td class="p-4 text-slate-500 dark:text-slate-400">
                           {{ new Date(emp.created_at).toLocaleDateString('vi-VN') }}
                         </td>
                         <td class="p-4 text-right space-x-2">
                           <button 
                             @click="openEditEmployeeModal(emp)"
-                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-all"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
                             title="Sửa thông tin"
                           >
                             <Edit class="h-3.5 w-3.5" />
                           </button>
                           <button 
                             @click="deleteEmployee(emp.id)"
-                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-500 dark:text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
                             title="Xóa nhân viên"
                           >
                             <Trash2 class="h-3.5 w-3.5" />
@@ -1677,27 +1820,115 @@ const faqs = [
               </div>
             </div>
 
+            <!-- TAB: BLOG & SEO MANAGEMENT -->
+            <div v-else-if="activeAdminTab === 'blog' && adminRole === 'admin'" class="space-y-6">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Quản Lý Bài Viết & SEO</h2>
+                <button 
+                  @click="openAddBlogModal"
+                  class="flex h-9 items-center justify-center rounded-lg bg-blue-600 px-4 text-xs font-bold text-white hover:bg-blue-500 transition-colors gap-1.5"
+                >
+                  <Plus class="h-3.5 w-3.5" />
+                  Viết bài mới
+                </button>
+              </div>
+
+              <!-- Blog Posts Table -->
+              <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524]/40 overflow-hidden transition-colors">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px]">
+                        <th class="p-4">Bài viết</th>
+                        <th class="p-4">Tóm tắt / SEO Keywords</th>
+                        <th class="p-4">SEO Meta Title & Desc</th>
+                        <th class="p-4">Ngày tạo</th>
+                        <th class="p-4 text-right">Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="post in rawBlogPosts" :key="post.id" class="border-b border-slate-100 dark:border-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
+                        <td class="p-4 flex items-start gap-3">
+                          <img 
+                            :src="post.image_url || 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80'" 
+                            class="w-12 h-12 object-cover rounded-lg border border-slate-200 dark:border-slate-800"
+                            alt="Banner" 
+                          />
+                          <div class="flex flex-col">
+                            <span class="font-black text-slate-900 dark:text-white text-[13px] line-clamp-1">{{ post.title }}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">slug: {{ post.slug }}</span>
+                          </div>
+                        </td>
+                        <td class="p-4 max-w-[200px]">
+                          <p class="text-slate-600 dark:text-slate-350 line-clamp-2 leading-relaxed">{{ post.excerpt || 'Không có tóm tắt.' }}</p>
+                          <div class="mt-1 flex items-center gap-1">
+                            <span class="text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded">
+                              {{ post.meta_keywords || 'Chưa có từ khóa SEO' }}
+                            </span>
+                          </div>
+                        </td>
+                        <td class="p-4 max-w-[250px]">
+                          <div class="flex flex-col gap-0.5">
+                            <span class="font-bold text-slate-850 dark:text-slate-300 text-[11px] line-clamp-1" :class="post.meta_title ? '' : 'text-amber-500 dark:text-amber-450 italic'">
+                              {{ post.meta_title || 'Thiếu SEO Title' }}
+                            </span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-tight">
+                              {{ post.meta_description || 'Chưa thiết lập mô tả SEO' }}
+                            </span>
+                          </div>
+                        </td>
+                        <td class="p-4 text-slate-500 dark:text-slate-400 font-medium">
+                          {{ new Date(post.created_at).toLocaleDateString('vi-VN') }}
+                        </td>
+                        <td class="p-4 text-right space-x-2 whitespace-nowrap">
+                          <button 
+                            @click="openEditBlogModal(post)"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
+                            title="Chỉnh sửa bài viết & SEO"
+                          >
+                            <Edit class="h-3.5 w-3.5" />
+                          </button>
+                          <button 
+                            @click="deleteBlogPost(post.id)"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-500 dark:text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
+                            title="Xóa bài viết"
+                          >
+                            <Trash2 class="h-3.5 w-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                      <tr v-if="rawBlogPosts.length === 0">
+                        <td colspan="5" class="p-8 text-center text-slate-500">
+                          Chưa có bài viết nào trên hệ thống. Hãy tạo bài viết đầu tiên của bạn!
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
             <!-- TAB 3: CUSTOMER CHAT (TIN NHẮN KHÁCH HÀNG) -->
-            <div v-else-if="activeAdminTab === 'chat'" class="grid grid-cols-1 md:grid-cols-12 gap-6 h-[600px] border border-slate-800 rounded-3xl overflow-hidden bg-[#0c1524]/20 backdrop-blur-xl">
+            <div v-else-if="activeAdminTab === 'chat'" class="grid grid-cols-1 md:grid-cols-12 gap-6 h-[600px] border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden bg-white dark:bg-[#0c1524]/20 backdrop-blur-xl transition-colors">
               <!-- Left Panel: Session list -->
-              <div class="md:col-span-4 border-r border-slate-800 flex flex-col h-full bg-[#0c1524]/40">
-                <div class="p-4 border-b border-slate-800 font-black text-white text-sm flex items-center justify-between">
+              <div class="md:col-span-4 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full bg-slate-50/50 dark:bg-[#0c1524]/40">
+                <div class="p-4 border-b border-slate-200 dark:border-slate-800 font-black text-slate-900 dark:text-white text-sm flex items-center justify-between">
                   <span>Phiên Hội Thoại</span>
-                  <span class="text-[10px] text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-full font-bold">
+                  <span class="text-[10px] text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full font-bold">
                     {{ chatSessions.length }}
                   </span>
                 </div>
                 
-                <div class="flex-1 overflow-y-auto divide-y divide-slate-900/60">
+                <div class="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-900/60">
                   <div 
                     v-for="session in chatSessions" 
                     :key="session.session_id"
                     @click="selectChatSession(session.session_id)"
-                    class="p-4 cursor-pointer hover:bg-slate-800/30 transition-all flex flex-col gap-1"
-                    :class="activeSessionId === session.session_id ? 'bg-blue-500/10 border-l-4 border-blue-500' : ''"
+                    class="p-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-all flex flex-col gap-1"
+                    :class="activeSessionId === session.session_id ? 'bg-blue-500/10 dark:bg-blue-500/10 border-l-4 border-blue-500' : ''"
                   >
                     <div class="flex items-center justify-between">
-                      <span class="font-extrabold text-[13px]" :class="session.unread_count > 0 ? 'text-white' : 'text-slate-300'">
+                      <span class="font-extrabold text-[13px]" :class="session.unread_count > 0 ? 'text-slate-900 dark:text-white font-black' : 'text-slate-700 dark:text-slate-300'">
                         {{ session.customer_name }}
                       </span>
                       <span class="text-[9px] text-slate-500 font-medium whitespace-nowrap">
@@ -1705,7 +1936,7 @@ const faqs = [
                       </span>
                     </div>
                     <div class="flex items-center justify-between gap-2">
-                      <p class="text-[11px] text-slate-400 truncate flex-1">
+                      <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate flex-1">
                         {{ session.last_message }}
                       </p>
                       <span 
@@ -1723,11 +1954,11 @@ const faqs = [
               </div>
 
               <!-- Right Panel: Message Thread -->
-              <div class="md:col-span-8 flex flex-col h-full bg-slate-950/20">
+              <div class="md:col-span-8 flex flex-col h-full bg-slate-100/30 dark:bg-slate-950/20">
                 <!-- Thread Header -->
-                <div v-if="activeSessionId" class="p-4 border-b border-slate-800 flex items-center justify-between bg-[#0c1524]/20">
+                <div v-if="activeSessionId" class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-[#0c1524]/20">
                   <div>
-                    <h3 class="font-extrabold text-white text-[13px]">
+                    <h3 class="font-extrabold text-slate-900 dark:text-white text-[13px]">
                       {{ chatSessions.find(s => s.session_id === activeSessionId)?.customer_name || 'Đang hội thoại' }}
                     </h3>
                     <p class="text-[10px] text-slate-500 mt-0.5">ID: {{ activeSessionId }}</p>
@@ -1756,7 +1987,7 @@ const faqs = [
                       </span>
                       <div 
                         class="rounded-2xl px-4 py-2.5 text-xs text-left"
-                        :class="msg.sender_type === 'employee' || msg.sender_type === 'admin' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none'"
+                        :class="msg.sender_type === 'employee' || msg.sender_type === 'admin' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-transparent rounded-tl-none'"
                       >
                         {{ msg.message }}
                       </div>
@@ -1765,13 +1996,13 @@ const faqs = [
                 </div>
 
                 <!-- Input area -->
-                <div v-if="activeSessionId" class="p-4 border-t border-slate-800 bg-[#0c1524]/40">
+                <div v-if="activeSessionId" class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0c1524]/40">
                   <form @submit.prevent="sendAdminMessage" class="flex gap-2">
                     <input 
                       type="text" 
                       v-model="adminChatInput"
                       placeholder="Nhập nội dung tin nhắn gửi khách hàng..."
-                      class="flex-1 rounded-xl border border-slate-800 bg-[#060b13] px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                      class="flex-1 rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
                     />
                     <button 
                       type="submit"
@@ -1786,42 +2017,42 @@ const faqs = [
 
             <!-- Employee Form Modal -->
             <div v-if="showEmployeeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-              <div class="w-full max-w-md rounded-3xl border border-slate-800 bg-[#0c1524] p-6 shadow-2xl">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-                  <h3 class="text-base font-bold text-white">
+              <div class="w-full max-w-md rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-6 shadow-2xl transition-colors">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-4">
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white">
                     {{ employeeForm.id ? 'Cập Nhật Nhân Viên' : 'Thêm Nhân Viên Mới' }}
                   </h3>
-                  <button @click="showEmployeeModal = false" class="text-slate-400 hover:text-white">
+                  <button @click="showEmployeeModal = false" class="text-slate-400 hover:text-slate-650 dark:hover:text-white">
                     <X class="h-5 w-5" />
                   </button>
                 </div>
                 
                 <form @submit.prevent="saveEmployee" class="space-y-4">
                   <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Tên nhân viên</label>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Tên nhân viên</label>
                     <input 
                       type="text" 
                       v-model="employeeForm.name" 
                       placeholder="Nhập tên đầy đủ"
-                      class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                      class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
                     />
                     <p v-if="employeeErrors.name" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ employeeErrors.name }}</p>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Mật mã đăng nhập</label>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Mật mã đăng nhập</label>
                     <input 
                       type="text" 
                       v-model="employeeForm.passcode" 
                       placeholder="Mật mã đăng nhập duy nhất"
-                      class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none font-mono"
+                      class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none font-mono transition-colors"
                     />
                     <p v-if="employeeErrors.passcode" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ employeeErrors.passcode }}</p>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Trạng thái</label>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Trạng thái</label>
                     <select 
                       v-model="employeeForm.status"
-                      class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-3 py-2 text-sm text-white focus:outline-none"
+                      class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none transition-colors"
                     >
                       <option value="active">Hoạt động (Active)</option>
                       <option value="inactive">Tạm khóa (Inactive)</option>
@@ -1832,15 +2063,134 @@ const faqs = [
                     <button 
                       type="button" 
                       @click="showEmployeeModal = false"
-                      class="rounded-xl border border-slate-800 px-4 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800"
+                      class="rounded-xl border border-slate-300 dark:border-slate-800 px-4 py-2 text-xs font-bold text-slate-650 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
                       Hủy bỏ
                     </button>
                     <button 
                       type="submit" 
-                      class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500"
+                      class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 transition-colors"
                     >
                       Lưu thông tin
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Blog Form Modal -->
+            <div v-if="showBlogModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+              <div class="w-full max-w-4xl rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-6 shadow-2xl transition-colors my-8 flex flex-col max-h-[90vh]">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-4 flex-shrink-0">
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <BookOpen class="h-5 w-5 text-blue-500" />
+                    {{ blogForm.id ? 'Cập Nhật Bài Viết & SEO' : 'Viết Bài Mới' }}
+                  </h3>
+                  <button @click="showBlogModal = false" class="text-slate-400 hover:text-slate-650 dark:hover:text-white">
+                    <X class="h-5 w-5" />
+                  </button>
+                </div>
+                
+                <form @submit.prevent="saveBlogPost" class="space-y-6 flex-1 overflow-y-auto pr-1 pb-4">
+                  <!-- Row 1: Title & Image URL -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Tiêu đề bài viết</label>
+                      <input 
+                        type="text" 
+                        v-model="blogForm.title" 
+                        placeholder="Nhập tiêu đề bài viết"
+                        class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                      />
+                      <p v-if="blogErrors.title" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ blogErrors.title }}</p>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Đường dẫn ảnh đại diện (Banner Image URL)</label>
+                      <input 
+                        type="text" 
+                        v-model="blogForm.image_url" 
+                        placeholder="Nhập liên kết ảnh Unsplash hoặc ảnh tải lên"
+                        class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Row 2: Excerpt -->
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Tóm tắt ngắn (Excerpt)</label>
+                    <textarea 
+                      v-model="blogForm.excerpt" 
+                      rows="2"
+                      placeholder="Nhập tóm tắt ngắn hiển thị trên danh sách tin tức (dưới 500 ký tự)"
+                      class="w-full rounded-xl border border-slate-355 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    ></textarea>
+                  </div>
+
+                  <!-- Row 3: Content -->
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Nội dung bài viết (Hỗ trợ HTML)</label>
+                    <textarea 
+                      v-model="blogForm.content" 
+                      rows="8"
+                      placeholder="Nhập nội dung bài viết chi tiết..."
+                      class="w-full rounded-xl border border-slate-355 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none font-mono transition-colors"
+                    ></textarea>
+                    <p v-if="blogErrors.content" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ blogErrors.content }}</p>
+                  </div>
+
+                  <!-- Row 4: SEO Metadata Section -->
+                  <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-900/40 space-y-4">
+                    <div class="flex items-center gap-1.5 border-b border-slate-200 dark:border-slate-800 pb-2 mb-2">
+                      <Globe class="h-4 w-4 text-emerald-500" />
+                      <span class="text-xs font-black text-slate-850 dark:text-slate-200 uppercase tracking-wider">Cấu hình SEO Meta Tags</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meta Title (Tiêu đề SEO)</label>
+                        <input 
+                          type="text" 
+                          v-model="blogForm.meta_title" 
+                          placeholder="Mặc định sử dụng tiêu đề bài viết"
+                          class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meta Keywords (SEO Từ khóa)</label>
+                        <input 
+                          type="text" 
+                          v-model="blogForm.meta_keywords" 
+                          placeholder="Ví dụ: facebook verification, tich xanh, az media"
+                          class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meta Description (Mô tả SEO)</label>
+                      <textarea 
+                        v-model="blogForm.meta_description" 
+                        rows="2"
+                        placeholder="Nhập mô tả SEO phục vụ kết quả tìm kiếm Google (dưới 500 ký tự)"
+                        class="w-full rounded-xl border border-slate-355 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <!-- Footer Buttons inside form -->
+                  <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800 flex-shrink-0">
+                    <button 
+                      type="button" 
+                      @click="showBlogModal = false"
+                      class="rounded-xl border border-slate-300 dark:border-slate-800 px-4 py-2 text-xs font-bold text-slate-650 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      Hủy bỏ
+                    </button>
+                    <button 
+                      type="submit" 
+                      class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/15"
+                    >
+                      {{ blogForm.id ? 'Cập nhật bài viết' : 'Lưu & xuất bản' }}
                     </button>
                   </div>
                 </form>
@@ -1852,24 +2202,24 @@ const faqs = [
 
       <!-- BLOG PAGE -->
       <template v-else-if="selectedPage === 'blog'">
-        <main class="min-h-screen bg-[#060b13] text-slate-100 py-12">
+        <main class="min-h-screen bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-slate-100 py-12 transition-colors duration-300">
           <div class="mx-auto max-w-[760px] px-5">
             <nav class="mb-6 flex items-center gap-2 text-[11px] font-semibold text-slate-500">
               <button @click="closePage" class="hover:text-blue-500">Trang chủ</button>
               <span>/</span>
-              <span class="text-slate-300">Tin tức & Kiến thức</span>
+              <span class="text-slate-700 dark:text-slate-300">Tin tức & Kiến thức</span>
             </nav>
-            <h1 class="text-3xl font-extrabold text-white">Tin Tức & Kiến Thức</h1>
-            <p class="mt-2 text-[13px] font-medium text-slate-400">Cập nhật mới nhất về đăng ký tích xanh Facebook, Instagram, TikTok & WhatsApp</p>
+            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Tin Tức & Kiến Thức</h1>
+            <p class="mt-2 text-[13px] font-medium text-slate-600 dark:text-slate-400">Cập nhật mới nhất về đăng ký tích xanh Facebook, Instagram, TikTok & WhatsApp</p>
             
             <div class="mt-8 grid gap-6 sm:grid-cols-2">
               <article v-for="item in articles" :key="item.id"
-                class="group cursor-pointer rounded-2xl border border-slate-800 bg-[#0c1524] p-5 shadow-sm transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 hover:-translate-y-1"
+                class="group cursor-pointer rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-5 shadow-sm transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 hover:-translate-y-1"
                 @click="selectArticle(item)">
                 <img :src="item.banner" :alt="item.title" class="mb-4 h-40 w-full rounded-xl object-cover" loading="lazy" />
-                <span class="inline-block rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-400">{{ item.category }}</span>
-                <h2 class="mt-2 text-[14px] font-black leading-snug text-white group-hover:text-blue-400 transition-colors">{{ item.title }}</h2>
-                <p class="mt-1.5 text-[11px] font-medium leading-5 text-slate-400 line-clamp-2">{{ item.description }}</p>
+                <span class="inline-block rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400">{{ item.category }}</span>
+                <h2 class="mt-2 text-[14px] font-black leading-snug text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ item.title }}</h2>
+                <p class="mt-1.5 text-[11px] font-medium leading-5 text-slate-500 dark:text-slate-400 line-clamp-2">{{ item.description }}</p>
                 <div class="mt-4 flex items-center gap-2 text-[10px] font-semibold text-slate-500">
                   <span>{{ item.author }}</span><span>·</span><span>{{ item.date }}</span><span>·</span><span>{{ item.readTime }}</span>
                 </div>
@@ -1889,44 +2239,44 @@ const faqs = [
 
       <!-- GIỚI THIỆU PAGE -->
       <template v-else-if="selectedPage === 'gioi-thieu'">
-        <main class="min-h-screen bg-[#060b13] text-slate-100 py-12">
+        <main class="min-h-screen bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-slate-100 py-12 transition-colors duration-300">
           <div class="mx-auto max-w-[760px] px-5">
             <nav class="mb-6 flex items-center gap-2 text-[11px] font-semibold text-slate-500">
               <button @click="closePage" class="hover:text-blue-500">Trang chủ</button>
               <span>/</span>
-              <span class="text-slate-300">Giới thiệu</span>
+              <span class="text-slate-700 dark:text-slate-300">Giới thiệu</span>
             </nav>
-            <h1 class="text-3xl font-extrabold text-white">Về Chúng Tôi</h1>
-            <p class="mt-4 text-[14px] font-medium leading-7 text-slate-300">
+            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Về Chúng Tôi</h1>
+            <p class="mt-4 text-[14px] font-medium leading-7 text-slate-700 dark:text-slate-300">
               <strong>AZ Media</strong> là đơn vị chuyên tư vấn và hỗ trợ đăng ký tích xanh (Meta Verified) cho Fanpage Facebook, Instagram, TikTok và WhatsApp tại Việt Nam. Với 5+ năm kinh nghiệm, chúng tôi đã hỗ trợ hơn <strong>2.368 khách hàng</strong> thành công.
             </p>
             
             <div class="mt-8 grid gap-4 grid-cols-3">
               <div v-for="[num, label] in [['2.368+', 'Khách hàng'], ['100%', 'Tỉ lệ thành công'], ['5+', 'Năm kinh nghiệm']]" :key="label"
-                class="rounded-xl border border-slate-800 bg-[#0c1524] p-5 text-center shadow-sm">
-                <p class="text-2xl font-black text-blue-400">{{ num }}</p>
-                <p class="mt-1 text-[11px] font-semibold text-slate-400">{{ label }}</p>
+                class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-5 text-center shadow-sm transition-colors">
+                <p class="text-2xl font-black text-blue-650 dark:text-blue-400">{{ num }}</p>
+                <p class="mt-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">{{ label }}</p>
               </div>
             </div>
             
-            <div class="mt-8 space-y-6 text-[14px] font-medium leading-7 text-slate-300">
-              <h2 class="text-xl font-extrabold text-white">Cam kết của chúng tôi</h2>
+            <div class="mt-8 space-y-6 text-[14px] font-medium leading-7 text-slate-700 dark:text-slate-300">
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Cam kết của chúng tôi</h2>
               <ul class="space-y-3.5">
                 <li v-for="item in ['Làm xong tích xanh mới thu phí — không mất tiền oan', 'Không yêu cầu mật khẩu, đảm bảo an toàn tài khoản', 'Hỗ trợ 24/7, bảo hành trọn đời', 'Chỉ dùng phương pháp chính thức của Meta']" :key="item"
                   class="flex items-start gap-2.5">
-                  <span class="mt-0.5 text-emerald-400">✓</span>
+                  <span class="mt-0.5 text-emerald-500 dark:text-emerald-400">✓</span>
                   <span>{{ item }}</span>
                 </li>
               </ul>
               
-              <h2 class="mt-8 text-xl font-extrabold text-white">Thông tin công ty</h2>
-              <div class="rounded-xl border border-slate-800 bg-[#0c1524] p-6 space-y-3 text-[13px]">
-                <p><strong class="text-white">Mã số doanh nghiệp:</strong> 0314247738 — 002</p>
-                <p><strong class="text-white">Địa chỉ ĐKKD:</strong> 127 Lê Trọng Tấn, Phường An Khê, Đà Nẵng</p>
-                <p><strong class="text-white">Văn phòng giao dịch:</strong> 84 Nguyễn Hữu Dật, Hòa Cường Bắc, Hải Châu, Đà Nẵng</p>
-                <p><strong class="text-white">Điện thoại:</strong> <a href="tel:0968825068" class="text-blue-400 hover:underline">0968.825.068</a> (Mr. Quang — CEO)</p>
-                <p><strong class="text-white">Email:</strong> <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></p>
-                <p><strong class="text-white">Facebook:</strong> <a href="https://fb.com/congtyazmedia" target="_blank" class="text-blue-400 hover:underline">fb.com/congtyazmedia</a></p>
+              <h2 class="mt-8 text-xl font-extrabold text-slate-900 dark:text-white">Thông tin công ty</h2>
+              <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1524] p-6 space-y-3 text-[13px] transition-colors">
+                <p><strong class="text-slate-900 dark:text-white">Mã số doanh nghiệp:</strong> 0314247738 — 002</p>
+                <p><strong class="text-slate-900 dark:text-white">Địa chỉ ĐKKD:</strong> 127 Lê Trọng Tấn, Phường An Khê, Đà Nẵng</p>
+                <p><strong class="text-slate-900 dark:text-white">Văn phòng giao dịch:</strong> 84 Nguyễn Hữu Dật, Hòa Cường Bắc, Hải Châu, Đà Nẵng</p>
+                <p><strong class="text-slate-900 dark:text-white">Điện thoại:</strong> <a href="tel:0968825068" class="text-blue-650 dark:text-blue-400 hover:underline">0968.825.068</a> (Mr. Quang — CEO)</p>
+                <p><strong class="text-slate-900 dark:text-white">Email:</strong> <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-650 dark:text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></p>
+                <p><strong class="text-slate-900 dark:text-white">Facebook:</strong> <a href="https://fb.com/congtyazmedia" target="_blank" class="text-blue-650 dark:text-blue-400 hover:underline">fb.com/congtyazmedia</a></p>
               </div>
             </div>
           </div>
@@ -1935,56 +2285,56 @@ const faqs = [
 
       <!-- LEGAL PAGES -->
       <template v-else-if="selectedPage && selectedPage.startsWith('legal-')">
-        <main class="min-h-screen bg-[#060b13] text-slate-100 py-12">
+        <main class="min-h-screen bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-slate-100 py-12 transition-colors duration-300">
           <div class="mx-auto max-w-[760px] px-5">
             <nav class="mb-6 flex items-center gap-2 text-[11px] font-semibold text-slate-500">
               <button @click="closePage" class="hover:text-blue-500">Trang chủ</button>
               <span>/</span>
-              <span class="text-slate-300">{{ selectedPage === 'legal-terms' ? 'Điều khoản dịch vụ' : selectedPage === 'legal-privacy' ? 'Chính sách bảo mật' : 'DMCA' }}</span>
+              <span class="text-slate-700 dark:text-slate-300">{{ selectedPage === 'legal-terms' ? 'Điều khoản dịch vụ' : selectedPage === 'legal-privacy' ? 'Chính sách bảo mật' : 'DMCA' }}</span>
             </nav>
             
             <!-- TERMS -->
             <template v-if="selectedPage === 'legal-terms'">
-              <h1 class="text-3xl font-extrabold text-white">Điều Khoản Dịch Vụ</h1>
-              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-300">
+              <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Điều Khoản Dịch Vụ</h1>
+              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-700 dark:text-slate-300">
                 <p>Bằng việc sử dụng dịch vụ của <strong>Đăng Ký Tích Xanh (AZ Media)</strong>, bạn đồng ý với các điều khoản sau:</p>
-                <h2 class="text-base font-bold text-white mt-6">1. Phạm vi dịch vụ</h2>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">1. Phạm vi dịch vụ</h2>
                 <p>Chúng tôi cung cấp dịch vụ tư vấn và hỗ trợ đăng ký tích xanh (Meta Verified) cho Fanpage Facebook, Instagram, TikTok và WhatsApp Business thông qua các phương pháp chính thức của Meta.</p>
-                <h2 class="text-base font-bold text-white mt-6">2. Chính sách thanh toán</h2>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">2. Chính sách thanh toán</h2>
                 <p>Khách hàng <strong>chỉ thanh toán sau khi tích xanh đã hiển thị thành công</strong> trên tài khoản. Không thu bất kỳ khoản tiền nào trước khi hoàn thành.</p>
-                <h2 class="text-base font-bold text-white mt-6">3. Bảo hành & hỗ trợ</h2>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">3. Bảo hành & hỗ trợ</h2>
                 <p>Chúng tôi cam kết hỗ trợ trọn đời trong trường hợp tích xanh bị mất do lỗi kỹ thuật từ phía chúng tôi.</p>
-                <h2 class="text-base font-bold text-white mt-6">4. Giới hạn trách nhiệm</h2>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">4. Giới hạn trách nhiệm</h2>
                 <p>Chúng tôi không chịu trách nhiệm cho các thay đổi chính sách đột ngột từ phía Meta/Facebook làm ảnh hưởng đến tích xanh sau khi đã hoàn thành dịch vụ.</p>
               </div>
             </template>
             
             <!-- PRIVACY -->
             <template v-else-if="selectedPage === 'legal-privacy'">
-              <h1 class="text-3xl font-extrabold text-white">Chính Sách Bảo Mật</h1>
-              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-300">
+              <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Chính Sách Bảo Mật</h1>
+              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-700 dark:text-slate-300">
                 <p>Chúng tôi cam kết bảo vệ thông tin cá nhân của khách hàng theo các nguyên tắc sau:</p>
-                <h2 class="text-base font-bold text-white mt-6">1. Thông tin thu thập</h2>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">1. Thông tin thu thập</h2>
                 <p>Chúng tôi chỉ thu thập: Họ tên, số điện thoại, link Fanpage/tài khoản cần đăng ký. <strong>Tuyệt đối không yêu cầu mật khẩu.</strong></p>
-                <h2 class="text-base font-bold text-white mt-6">2. Mục đích sử dụng</h2>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">2. Mục đích sử dụng</h2>
                 <p>Thông tin chỉ được dùng để liên hệ tư vấn và thực hiện dịch vụ. Không chia sẻ cho bên thứ ba.</p>
-                <h2 class="text-base font-bold text-white mt-6">3. Bảo mật dữ liệu</h2>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">3. Bảo mật dữ liệu</h2>
                 <p>Thông tin khách hàng được lưu trữ an toàn và xóa sau khi hoàn thành dịch vụ theo yêu cầu.</p>
-                <h2 class="text-base font-bold text-white mt-6">4. Liên hệ</h2>
-                <p>Mọi thắc mắc về bảo mật: <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></p>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">4. Liên hệ</h2>
+                <p>Mọi thắc mắc về bảo mật: <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-650 dark:text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></p>
               </div>
             </template>
             
             <!-- DMCA -->
             <template v-else>
-              <h1 class="text-3xl font-extrabold text-white">DMCA</h1>
-              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-300">
+              <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">DMCA</h1>
+              <div class="mt-6 space-y-5 text-[14px] leading-7 text-slate-700 dark:text-slate-300">
                 <p>Tất cả nội dung trên website <strong>dangkytichxanh.vn</strong> bao gồm văn bản, hình ảnh, logo và thiết kế đều thuộc quyền sở hữu của AZ Media.</p>
-                <h2 class="text-base font-bold text-white mt-6">Báo cáo vi phạm bản quyền</h2>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white mt-6">Báo cáo vi phạm bản quyền</h2>
                 <p>Nếu bạn phát hiện nội dung của chúng tôi bị sao chép trái phép, vui lòng liên hệ:</p>
                 <ul class="space-y-1.5 pl-4 list-disc">
-                  <li>Email: <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></li>
-                  <li>Hotline: <a href="tel:0968825068" class="text-blue-400 hover:underline">0968.825.068</a></li>
+                  <li>Email: <a href="mailto:azmedia.com.vn@gmail.com" class="text-blue-650 dark:text-blue-400 hover:underline">azmedia.com.vn@gmail.com</a></li>
+                  <li>Hotline: <a href="tel:0968825068" class="text-blue-650 dark:text-blue-400 hover:underline">0968.825.068</a></li>
                 </ul>
                 <p>Chúng tôi sẽ xử lý trong vòng 72 giờ làm việc.</p>
               </div>
@@ -2185,7 +2535,7 @@ const faqs = [
       </section>
 
       <!-- Bài viết hữu ích (Useful Articles) Section -->
-      <section id="tin-tuc" class="py-20 bg-white dark:bg-[#060b13] relative overflow-hidden border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
+      <section v-if="enableBlog" id="tin-tuc" class="py-20 bg-white dark:bg-[#060b13] relative overflow-hidden border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <!-- Heading -->
           <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
@@ -2471,7 +2821,7 @@ const faqs = [
       </template>
     </template>
 
-    <template v-else>
+    <template v-else-if="enableBlog">
       <ArticleView 
         :article="selectedArticle" 
         :allArticles="articles" 
@@ -2884,7 +3234,7 @@ const faqs = [
 
     <!-- Customer Chat Window Panel -->
     <div 
-      class="fixed bottom-24 right-6 z-50 w-[350px] max-w-[calc(100vw-2rem)] h-[480px] rounded-3xl border border-slate-800 bg-[#0c1524]/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform"
+      class="fixed bottom-24 right-6 z-50 w-[350px] max-w-[calc(100vw-2rem)] h-[480px] rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0c1524]/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform"
       :class="isCustomerChatOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-90 pointer-events-none'"
     >
       <!-- Chat Header -->
@@ -2902,16 +3252,16 @@ const faqs = [
       </div>
 
       <!-- Chat Body -->
-      <div class="flex-1 flex flex-col min-h-0 bg-[#060b13]/40">
+      <div class="flex-1 flex flex-col min-h-0 bg-slate-50/40 dark:bg-[#060b13]/40">
         
         <!-- Welcome / Input Name Screen -->
         <div v-if="!customerNameEntered" class="flex-1 flex flex-col justify-center p-6 text-center space-y-4">
-          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
             <MessageSquare class="h-6 w-6" />
           </div>
           <div>
-            <h5 class="text-xs font-bold text-white">Bắt Đầu Trò Chuyện</h5>
-            <p class="text-[10px] text-slate-400 mt-1">Vui lòng nhập tên của bạn để nhân viên tiện tư vấn hỗ trợ đăng ký tích xanh.</p>
+            <h5 class="text-xs font-bold text-slate-900 dark:text-white">Bắt Đầu Trò Chuyện</h5>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Vui lòng nhập tên của bạn để nhân viên tiện tư vấn hỗ trợ đăng ký tích xanh.</p>
           </div>
           
           <form @submit.prevent="enterCustomerName" class="space-y-3">
@@ -2920,7 +3270,7 @@ const faqs = [
               v-model="customerNameInput"
               placeholder="Tên của bạn..."
               required
-              class="w-full rounded-xl border border-slate-800 bg-[#060b13] px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
             />
             <button 
               type="submit"
@@ -2939,7 +3289,7 @@ const faqs = [
             class="flex-1 p-4 overflow-y-auto space-y-3"
           >
             <div class="text-center py-2">
-              <span class="inline-block bg-slate-900/60 text-[9px] text-slate-500 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+              <span class="inline-block bg-slate-100 dark:bg-slate-900/60 text-[9px] text-slate-600 dark:text-slate-500 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
                 Kết nối thành công với: {{ customerNameEntered }}
               </span>
             </div>
@@ -2959,7 +3309,7 @@ const faqs = [
               </span>
               <div 
                 class="rounded-2xl px-3 py-2 text-xs text-left"
-                :class="msg.sender_type === 'customer' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none'"
+                :class="msg.sender_type === 'customer' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-transparent rounded-tl-none'"
               >
                 {{ msg.message }}
               </div>
@@ -2967,14 +3317,14 @@ const faqs = [
           </div>
 
           <!-- Input area -->
-          <div class="p-3 border-t border-slate-800/80 bg-[#0c1524]/60">
+          <div class="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0c1524]/60">
             <form @submit.prevent="sendCustomerMessage" class="flex gap-2">
               <input 
                 type="text" 
                 v-model="customerChatInput"
                 placeholder="Nhập câu hỏi của bạn..."
                 required
-                class="flex-1 rounded-xl border border-slate-800 bg-[#060b13] px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                class="flex-1 rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-450 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
               />
               <button 
                 type="submit"

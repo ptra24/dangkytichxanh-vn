@@ -12,5 +12,8 @@ class BlogPost extends Model
         'content',
         'excerpt',
         'image_url',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
     ];
 }

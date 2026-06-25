@@ -9,6 +9,9 @@
             document.documentElement.classList.add('dark');
         }
     </script>
+    <script>
+        window.ENABLE_BLOG = {{ env('ENABLE_BLOG', true) ? 'true' : 'false' }};
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Đăng Ký Tích Xanh Fanpage, Instagram 15 Phút | Đăng Ký Tích Xanh</title>
     <meta name="description" content="Đăng ký tích xanh Facebook, Instagram 15 phút. Không cần báo chí, làm xong thanh toán. Tỉ lệ thành công vượt trội, 2.368 khách. Hotline 0968.825.068.">

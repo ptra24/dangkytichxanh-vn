@@ -62,22 +62,35 @@ class ChatController extends Controller
             'is_read' => false
         ]);
 
-        // Tự động phản hồi để phục vụ kiểm thử và tạo dữ liệu thực tế cho Admin
-        $autoReplies = [
-            "Chào bạn {$customerName}, cảm ơn bạn đã liên hệ dịch vụ Đăng ký Tích xanh. Yêu cầu của bạn đang được chuyển đến nhân viên hỗ trợ trực tuyến!",
-            "Xin chào! Nhân viên hỗ trợ của chúng tôi sẽ online và tư vấn trực tiếp cho bạn sau ít phút. Bạn vui lòng để lại số điện thoại/link fanpage để chúng tôi tiện liên hệ nhé.",
-            "Chào bạn, AZ Media đã nhận được lời nhắn của bạn. Chúng tôi sẽ phản hồi lại ngay lập tức qua Zalo hoặc trực tiếp tại khung chat này."
-        ];
-        $replyText = $autoReplies[array_rand($autoReplies)];
+        // Kiểm tra xem đã có tin nhắn từ nhân viên thực tế chưa
+        $hasHumanReplied = ChatMessage::where('session_id', $request->session_id)
+            ->where('sender_type', 'employee')
+            ->where('sender_name', '!=', 'Hệ thống tự động')
+            ->exists();
 
-        ChatMessage::create([
-            'session_id' => $request->session_id,
-            'customer_name' => $customerName,
-            'sender_type' => 'employee',
-            'sender_name' => 'Hệ thống tự động',
-            'message' => $replyText,
-            'is_read' => false // Để hiện thông báo đỏ chưa đọc phía Khách hàng
-        ]);
+        // Kiểm tra xem đã gửi tin nhắn tự động chưa
+        $hasAutoReplied = ChatMessage::where('session_id', $request->session_id)
+            ->where('sender_name', 'Hệ thống tự động')
+            ->exists();
+
+        if (!$hasHumanReplied && !$hasAutoReplied) {
+            // Tự động phản hồi để phục vụ kiểm thử và tạo dữ liệu thực tế cho Admin
+            $autoReplies = [
+                "Chào bạn {$customerName}, cảm ơn bạn đã liên hệ dịch vụ Đăng ký Tích xanh. Yêu cầu của bạn đang được chuyển đến nhân viên hỗ trợ trực tuyến!",
+                "Xin chào! Nhân viên hỗ trợ của chúng tôi sẽ online và tư vấn trực tiếp cho bạn sau ít phút. Bạn vui lòng để lại số điện thoại/link fanpage để chúng tôi tiện liên hệ nhé.",
+                "Chào bạn, AZ Media đã nhận được lời nhắn của bạn. Chúng tôi sẽ phản hồi lại ngay lập tức qua Zalo hoặc trực tiếp tại khung chat này."
+            ];
+            $replyText = $autoReplies[array_rand($autoReplies)];
+
+            ChatMessage::create([
+                'session_id' => $request->session_id,
+                'customer_name' => $customerName,
+                'sender_type' => 'employee',
+                'sender_name' => 'Hệ thống tự động',
+                'message' => $replyText,
+                'is_read' => false // Để hiện thông báo đỏ chưa đọc phía Khách hàng
+            ]);
+        }
 
         return response()->json([
             'success' => true,

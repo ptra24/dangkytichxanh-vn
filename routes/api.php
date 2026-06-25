@@ -28,6 +28,11 @@ Route::get('/admin/contacts', [ContactController::class, 'index']);
 Route::put('/admin/contacts/{id}', [ContactController::class, 'update']);
 Route::delete('/admin/contacts/{id}', [ContactController::class, 'destroy']); // Phân quyền thêm trong Controller
 
+// Quản lý Blog (Yêu cầu Header X-Admin-Passcode)
+Route::post('/admin/blog', [BlogController::class, 'store']);
+Route::put('/admin/blog/{id}', [BlogController::class, 'update']);
+Route::delete('/admin/blog/{id}', [BlogController::class, 'destroy']);
+
 // Quản lý Nhân viên (Yêu cầu passcode Admin)
 Route::get('/admin/employees', [EmployeeController::class, 'index']);
 Route::post('/admin/employees', [EmployeeController::class, 'store']);

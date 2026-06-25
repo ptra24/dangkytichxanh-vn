@@ -1,18 +1,18 @@
 {
   "logo.png": {
-    "file": "assets/logo-C6fIJis9.png",
+    "file": "assets/logo-CaLAdCHy.png",
     "src": "logo.png"
   },
   "resources/js/app.js": {
-    "file": "assets/app-C_J-OF8f.js",
+    "file": "assets/app-3zv8nlBj.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-C-jp8vBq.css"
+      "assets/app-CAseQW5X.css"
     ],
     "assets": [
-      "assets/logo-C6fIJis9.png"
+      "assets/logo-CaLAdCHy.png"
     ]
   }
 }

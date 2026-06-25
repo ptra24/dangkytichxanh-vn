@@ -137,15 +137,18 @@ const checkBgColor = computed(() => {
               <!-- Avatar with verification badge -->
               <div class="relative mb-4">
                 <div 
-                  class="flex h-20 w-20 items-center justify-center rounded-full font-sans text-2xl font-black tracking-wider text-white shadow-inner transition-transform duration-500"
+                  class="flex h-20 w-20 items-center justify-center rounded-full font-sans text-2xl font-black tracking-wider text-white shadow-inner transition-transform duration-500 overflow-hidden"
                   :class="{
-                    'bg-blue-600': service.id.startsWith('facebook'),
-                    'bg-gradient-to-tr from-purple-600 via-pink-500 to-yellow-500': service.id === 'instagram',
-                    'bg-slate-950 border border-slate-800': service.id === 'tiktok',
-                    'bg-emerald-600': service.id === 'whatsapp'
+                    'bg-blue-600': !service.mockup.avatarImage && service.id.startsWith('facebook'),
+                    'bg-gradient-to-tr from-purple-600 via-pink-500 to-yellow-500': !service.mockup.avatarImage && service.id === 'instagram',
+                    'bg-slate-950 border border-slate-800': !service.mockup.avatarImage && service.id === 'tiktok',
+                    'bg-emerald-600': !service.mockup.avatarImage && service.id === 'whatsapp'
                   }"
                 >
-                  {{ service.mockup.avatarLetters }}
+                  <img v-if="service.mockup.avatarImage" :src="service.mockup.avatarImage" alt="Avatar" class="h-full w-full object-cover" />
+                  <template v-else>
+                    {{ service.mockup.avatarLetters }}
+                  </template>
                 </div>
                 
                 <!-- Verification Check Badge at the bottom right corner of avatar -->

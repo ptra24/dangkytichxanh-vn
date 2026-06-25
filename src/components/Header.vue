@@ -79,6 +79,8 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
 });
+
+const showBlog = ref(typeof window !== 'undefined' ? window.ENABLE_BLOG !== false : true);
 </script>
 
 <template>
@@ -193,7 +195,7 @@ onUnmounted(() => {
         <a href="#loi-ich" @click.prevent="emit('navigate-section', 'loi-ich')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Lợi ích</a>
         <a href="#bang-gia" @click.prevent="emit('navigate-section', 'bang-gia')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Bảng giá</a>
         <a href="#quy-trinh" @click.prevent="emit('navigate-section', 'quy-trinh')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Quy trình</a>
-        <a href="#tin-tuc" @click.prevent="emit('navigate-section', 'tin-tuc')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Tin tức</a>
+        <a v-if="showBlog" href="#tin-tuc" @click.prevent="emit('navigate-section', 'tin-tuc')" class="text-sm font-medium text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors">Tin tức</a>
       </nav>
 
       <!-- Right Header Actions (Desktop) -->
@@ -357,6 +359,7 @@ onUnmounted(() => {
         Quy trình
       </a>
       <a 
+        v-if="showBlog"
         href="#tin-tuc" 
         @click.prevent="emit('navigate-section', 'tin-tuc'); isMobileMenuOpen = false" 
         class="block rounded-lg px-3 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors"
