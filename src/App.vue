@@ -1420,13 +1420,13 @@ const faqs = [
                     type="text" 
                     v-model="loginUsername" 
                     placeholder="Tên đăng nhập" 
-                    class="w-full rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    class="w-full rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-6 py-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
                   />
                   <input 
                     type="password" 
                     v-model="loginPassword" 
                     placeholder="Mật khẩu" 
-                    class="w-full rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    class="w-full rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#060b13] px-6 py-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
                   />
                   <p v-if="adminError" class="mt-2 text-xs font-semibold text-rose-500 text-left flex items-center gap-1">
                     <span class="text-rose-500">⚠</span> {{ adminError }}
@@ -2705,7 +2705,7 @@ const faqs = [
                       v-model="contactName"
                       placeholder="Nguyễn Văn A"
                       required
-                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50"
+                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-6 py-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50"
                     />
                   </div>
 
@@ -2719,7 +2719,7 @@ const faqs = [
                       maxlength="11"
                       placeholder="0912345678"
                       required
-                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50"
+                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-6 py-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50"
                     />
                   </div>
 
@@ -2729,7 +2729,7 @@ const faqs = [
                       v-model="contactNote"
                       placeholder="VD: Tôi muốn đăng ký tích xanh cho Fanpage ABC..."
                       rows="3"
-                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50 resize-none"
+                      class="w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#141f36] px-6 py-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9aa8c7] transition-colors focus:border-orange-400 dark:focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-orange-400/50 dark:focus:ring-blue-500/50 resize-none"
                     ></textarea>
                   </div>
 
@@ -2859,7 +2859,7 @@ const faqs = [
                   v-model="name"
                   placeholder="Nguyễn Văn A"
                   required
-                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-6 py-3.5 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
@@ -2877,7 +2877,7 @@ const faqs = [
                   required
                   pattern="[0-9]{9,11}"
                   title="Vui lòng nhập số điện thoại hợp lệ từ 9 đến 11 số"
-                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-6 py-3.5 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
@@ -2888,7 +2888,7 @@ const faqs = [
                 <select 
                   v-model="formServiceIndex" 
                   required
-                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 px-6 py-3.5 text-sm text-slate-900 dark:text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   <option value="" disabled class="text-slate-500 dark:bg-slate-900">-- Chọn dịch vụ --</option>
                   
