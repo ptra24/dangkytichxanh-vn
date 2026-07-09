@@ -7,12 +7,19 @@ const props = defineProps({
   modelValue: {
     type: String,
     default: ''
+  },
+  adminPasscode: {
+    type: String,
+    default: ''
   }
 });
 
 const emit = defineEmits(['update:modelValue']);
 
 const editorContainer = ref(null);
+const imageInput = ref(null);
+const uploading = ref(false);
+const uploadError = ref('');
 let quill = null;
 let isUpdatingFromOutside = false;
 
@@ -23,9 +30,55 @@ const toolbarOptions = [
   [{ list: 'ordered' }, { list: 'bullet' }],
   [{ indent: '-1' }, { indent: '+1' }],
   ['blockquote', 'code-block'],
-  ['link'],
+  ['link', 'image'],
   ['clean']
 ];
+
+// Custom image upload handler
+const handleImageUpload = () => {
+  imageInput.value.click();
+};
+
+const onFileSelected = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Reset input so same file can be re-selected
+  event.target.value = '';
+
+  uploading.value = true;
+  uploadError.value = '';
+
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const res = await fetch('/api/admin/upload-image', {
+      method: 'POST',
+      headers: {
+        'X-Admin-Passcode': props.adminPasscode
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      // Insert image into editor at current cursor position
+      const range = quill.getSelection(true);
+      quill.insertEmbed(range.index, 'image', data.url);
+      quill.setSelection(range.index + 1);
+    } else {
+      uploadError.value = data.message || 'Upload thất bại';
+      setTimeout(() => { uploadError.value = ''; }, 4000);
+    }
+  } catch (err) {
+    uploadError.value = 'Lỗi kết nối, thử lại.';
+    setTimeout(() => { uploadError.value = ''; }, 4000);
+  } finally {
+    uploading.value = false;
+  }
+};
 
 onMounted(async () => {
   await nextTick();
@@ -34,11 +87,16 @@ onMounted(async () => {
     theme: 'snow',
     placeholder: 'Viết nội dung bài viết tại đây...',
     modules: {
-      toolbar: toolbarOptions
+      toolbar: {
+        container: toolbarOptions,
+        handlers: {
+          image: handleImageUpload
+        }
+      }
     }
   });
 
-  // Load initial content using dangerouslyPasteHTML (proper Quill v2 way)
+  // Load initial content
   if (props.modelValue && props.modelValue.trim()) {
     isUpdatingFromOutside = true;
     quill.clipboard.dangerouslyPasteHTML(props.modelValue);
@@ -53,7 +111,7 @@ onMounted(async () => {
   });
 });
 
-// Watch for external value changes (e.g. modal re-open with different article)
+// Watch for external value changes
 watch(() => props.modelValue, (newVal) => {
   if (!quill) return;
   const currentHtml = quill.root.innerHTML;
@@ -76,11 +134,34 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="rich-editor-wrapper">
+    <!-- Hidden file input for image upload -->
+    <input
+      ref="imageInput"
+      type="file"
+      accept="image/jpeg,image/png,image/gif,image/webp"
+      class="hidden"
+      @change="onFileSelected"
+    />
+
+    <!-- Upload status -->
+    <div v-if="uploading" class="flex items-center gap-2 mb-2 text-xs text-blue-600 dark:text-blue-400 font-semibold">
+      <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+      </svg>
+      Đang tải ảnh lên...
+    </div>
+    <div v-if="uploadError" class="mb-2 text-xs text-rose-500 font-semibold">
+      ⚠ {{ uploadError }}
+    </div>
+
     <div ref="editorContainer"></div>
   </div>
 </template>
 
 <style scoped>
+.hidden { display: none; }
+
 .rich-editor-wrapper :deep(.ql-toolbar) {
   border-top-left-radius: 0.75rem;
   border-top-right-radius: 0.75rem;
@@ -113,7 +194,14 @@ onBeforeUnmount(() => {
   font-style: normal;
 }
 
-/* Dark mode via .dark class on html (Tailwind dark mode) */
+.rich-editor-wrapper :deep(.ql-editor img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+/* Dark mode */
 :global(.dark) .rich-editor-wrapper :deep(.ql-toolbar) {
   background: #0c1524;
   border-color: rgb(51 65 85 / 0.8);

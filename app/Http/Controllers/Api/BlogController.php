@@ -202,4 +202,43 @@ class BlogController extends Controller
             'message' => 'Xóa bài viết thành công.'
         ]);
     }
+
+    /**
+     * Upload an image for use in blog post content (Admin only).
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadImage(Request $request)
+    {
+        $user = $this->getAuthorizedUser($request);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+        if ($user['role'] !== 'admin') {
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        }
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // max 5MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first('image')
+            ], 422);
+        }
+
+        $file = $request->file('image');
+        $filename = time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('blog-images', $filename, 'public');
+
+        $url = asset('storage/' . $path);
+
+        return response()->json([
+            'success' => true,
+            'url' => $url,
+        ]);
+    }
 }

@@ -32,6 +32,7 @@ Route::delete('/admin/contacts/{id}', [ContactController::class, 'destroy']); //
 Route::post('/admin/blog', [BlogController::class, 'store']);
 Route::put('/admin/blog/{id}', [BlogController::class, 'update']);
 Route::delete('/admin/blog/{id}', [BlogController::class, 'destroy']);
+Route::post('/admin/upload-image', [BlogController::class, 'uploadImage']);
 
 // Quản lý Nhân viên (Yêu cầu passcode Admin)
 Route::get('/admin/employees', [EmployeeController::class, 'index']);

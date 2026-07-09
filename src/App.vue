@@ -2131,7 +2131,7 @@ const faqs = [
                   <!-- Row 3: Content -->
                   <div>
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Nội dung bài viết</label>
-                    <RichTextEditor v-model="blogForm.content" />
+                    <RichTextEditor v-model="blogForm.content" :adminPasscode="adminPasscode" />
                     <p v-if="blogErrors.content" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ blogErrors.content }}</p>
                   </div>
 
