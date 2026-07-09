@@ -1390,6 +1390,7 @@ const faqs = [
   <div id="top" class="min-h-screen bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-slate-100 flex flex-col selection:bg-orange-500/30 selection:text-orange-900 dark:selection:bg-blue-600/30 dark:selection:text-blue-200 transition-colors duration-300">
     <!-- Header component -->
     <Header 
+      v-if="!(selectedPage === 'admin' && !isAdminAuthenticated)"
       :currentServiceIndex="currentServiceIndex" 
       @select-service="selectService" 
       @toggle-theme="handleToggleTheme" 
@@ -2801,6 +2802,7 @@ const faqs = [
 
     <!-- Footer component -->
     <Footer 
+      v-if="!(selectedPage === 'admin' && !isAdminAuthenticated)"
       @open-register="openModal" 
       @open-page="openPage" 
       @select-service="selectService" 

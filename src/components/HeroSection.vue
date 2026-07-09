@@ -113,7 +113,7 @@ const checkBgColor = computed(() => {
 
             <a 
               href="tel:0968825068" 
-              class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200/50 hover:border-slate-300 text-slate-800 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 dark:hover:border-white/20 dark:text-white transition-all duration-300 transform active:scale-98"
+              class="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200/50 hover:border-slate-300 text-slate-800 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 dark:hover:border-white/20 dark:text-white transition-all duration-300 transform active:scale-98"
             >
               <Phone class="h-5 w-5 text-slate-500 dark:text-slate-400 fill-slate-500/10 dark:fill-slate-400/10" />
               0968.825.068
