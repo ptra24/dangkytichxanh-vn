@@ -3106,6 +3106,7 @@ const faqs = [
 
     <!-- Social Proof Notification (Bottom-Left) -->
     <div 
+      v-if="selectedPage !== 'admin'"
       class="fixed bottom-6 left-6 z-40 max-w-[320px] rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0c1524]/90 backdrop-blur-xl p-4 shadow-2xl transition-all duration-500 flex items-center gap-3"
       :class="showSocialProof && socialProofData ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-12 opacity-0 scale-95 pointer-events-none'"
     >
@@ -3134,7 +3135,7 @@ const faqs = [
     </div>
 
     <!-- Floating Contact Actions & Chat Toggle (Bottom-Right) -->
-    <div class="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 pointer-events-none">
+    <div v-if="selectedPage !== 'admin'" class="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 pointer-events-none">
       
       <!-- Hotline floating bubble -->
       <a 
@@ -3203,6 +3204,7 @@ const faqs = [
 
     <!-- Customer Chat Window Panel -->
     <div 
+      v-if="selectedPage !== 'admin'"
       class="fixed bottom-24 right-6 z-50 w-[350px] max-w-[calc(100vw-2rem)] h-[480px] rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0c1524]/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform"
       :class="isCustomerChatOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-90 pointer-events-none'"
     >
