@@ -211,6 +211,37 @@ const blogForm = ref({
   meta_keywords: ''
 });
 const blogErrors = ref({});
+const bannerUploading = ref(false);
+const bannerUploadError = ref('');
+
+const uploadBannerImage = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+  bannerUploading.value = true;
+  bannerUploadError.value = '';
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+    const res = await fetch('/api/admin/upload-image', {
+      method: 'POST',
+      headers: { 'X-Admin-Passcode': adminPasscode.value },
+      body: formData
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      blogForm.value.image_url = data.url;
+    } else {
+      bannerUploadError.value = data.message || 'Upload thất bại';
+      setTimeout(() => { bannerUploadError.value = ''; }, 4000);
+    }
+  } catch (err) {
+    bannerUploadError.value = 'Lỗi kết nối, thử lại.';
+    setTimeout(() => { bannerUploadError.value = ''; }, 4000);
+  } finally {
+    bannerUploading.value = false;
+  }
+};
 
 const loginUsername = ref('');
 const loginPassword = ref('');
@@ -2107,13 +2138,28 @@ const faqs = [
                       <p v-if="blogErrors.title" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ blogErrors.title }}</p>
                     </div>
                     <div>
-                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Đường dẫn ảnh đại diện (Banner Image URL)</label>
-                      <input 
-                        type="text" 
-                        v-model="blogForm.image_url" 
-                        placeholder="Nhập liên kết ảnh Unsplash hoặc ảnh tải lên"
-                        class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
-                      />
+                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Ảnh đại diện bài viết (Banner)</label>
+                      <!-- Upload or paste URL -->
+                      <div class="flex gap-2">
+                        <input 
+                          type="text" 
+                          v-model="blogForm.image_url" 
+                          placeholder="Dán link ảnh hoặc tải lên..."
+                          class="flex-1 rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                        />
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-2 text-xs font-bold text-blue-600 dark:text-blue-400 transition-colors whitespace-nowrap">
+                          <svg v-if="!bannerUploading" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                          <svg v-else class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                          {{ bannerUploading ? 'Đang tải...' : 'Tải ảnh lên' }}
+                          <input type="file" accept="image/*" class="hidden" @change="uploadBannerImage" :disabled="bannerUploading" />
+                        </label>
+                      </div>
+                      <p v-if="bannerUploadError" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ bannerUploadError }}</p>
+                      <!-- Preview -->
+                      <div v-if="blogForm.image_url" class="mt-2 relative h-20 w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                        <img :src="blogForm.image_url" class="w-full h-full object-cover" />
+                        <button type="button" @click="blogForm.image_url = ''" class="absolute top-1 right-1 rounded-full bg-black/60 text-white h-5 w-5 flex items-center justify-center text-[10px] hover:bg-black/80 transition-colors">✕</button>
+                      </div>
                     </div>
                   </div>
 
