@@ -509,6 +509,10 @@ const saveBlogPost = async () => {
   }
   if (Object.keys(blogErrors.value).length > 0) return;
 
+  // Sync merged fields
+  blogForm.value.meta_description = blogForm.value.excerpt;
+  blogForm.value.meta_title = blogForm.value.title;
+
   const isEdit = blogForm.value.id !== null;
   const url = isEdit ? `/api/admin/blog/${blogForm.value.id}` : '/api/admin/blog';
   const method = isEdit ? 'PUT' : 'POST';
@@ -2163,15 +2167,32 @@ const faqs = [
                     </div>
                   </div>
 
-                  <!-- Row 2: Excerpt -->
-                  <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Tóm tắt ngắn (Excerpt)</label>
-                    <textarea 
-                      v-model="blogForm.excerpt" 
-                      rows="2"
-                      placeholder="Nhập tóm tắt ngắn hiển thị trên danh sách tin tức (dưới 500 ký tự)"
-                      class="w-full rounded-xl border border-slate-355 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
-                    ></textarea>
+                  <!-- Row 2: Excerpt & SEO Keywords -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
+                        Tóm tắt & Mô tả SEO
+                        <span class="font-normal text-slate-400"> — hiển thị trên Google & danh sách tin</span>
+                      </label>
+                      <textarea 
+                        v-model="blogForm.excerpt" 
+                        rows="2"
+                        placeholder="Nhập tóm tắt ngắn của bài viết (tối ưu khoảng 150-160 ký tự cho SEO)..."
+                        class="w-full rounded-xl border border-slate-355 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors resize-none"
+                      ></textarea>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
+                        Từ khóa SEO
+                        <span class="font-normal text-slate-400"> — cách nhau bằng dấu phẩy</span>
+                      </label>
+                      <textarea 
+                        v-model="blogForm.meta_keywords" 
+                        rows="2"
+                        placeholder="Ví dụ: facebook verification, tich xanh, az media..."
+                        class="w-full rounded-xl border border-slate-355 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors resize-none"
+                      ></textarea>
+                    </div>
                   </div>
 
                   <!-- Row 3: Content -->
@@ -2179,35 +2200,6 @@ const faqs = [
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Nội dung bài viết</label>
                     <RichTextEditor v-model="blogForm.content" :adminPasscode="adminPasscode" />
                     <p v-if="blogErrors.content" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ blogErrors.content }}</p>
-                  </div>
-
-
-                  <!-- Row 4: SEO compact -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
-                        Từ khóa SEO
-                        <span class="font-normal text-slate-400"> — cách nhau bằng dấu phẩy</span>
-                      </label>
-                      <input
-                        type="text"
-                        v-model="blogForm.meta_keywords"
-                        placeholder="tích xanh, facebook verified, az media..."
-                        class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
-                        Mô tả SEO
-                        <span class="font-normal text-slate-400"> — hiện trên Google, tối đa 160 ký tự</span>
-                      </label>
-                      <input
-                        type="text"
-                        v-model="blogForm.meta_description"
-                        placeholder="Mô tả ngắn hiển thị trên kết quả tìm kiếm..."
-                        class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
-                      />
-                    </div>
                   </div>
 
                   <!-- Footer Buttons inside form -->
