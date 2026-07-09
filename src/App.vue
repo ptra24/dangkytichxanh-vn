@@ -2181,42 +2181,32 @@ const faqs = [
                     <p v-if="blogErrors.content" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ blogErrors.content }}</p>
                   </div>
 
-                  <!-- Row 4: SEO Metadata Section -->
-                  <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-900/40 space-y-4">
-                    <div class="flex items-center gap-1.5 border-b border-slate-200 dark:border-slate-800 pb-2 mb-2">
-                      <Globe class="h-4 w-4 text-emerald-500" />
-                      <span class="text-xs font-black text-slate-850 dark:text-slate-200 uppercase tracking-wider">Cấu hình SEO Meta Tags</span>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meta Title (Tiêu đề SEO)</label>
-                        <input 
-                          type="text" 
-                          v-model="blogForm.meta_title" 
-                          placeholder="Mặc định sử dụng tiêu đề bài viết"
-                          class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meta Keywords (SEO Từ khóa)</label>
-                        <input 
-                          type="text" 
-                          v-model="blogForm.meta_keywords" 
-                          placeholder="Ví dụ: facebook verification, tich xanh, az media"
-                          class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
-                        />
-                      </div>
-                    </div>
-
+                  <!-- Row 4: SEO compact -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meta Description (Mô tả SEO)</label>
-                      <textarea 
-                        v-model="blogForm.meta_description" 
-                        rows="2"
-                        placeholder="Nhập mô tả SEO phục vụ kết quả tìm kiếm Google (dưới 500 ký tự)"
-                        class="w-full rounded-xl border border-slate-355 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
-                      ></textarea>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
+                        Từ khóa SEO
+                        <span class="font-normal text-slate-400"> — cách nhau bằng dấu phẩy</span>
+                      </label>
+                      <input
+                        type="text"
+                        v-model="blogForm.meta_keywords"
+                        placeholder="tích xanh, facebook verified, az media..."
+                        class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
+                        Mô tả SEO
+                        <span class="font-normal text-slate-400"> — hiện trên Google, tối đa 160 ký tự</span>
+                      </label>
+                      <input
+                        type="text"
+                        v-model="blogForm.meta_description"
+                        placeholder="Mô tả ngắn hiển thị trên kết quả tìm kiếm..."
+                        class="w-full rounded-xl border border-slate-350 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+                      />
                     </div>
                   </div>
 
