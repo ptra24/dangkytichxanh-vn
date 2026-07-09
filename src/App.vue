@@ -29,6 +29,7 @@ import Footer from './components/Footer.vue';
 import { services } from './data/services';
 import { articles as staticArticles } from './data/articles';
 import ArticleView from './components/ArticleView.vue';
+import RichTextEditor from './components/RichTextEditor.vue';
 
 const articles = ref([...staticArticles]);
 const currentServiceIndex = ref(0);
@@ -2129,13 +2130,8 @@ const faqs = [
 
                   <!-- Row 3: Content -->
                   <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Nội dung bài viết (Hỗ trợ HTML)</label>
-                    <textarea 
-                      v-model="blogForm.content" 
-                      rows="8"
-                      placeholder="Nhập nội dung bài viết chi tiết..."
-                      class="w-full rounded-xl border border-slate-355 dark:border-slate-800 bg-white dark:bg-[#060b13] px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none font-mono transition-colors"
-                    ></textarea>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Nội dung bài viết</label>
+                    <RichTextEditor v-model="blogForm.content" />
                     <p v-if="blogErrors.content" class="mt-1 text-[11px] text-rose-500 font-semibold">{{ blogErrors.content }}</p>
                   </div>
 
